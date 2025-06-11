@@ -6,4 +6,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Base\" />
+    <Folder Include="Interfaces\Repositories\User_manegement\" />
+    <Folder Include="Interfaces\Repositories\Services\" />
+    <Folder Include="Interfaces\Repositories\Reservation\" />
+    <Folder Include="Interfaces\Services\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SGRH.Domain\SGRH.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
