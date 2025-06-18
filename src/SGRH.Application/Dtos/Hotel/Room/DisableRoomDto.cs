@@ -1,0 +1,9 @@
+﻿
+namespace SGRH.Application.Dtos.Hotel.Room
+{
+    public record DisableRoomDto
+    {
+        public int RoomId { get; set; }
+        public string UpdatedBy { get; set; }
+    }
+}
