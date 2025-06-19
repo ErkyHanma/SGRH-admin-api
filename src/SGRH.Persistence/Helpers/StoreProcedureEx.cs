@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Npgsql;
-using NpgsqlTypes;
 using SGRH.Domain.Base;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Data;
 
 namespace SGRH.Persistence.Helpers
 {
@@ -19,34 +17,35 @@ namespace SGRH.Persistence.Helpers
 
             try
             {
-                // Setear la conexion y el comando en bd pasandole la conexion.
-                using var conn = new NpgsqlConnection(connectionString);
-                using var command = new NpgsqlCommand(procedureName, conn)
+                // Crear la conexión y el comando en BD pasándole la conexión.
+                using var connection = new NpgsqlConnection(connectionString);
+                using var command = new NpgsqlCommand(procedureName, connection)
                 {
-                    CommandType = System.Data.CommandType.StoredProcedure
+                    CommandType = CommandType.StoredProcedure
                 };
 
-                // Bucle. Agrega nombre del parametro + valor real en base al diccionario, (Acepta nulls).
-                foreach (var kv in parameters)
+                // Bucle. Agrega nombre del parámetro + valor real en base al diccionario (acepta nulls).
+                foreach (var parameter in parameters)
                 {
-                    command.Parameters.AddWithValue(kv.Key, kv.Value ?? DBNull.Value);
+                    command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
                 }
 
-                // Crear parametro de salida y agregar al comando 
-                var pResult = new NpgsqlParameter("presult", NpgsqlDbType.Varchar)
+                // Crear parámetro de salida y agregar al comando.
+                var pResult = new NpgsqlParameter("presult", NpgsqlTypes.NpgsqlDbType.Text)
                 {
-                    Size = 1000,
-                    Direction = System.Data.ParameterDirection.Output
+                    Direction = ParameterDirection.Output
                 };
+
                 command.Parameters.Add(pResult);
 
-                // Abrir conexion y esperar
-                await conn.OpenAsync();
-                var affected = await command.ExecuteNonQueryAsync();
+                // Abrir conexión y esperar
+                await connection.OpenAsync();
+                var affectedRows = await command.ExecuteNonQueryAsync();
+
                 var message = pResult.Value?.ToString() ?? "No message";
 
-                // Verificar resultado (careful)
-                if (affected > 0)
+                // Verificar resultado
+                if (affectedRows > 0)
                 {
                     result = OperationResult<string>.Success(message);
                 }
@@ -69,3 +68,5 @@ namespace SGRH.Persistence.Helpers
     }
 
 }
+
+

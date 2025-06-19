@@ -1,21 +1,11 @@
 ﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
-using Npgsql;
-using NpgsqlTypes;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Interfaces.Repositories.Hotel; // Cuidado con esto?
 using SGRH.Domain.Base; // Cuidado con esto?
 using SGRH.Persistence.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
-namespace SGRH.Persistence.Repositories
+namespace SGRH.Persistence.Repositories.Hotel
 {
     // Logs (!)
     public class RoomRepository : IRoomRepository
@@ -120,7 +110,7 @@ namespace SGRH.Persistence.Repositories
 
             if (!validationResult.IsValid)
             {
-                var message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)); 
+                var message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
                 _logger.LogWarning("Validation failed: {Message}", message);
                 return OperationResult<ModifyRoomDto>.Failure(message);
             }
