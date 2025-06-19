@@ -5,8 +5,6 @@ namespace SGRH.Application.Interfaces.Repositories.Hotel
 {
     public interface IRoomRepository
     {
-        //Arreglados, faltan Dtos 
-
         Task<OperationResult<IEnumerable<RoomDto>>> GetAllAsync();
         Task<OperationResult<RoomDto>> GetByIdAsync(int id);
         Task<OperationResult<CreateRoomDto>> AddAsync(CreateRoomDto createRoomDto);
