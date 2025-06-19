@@ -5,8 +5,8 @@ namespace SGRH.Application.Interfaces.Repositories.ReservationModule
 {
     public interface IReservationServiceRepository
     {
-        public Task<OperationResult> AddAsync(CreateReservationServiceDto createReservationServiceDto);
-        public Task<OperationResult> DeleteAsync(DeleteReservationServiceDto deleteReservationServiceDto);
+        public Task<OperationResult<CreateReservationServiceDto>> AddAsync(CreateReservationServiceDto createReservationServiceDto);
+        public Task<OperationResult<DeleteReservationServiceDto>> DeleteAsync(DeleteReservationServiceDto deleteReservationServiceDto);
 
     }
 }

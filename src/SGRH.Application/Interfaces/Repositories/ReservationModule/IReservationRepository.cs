@@ -5,11 +5,11 @@ namespace SGRH.Application.Interfaces.Repositories.ReservationModule
 {
     public interface IReservationRepository
     {
-        Task<OperationResult> GetAllAsync();
-        Task<OperationResult> GetByIdAsync(int id);
-        Task<OperationResult> AddAsync(CreateReservationDto createReservationDto);
-        Task<OperationResult> UpdateAsync(UpdateReservationDto updateReservationDto);
-        Task<OperationResult> DeleteAsync(DisableReservationDto disableReservationDto);
-        Task<OperationResult> CheckAvailability(CheckRoomAvailabilityResultDto checkRoomAvailabilityResultDto);
+        Task<OperationResult<IEnumerable<ReservationDto>>> GetAllAsync();
+        Task<OperationResult<ReservationDto>> GetByIdAsync(int id);
+        Task<OperationResult<CreateReservationDto>> AddAsync(CreateReservationDto createReservationDto);
+        Task<OperationResult<UpdateReservationDto>> UpdateAsync(UpdateReservationDto updateReservationDto);
+        Task<OperationResult<DisableReservationDto>> DeleteAsync(DisableReservationDto disableReservationDto);
+        Task<OperationResult<CheckRoomAvailabilityResultDto>> CheckAvailability(CheckRoomAvailabilityResultDto checkRoomAvailabilityResultDto);
     }
 }
