@@ -10,6 +10,6 @@ namespace SGRH.Application.Dtos.Hotel.Room
         public string? Description { get; set; }
         public string? RoomImgUrl { get; set; }
         public string Status { get; set; }
-        public string UpdatedBy { get; set; }
+        public int UpdatedBy { get; set; }
     }
 }
