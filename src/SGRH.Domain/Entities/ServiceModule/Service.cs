@@ -1,6 +1,6 @@
 ﻿using SGRH.Domain.Base;
 
-namespace SGRH.Domain.Entities.Services
+namespace SGRH.Domain.Entities.ServiceModule
 {
     public class Service : AuditEntity
     {

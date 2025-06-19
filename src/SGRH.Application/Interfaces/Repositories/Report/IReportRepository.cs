@@ -1,13 +1,14 @@
-﻿using SGRH.Domain.Base;
+﻿using SGRH.Application.Dtos.Report;
+using SGRH.Domain.Base;
 
 namespace SGRH.Application.Interfaces.Repositories.Report
 {
     public interface IReportRepository
     {
-        Task<OperationResult> GetOcuppancyReportAsync(DateTime startDate, DateTime endDate);
-        Task<OperationResult> GetRevenueReportAsync(DateTime startDate, DateTime endDate);
-        Task<OperationResult> GetRatesReportAsync(DateTime startDate, DateTime endDate);
-        Task<OperationResult> GetServiceRevenueReportAsync(int? categoryId = null);
+        Task<OperationResult<OcuppancyReportDto>> GetOcuppancyReportAsync(DateTime startDate, DateTime endDate);
+        Task<OperationResult<RevenueReportDto>> GetRevenueReportAsync(DateTime startDate, DateTime endDate);
+        Task<OperationResult<RatesReportDto>> GetRatesReportAsync(DateTime startDate, DateTime endDate);
+        Task<OperationResult<ServiceRevenueReportDto>> GetServiceRevenueReportAsync(int? categoryId = null);
 
         // To export
 

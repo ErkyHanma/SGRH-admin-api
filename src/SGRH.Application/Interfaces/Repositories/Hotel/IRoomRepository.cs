@@ -3,18 +3,20 @@ using SGRH.Domain.Base;
 
 namespace SGRH.Application.Interfaces.Repositories.Hotel
 {
-    public interface IRoomRepository 
+    public interface IRoomRepository
     {
         //Arreglados, faltan Dtos 
 
-        Task<OperationResult> GetAllAsync();
-        Task<OperationResult> GetByIdAsync(int id);
-        Task<OperationResult> AddAsync(CreateRoomDto createRoomDto);
-        Task<OperationResult> UpdateAsync(ModifyRoomDto modifyRoomDto);
-        Task<OperationResult> DeleteAsync(DisableRoomDto disableRoomDto);
-        
+        Task<OperationResult<IEnumerable<RoomDto>>> GetAllAsync();
+        Task<OperationResult<RoomDto>> GetByIdAsync(int id);
+        Task<OperationResult<CreateRoomDto>> AddAsync(CreateRoomDto createRoomDto);
+        Task<OperationResult<ModifyRoomDto>> UpdateAsync(ModifyRoomDto modifyRoomDto);
+        Task<OperationResult<DisableRoomDto>> DeleteAsync(DisableRoomDto disableRoomDto);
+
         //Task<OperationResult> GetAllAsync(Expression<Func<TEntity, bool>> filter);
         //Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter);
 
     }
 }
+
+

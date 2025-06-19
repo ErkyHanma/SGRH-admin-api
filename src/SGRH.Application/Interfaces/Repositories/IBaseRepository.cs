@@ -5,12 +5,13 @@ namespace SGRH.Application.Interfaces.Repositories
 {
     public interface IBaseRepository<TEntity> where TEntity : class
     {
-        Task<OperationResult> GetAllAsync();
-        Task<OperationResult> GetByIdAsync(int id);
-        Task<OperationResult> AddAsync(TEntity entity);
-        Task<OperationResult> UpdateAsync(TEntity entity);
-        Task<OperationResult> DeleteAsync(TEntity entity);
-        Task<OperationResult> GetAllAsync(Expression<Func<TEntity, bool>> filter);
+        Task<OperationResult<TEntity>> GetAllAsync();
+        Task<OperationResult<TEntity>> GetByIdAsync(int id);
+        Task<OperationResult<TEntity>> AddAsync(TEntity entity);
+        Task<OperationResult<TEntity>> UpdateAsync(TEntity entity);
+        Task<OperationResult<TEntity>> DeleteAsync(TEntity entity);
+        Task<OperationResult<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter);
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter);
     }
 }
+

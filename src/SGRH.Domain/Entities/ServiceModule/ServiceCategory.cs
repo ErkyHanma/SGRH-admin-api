@@ -1,4 +1,4 @@
-﻿namespace SGRH.Domain.Entities.Services
+﻿namespace SGRH.Domain.Entities.ServiceModule
 {
     public class ServiceCategory
     {

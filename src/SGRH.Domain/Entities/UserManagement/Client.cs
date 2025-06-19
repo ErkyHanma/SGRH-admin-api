@@ -1,6 +1,6 @@
 ﻿using SGRH.Domain.Base;
 
-namespace SGRH.Domain.Entities.User_management
+namespace SGRH.Domain.Entities.UserManagement
 {
     public class Client : Person
     {

@@ -8,13 +8,11 @@
 
   <ItemGroup>
     <Folder Include="Base\" />
-    <Folder Include="Dtos\User_management\" />
-    <Folder Include="Dtos\Services\" />
-    <Folder Include="Dtos\Reservation\" />
-    <Folder Include="Interfaces\Repositories\User_manegement\" />
-    <Folder Include="Interfaces\Repositories\Services\" />
+    <Folder Include="Dtos\UserManagement\" />
+    <Folder Include="Dtos\ServiceModule\" />
+    <Folder Include="Interfaces\Repositories\UserManagement\" />
+    <Folder Include="Interfaces\Repositories\ServiceModule\" />
     <Folder Include="Interfaces\Services\" />
-    <Folder Include="Dtos\" />
     <Folder Include="Services\" />
   </ItemGroup>
 
