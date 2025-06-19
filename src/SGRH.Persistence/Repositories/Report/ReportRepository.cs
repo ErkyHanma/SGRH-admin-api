@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGRH.Persistence.Repositories
+namespace SGRH.Persistence.Repositories.Report
 {
     public class ReportRepository : IReportRepository
     {
