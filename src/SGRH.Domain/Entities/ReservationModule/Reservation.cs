@@ -1,6 +1,6 @@
 ﻿using SGRH.Domain.Base;
 
-namespace SGRH.Domain.Entities.Reservations
+namespace SGRH.Domain.Entities.ReservationModule
 {
     public class Reservation : AuditEntity
     {
