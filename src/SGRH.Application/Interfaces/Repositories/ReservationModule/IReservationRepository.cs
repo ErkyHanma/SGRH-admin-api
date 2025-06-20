@@ -5,7 +5,7 @@ namespace SGRH.Application.Interfaces.Repositories.ReservationModule
 {
     public interface IReservationRepository
     {
-        Task<OperationResult<List<ReservationDto>>> GetAllAsync();
+        Task<OperationResult<IEnumerable<ReservationDto>>> GetAllAsync();
         Task<OperationResult<ReservationDto>> GetByIdAsync(int id);
         Task<OperationResult<CreateReservationDto>> AddAsync(CreateReservationDto createReservationDto);
         Task<OperationResult<UpdateReservationDto>> UpdateAsync(UpdateReservationDto updateReservationDto);

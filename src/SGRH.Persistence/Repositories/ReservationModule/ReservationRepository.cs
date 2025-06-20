@@ -18,7 +18,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             _logger = logger;
         }
 
-        public async Task<OperationResult<List<ReservationDto>>> GetAllAsync()
+        public async Task<OperationResult<IEnumerable<ReservationDto>>> GetAllAsync()
         {
             var reservations = new List<ReservationDto>();
             try
@@ -60,15 +60,15 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
                 if (reservations.Count == 0)
                 {
-                    return OperationResult<List<ReservationDto>>.Failure("No reservations found");
+                    return OperationResult<IEnumerable<ReservationDto>>.Failure("No reservations found");
                 }
 
-                return OperationResult<List<ReservationDto>>.Success("Reservations retrieved successfully", reservations);
+                return OperationResult<IEnumerable<ReservationDto>>.Success("Reservations retrieved successfully", reservations);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving reservations");
-                return OperationResult<List<ReservationDto>>.Failure("Error retrieving reservations");
+                return OperationResult<IEnumerable<ReservationDto>>.Failure("Error retrieving reservations");
             }
         }
         public async Task<OperationResult<ReservationDto>> GetByIdAsync(int id)
@@ -102,7 +102,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
                                     PaymentAmount = reader.GetDecimal(reader.GetOrdinal("payment_amount")),
                                     ServicesCount = reader.GetInt32(reader.GetOrdinal("services_count")),
                                     TotalServicesCost = reader.GetDecimal(reader.GetOrdinal("total_services_cost")),
-                                    ServiceNames = reader.IsDBNull(reader.GetOrdinal("service_names")) ? " : reader.GetString(reader.GetOrdinal("service_names")),
+                                    ServiceNames = reader.IsDBNull(reader.GetOrdinal("service_names")) ? "" : reader.GetString(reader.GetOrdinal("service_names")),
                                     CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                                     UpdatedAt = reader.GetDateTime(reader.GetOrdinal("updated_at")),
 
