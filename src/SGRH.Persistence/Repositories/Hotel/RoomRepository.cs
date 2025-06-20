@@ -96,12 +96,76 @@ namespace SGRH.Persistence.Repositories.Hotel
 
         public async Task<OperationResult<IEnumerable<RoomDto>>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                //Captura de variables.
+
+                var data = await FunctionReaderEx.CallFunctionAsync(
+                    _connectionString,
+                    "SELECT * FROM hotel.GetRooms()",
+                    reader => new RoomDto
+                    {
+                        RoomId = reader.GetInt32(reader.GetOrdinal("room_id")),
+                        RoomNumber = reader.GetString(reader.GetOrdinal("room_number")),
+                        CategoryId = reader.GetInt32(reader.GetOrdinal("category_id")),
+                        FloorId = reader.GetInt32(reader.GetOrdinal("floor_id")),
+                        Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString(reader.GetOrdinal("description")),
+                        RoomImgUrl = reader.IsDBNull(reader.GetOrdinal("room_img_url")) ? null : reader.GetString(reader.GetOrdinal("room_img_url")),
+                        Status = reader.GetString(reader.GetOrdinal("status")),
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
+                        CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by"))
+                    });
+
+                return OperationResult<IEnumerable<RoomDto>>.Success("Habitaciones obtenidas correctamente", data);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en GetAllAsync()");
+                return OperationResult<IEnumerable<RoomDto>>.Failure("Error al obtener habitaciones.");
+            }
         }
 
         public async Task<OperationResult<RoomDto>> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                //Captura de variables + diccionario para buscar por ID.
+
+                var data = await FunctionReaderEx.CallFunctionAsync(
+                    _connectionString,
+                    "SELECT * FROM hotel.GetRoomsById(@p_room_id)",
+                    reader => new RoomDto
+                    {
+                        RoomId = reader.GetInt32(reader.GetOrdinal("room_id")),
+                        RoomNumber = reader.GetString(reader.GetOrdinal("room_number")),
+                        CategoryId = reader.GetInt32(reader.GetOrdinal("category_id")),
+                        FloorId = reader.GetInt32(reader.GetOrdinal("floor_id")),
+                        Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString(reader.GetOrdinal("description")),
+                        RoomImgUrl = reader.IsDBNull(reader.GetOrdinal("room_img_url")) ? null : reader.GetString(reader.GetOrdinal("room_img_url")),
+                        Status = reader.GetString(reader.GetOrdinal("status")),
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
+                        CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by"))
+                    },
+                    new Dictionary<string, object>
+                    {
+                        { "p_room_id", id }
+                    });
+
+                //Validaciones
+
+                if (!data.Any())
+                {
+                    return OperationResult<RoomDto>.Failure("Habitación no encontrada");
+                }
+
+                return OperationResult<RoomDto>.Success("Habitación obtenida correctamente", data.First());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en GetByIdAsync()");
+                return OperationResult<RoomDto>.Failure("Error al obtener habitación.");
+            }
         }
 
         public async Task<OperationResult<ModifyRoomDto>> UpdateAsync(ModifyRoomDto modifyRoomDto)
