@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SGRH.Persistence.Helpers
 {
-    public static class FunctionReaderEx
+    public static class FunctionReaderEx 
     {
         public static async Task<List<T>> CallFunctionAsync<T>(
             string connectionString,
@@ -23,16 +23,17 @@ namespace SGRH.Persistence.Helpers
                 using var connection = new NpgsqlConnection(connectionString);
                 await connection.OpenAsync();
 
-                using var command = new NpgsqlCommand(functionName, connection)
+                using var command = new NpgsqlCommand(functionName, connection) 
                 {
-                    CommandType = CommandType.Text
+                    CommandType = CommandType.Text // Definimos como .Text a falta de una alternativa para funciones
                 };
 
                 if (parameters != null)
                 {
                     foreach (var parameter in parameters)
                     {
-                        command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
+                        var npgsqlParam = CreateNpgsqlParameter(parameter.Key, parameter.Value); //Llamamos a la funcion
+                        command.Parameters.Add(npgsqlParam);
                     }
                 }
 
@@ -49,9 +50,36 @@ namespace SGRH.Persistence.Helpers
             }
             catch (Exception ex) 
             {
-                throw new Exception($"Error ejecutando la función SQL: {ex.Message}", ex);
+                throw new Exception($"Error executing SQL function: {ex.Message}", ex);
+            }
+        }
+        // Esta funcion nos permite asignar un tipo explicito como parametro de entrada para la funcion BD 
+        private static NpgsqlParameter CreateNpgsqlParameter(string name, object? value)
+        {
+            var parameter = new NpgsqlParameter(name, value ?? DBNull.Value); // Crear parametro de consulta (maneja null)
+            
+            if (value is DateTime)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Date;
+            }
+            else if (value is int)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Integer;
+            }
+            else if (value is decimal)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Numeric;
+            }
+            else if (value is bool)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Boolean;
+            }
+            else if (value is string)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Varchar;
             }
 
+            return parameter;
         }
 
     }

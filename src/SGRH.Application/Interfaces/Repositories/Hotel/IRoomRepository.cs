@@ -11,9 +11,6 @@ namespace SGRH.Application.Interfaces.Repositories.Hotel
         Task<OperationResult<ModifyRoomDto>> UpdateAsync(ModifyRoomDto modifyRoomDto);
         Task<OperationResult<DisableRoomDto>> DeleteAsync(DisableRoomDto disableRoomDto);
 
-        //Task<OperationResult> GetAllAsync(Expression<Func<TEntity, bool>> filter);
-        //Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter);
-
     }
 }
 
