@@ -1,22 +1,25 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
-using SGRH.Application.Interfaces.Repositories.Hotel; // Cuidado con esto?
-using SGRH.Domain.Base; // Cuidado con esto?
+using SGRH.Application.Interfaces.Repositories.Hotel; 
+using SGRH.Domain.Base;
+using SGRH.Persistence.Common.Loggers.Interfaces;
 using SGRH.Persistence.Helpers;
 
 namespace SGRH.Persistence.Repositories.Hotel
 {
-    // Logs (!)
     public class RoomRepository : IRoomRepository
     {
         private readonly string _connectionString;
-        private readonly ILogger<RoomRepository> _logger;
+        private readonly IAppLogger<RoomRepository> _logger;
         private readonly IValidator<CreateRoomDto> _createValidator;
         private readonly IValidator<ModifyRoomDto> _modifyValidator;
         private readonly IValidator<DisableRoomDto> _disableValidator;
 
-        public RoomRepository(string connetionString, ILogger<RoomRepository> logger, IValidator<CreateRoomDto> createValidator, IValidator<ModifyRoomDto> modifyValidator, IValidator<DisableRoomDto> disableValidator)
+        public RoomRepository(string connetionString, IAppLogger<RoomRepository> logger, 
+                              IValidator<CreateRoomDto> createValidator, 
+                              IValidator<ModifyRoomDto> modifyValidator, 
+                              IValidator<DisableRoomDto> disableValidator)
         {
             _connectionString = connetionString;
             _logger = logger;
@@ -27,80 +30,105 @@ namespace SGRH.Persistence.Repositories.Hotel
 
         public async Task<OperationResult<CreateRoomDto>> AddAsync(CreateRoomDto createRoomDto)
         {
-            var validationResult = _createValidator.Validate(createRoomDto);
-
-            if (!validationResult.IsValid) // (Futura mejora?)
+            try
             {
-                var message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)); // Cadena de errores
-                _logger.LogWarning("Validation failed: {Message}", message);
-                return OperationResult<CreateRoomDto>.Failure(message);
+                // Validaciones
+                var validationResult = _createValidator.Validate(createRoomDto);
+
+                // En caso de ser invalidas
+                if (!validationResult.IsValid)
+                    return HandleValidationFailure<CreateRoomDto>(validationResult);
+
+                // Logear
+
+                _logger.Info("Creating Room {RoomNumber}", createRoomDto.RoomNumber);
+
+                // Definir parametros
+
+                var parameters = new Dictionary<string, object>
+                {
+                    {"p_room_number", createRoomDto.RoomNumber },
+                    { "p_category_id", createRoomDto.CategoryId },
+                    { "p_floor_id", createRoomDto.FloorId },
+                    { "p_description", createRoomDto.Description },
+                    { "p_room_img_url", createRoomDto.RoomImgUrl },
+                    { "p_status", createRoomDto.Status },
+                    { "p_created_by", createRoomDto.CreatedBy }
+                };
+
+                // Llamar StoreProcedureEx (Ahi se encuentra la logica de los Store Procedures)
+
+                var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync<RoomRepository>(
+                    _connectionString,
+                    "hotel.CreateRoom",
+                    parameters,
+                    _logger
+                );
+
+                // Validar 
+
+                if (StoredProcedureResult.IsSuccess)
+                {
+                    return OperationResult<CreateRoomDto>.Success(StoredProcedureResult.Message, createRoomDto);
+                }
+                else
+                {
+                    return OperationResult<CreateRoomDto>.Failure(StoredProcedureResult.Message);
+                }
             }
-
-            _logger.LogInformation("Creating Room {RoomNumber}", createRoomDto.RoomNumber);
-
-
-            var parameters = new Dictionary<string, object>
+            catch (Exception ex) 
             {
-                {"p_room_number", createRoomDto.RoomNumber },
-                { "p_category_id", createRoomDto.CategoryId },
-                { "p_floor_id", createRoomDto.FloorId },
-                { "p_description", createRoomDto.Description },
-                { "p_room_img_url", createRoomDto.RoomImgUrl },
-                { "p_status", createRoomDto.Status },
-                { "p_created_by", createRoomDto.CreatedBy }
-            };
-
-            var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync(
-                _connectionString,
-                "hotel.CreateRoom",
-                parameters,
-                _logger
-            );
-
-            if (StoredProcedureResult.IsSuccess)
-            {
-                return OperationResult<CreateRoomDto>.Success(StoredProcedureResult.Message, createRoomDto);
-            }
-            else
-            {
-                return OperationResult<CreateRoomDto>.Failure(StoredProcedureResult.Message);
+                _logger.ErrorEx(ex, "Exception thrown during AddAsync()");
+                return OperationResult<CreateRoomDto>.Failure("An error occurred while creating the room.");
             }
         }
 
         public async Task<OperationResult<DisableRoomDto>> DeleteAsync(DisableRoomDto disableRoomDto)
         {
-            _logger.LogInformation("Disabling Room ID {RoomId}", disableRoomDto.RoomId);
-
-            var parameters = new Dictionary<string, object>
+            try
             {
-                { "p_room_id", disableRoomDto.RoomId },
-                { "p_updated_by", disableRoomDto.UpdatedBy }
-            };
+                var validationResult = _disableValidator.Validate(disableRoomDto);
 
-            var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync(
-                _connectionString,
-                "hotel.DisableRoom",
-                parameters,
-                _logger
-            );
+                if (!validationResult.IsValid)
+                    return HandleValidationFailure<DisableRoomDto>(validationResult);
 
-            if (StoredProcedureResult.IsSuccess)
-            {
-                return OperationResult<DisableRoomDto>.Success(StoredProcedureResult.Message, disableRoomDto);
+                _logger.Info("Disabling Room ID {RoomId}", disableRoomDto.RoomId);
+
+                var parameters = new Dictionary<string, object>
+                {
+                    { "p_room_id", disableRoomDto.RoomId },
+                    { "p_updated_by", disableRoomDto.UpdatedBy }
+                };
+
+                var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync<RoomRepository>(
+                    _connectionString,
+                    "hotel.DisableRoom",
+                    parameters,
+                    _logger
+                );
+
+                if (StoredProcedureResult.IsSuccess)
+                {
+                    return OperationResult<DisableRoomDto>.Success(StoredProcedureResult.Message, disableRoomDto);
+                }
+                else
+                {
+                    return OperationResult<DisableRoomDto>.Failure(StoredProcedureResult.Message);
+                }
             }
-            else
+            catch (Exception ex) 
             {
-                return OperationResult<DisableRoomDto>.Failure(StoredProcedureResult.Message);
+                _logger.ErrorEx(ex, "Exception thrown during DeleteAsync()");
+                return OperationResult<DisableRoomDto>.Failure("An error occurred while disabling the room.");
             }
+           
         }
 
         public async Task<OperationResult<IEnumerable<RoomDto>>> GetAllAsync()
         {
             try
             {
-                //Captura de variables.
-
-                var data = await FunctionReaderEx.CallFunctionAsync(
+                var data = await FunctionReaderEx.CallFunctionAsync( // Datos
                     _connectionString,
                     "SELECT * FROM hotel.GetRooms()",
                     reader => new RoomDto
@@ -116,13 +144,13 @@ namespace SGRH.Persistence.Repositories.Hotel
                         CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by"))
                     });
 
-                return OperationResult<IEnumerable<RoomDto>>.Success("Habitaciones obtenidas correctamente", data);
+                return OperationResult<IEnumerable<RoomDto>>.Success("Rooms obtained successfully.", data);
 
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error en GetAllAsync()");
-                return OperationResult<IEnumerable<RoomDto>>.Failure("Error al obtener habitaciones.");
+                _logger.ErrorEx(ex, "Error in GetAllAsync()");
+                return OperationResult<IEnumerable<RoomDto>>.Failure("Error obtaining rooms.");
             }
         }
 
@@ -130,9 +158,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                //Captura de variables + diccionario para buscar por ID.
-
-                var data = await FunctionReaderEx.CallFunctionAsync(
+                var data = await FunctionReaderEx.CallFunctionAsync( // Datos + uso de diccionario para buscar por ID
                     _connectionString,
                     "SELECT * FROM hotel.GetRoomsById(@p_room_id)",
                     reader => new RoomDto
@@ -156,59 +182,77 @@ namespace SGRH.Persistence.Repositories.Hotel
 
                 if (!data.Any())
                 {
-                    return OperationResult<RoomDto>.Failure("Habitación no encontrada");
+                    return OperationResult<RoomDto>.Failure("Room not found");
                 }
 
-                return OperationResult<RoomDto>.Success("Habitación obtenida correctamente", data.First());
+                return OperationResult<RoomDto>.Success("Room obtained successfully", data.First());
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error en GetByIdAsync()");
-                return OperationResult<RoomDto>.Failure("Error al obtener habitación.");
+                _logger.ErrorEx(ex, "Error in GetByIdAsync()");
+                return OperationResult<RoomDto>.Failure("Error obtaining room.");
             }
         }
 
         public async Task<OperationResult<ModifyRoomDto>> UpdateAsync(ModifyRoomDto modifyRoomDto)
         {
-            var validationResult = _modifyValidator.Validate(modifyRoomDto);
-
-            if (!validationResult.IsValid)
+            try
             {
-                var message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                _logger.LogWarning("Validation failed: {Message}", message);
-                return OperationResult<ModifyRoomDto>.Failure(message);
+                var validationResult = _modifyValidator.Validate(modifyRoomDto);
+
+                if (!validationResult.IsValid)
+                    return HandleValidationFailure<ModifyRoomDto>(validationResult);
+
+                _logger.Info("Updating Room {RoomNumber}", modifyRoomDto.RoomNumber);
+
+                var parameters = new Dictionary<string, object>
+                {
+                    { "p_room_id", modifyRoomDto.RoomId },
+                    { "p_room_number", modifyRoomDto.RoomNumber },
+                    { "p_category_id", modifyRoomDto.CategoryId },
+                    { "p_floor_id", modifyRoomDto.FloorId },
+                    { "p_description", modifyRoomDto.Description },
+                    { "p_room_img_url", modifyRoomDto.RoomImgUrl },
+                    { "p_status", modifyRoomDto.Status },
+                    { "p_updated_by", modifyRoomDto.UpdatedBy }
+                };
+
+                var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync<RoomRepository>(
+                    _connectionString,
+                    "hotel.ModifyRoom",
+                    parameters,
+                    _logger
+                );
+
+                if (StoredProcedureResult.IsSuccess)
+                {
+                    return OperationResult<ModifyRoomDto>.Success(StoredProcedureResult.Message, modifyRoomDto);
+                }
+                else
+                {
+                    return OperationResult<ModifyRoomDto>.Failure(StoredProcedureResult.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                {
+                    _logger.ErrorEx(ex, "Exception thrown during UpdateAsync()");
+                    return OperationResult<ModifyRoomDto>.Failure("An error occurred while updating the room.");
+                }
+
             }
 
-            _logger.LogInformation("Updating Room {RoomNumber}", modifyRoomDto.RoomNumber);
+        }
 
-            var parameters = new Dictionary<string, object>
-            {
-                { "p_room_id", modifyRoomDto.RoomId },
-                { "p_room_number", modifyRoomDto.RoomNumber },
-                { "p_category_id", modifyRoomDto.CategoryId },
-                { "p_floor_id", modifyRoomDto.FloorId },
-                { "p_description", modifyRoomDto.Description },
-                { "p_room_img_url", modifyRoomDto.RoomImgUrl },
-                { "p_status", modifyRoomDto.Status },
-                { "p_updated_by", modifyRoomDto.UpdatedBy }
-            };
-
-            var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync(
-                _connectionString,
-                "hotel.ModifyRoom",
-                parameters,
-                _logger
-            );
-
-            if (StoredProcedureResult.IsSuccess)
-            {
-                return OperationResult<ModifyRoomDto>.Success(StoredProcedureResult.Message, modifyRoomDto);
-            }
-            else
-            {
-                return OperationResult<ModifyRoomDto>.Failure(StoredProcedureResult.Message);
-            }
+        // Se llama este metodo en caso de validaciones fallidas
+        private OperationResult<TDto> HandleValidationFailure<TDto>(FluentValidation.Results.ValidationResult validationResult)
+        {
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage); // Mensajes de error
+            var message = string.Join("; ", errors); // Los apila en cadena
+            _logger.ErrorNoEx("Validation failed: {Message}", message);
+            return OperationResult<TDto>.Failure(message);
         }
 
     }
+
 }
