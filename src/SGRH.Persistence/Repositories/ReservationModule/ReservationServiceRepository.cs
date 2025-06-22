@@ -1,4 +1,5 @@
 ﻿using SGRH.Application.Dtos.ReservationModule.ReservationService;
+using SGRH.Application.Dtos.ReservationModule.ReservationService.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Common.Loggers.Interfaces;
@@ -22,6 +23,14 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         public async Task<OperationResult<CreateReservationServiceDto>> AddAsync(CreateReservationServiceDto createReservationServiceDto)
         {
             _logger.Info("Add service for a reservation");
+
+            // Validation
+            var validationResult = CreateReservationServiceDtoValidator.Validate(createReservationServiceDto);
+
+            if (!validationResult.IsSuccess)
+            {
+                return validationResult;
+            }
 
             var parameters = new Dictionary<string, object>()
             {
@@ -49,6 +58,14 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         public async Task<OperationResult<DeleteReservationServiceDto>> DeleteAsync(DeleteReservationServiceDto deleteReservationServiceDto)
         {
             _logger.Info("Remove service for a reservation");
+
+            // Validation
+            var validationResult = DeleteReservationServiceDtoValidator.Validate(deleteReservationServiceDto);
+
+            if (!validationResult.IsSuccess)
+            {
+                return validationResult;
+            }
 
             var parameters = new Dictionary<string, object>()
             {

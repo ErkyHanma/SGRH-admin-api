@@ -1,5 +1,5 @@
-﻿using Npgsql;
-using SGRH.Application.Dtos.ReservationModule.Reservation;
+﻿using SGRH.Application.Dtos.ReservationModule.Reservation;
+using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Common.Loggers.Interfaces;
@@ -23,6 +23,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             try
             {
                 _logger.Info("Getting all Reservations");
+
 
                 var reservations = await FunctionReaderEx.CallFunctionAsync(
                     _connectionString,
@@ -63,6 +64,13 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             try
             {
                 _logger.Info($"Getting reservation {id}");
+
+                if (id <= 0)
+                {
+                    _logger.ErrorNoEx($"Trying to find reservation with invalid id {id}.");
+                    return OperationResult<ReservationDto>.Failure("Invalid reservation ID");
+                }
+
 
                 var reservation = await FunctionReaderEx.CallFunctionAsync(
                     _connectionString,
@@ -109,6 +117,15 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
             _logger.Info($"Creating Reservation for client {createReservationDto.ClientId}");
 
+            // Validation
+            var validationResult = CreateReservationDtoValidator.Validate(createReservationDto);
+
+            if (!validationResult.IsSuccess)
+            {
+                _logger.ErrorNoEx($"Validation failed for CreateReservationDto");
+                return validationResult;
+            }
+
             var parameters = new Dictionary<string, object>
             {
                 {"p_client_id", createReservationDto.ClientId },
@@ -139,6 +156,15 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         public async Task<OperationResult<UpdateReservationDto>> UpdateAsync(UpdateReservationDto updateReservationDto)
         {
             _logger.Info($"Update reservation {updateReservationDto.ReservationId}");
+
+            // Validation
+            var validationResult = UpdateReservationDtoValidator.Validate(updateReservationDto);
+
+            if (!validationResult.IsSuccess)
+            {
+                _logger.ErrorNoEx($"Validation failed for UpdateReservationDto");
+                return validationResult;
+            }
 
             var parameters = new Dictionary<string, object>()
             {
@@ -172,6 +198,15 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         {
             _logger.Info($"Disable reservation {disableReservationDto.ReservationId}");
 
+            // Validation
+            var validationResult = DisableReservationDtoValidator.Validate(disableReservationDto);
+
+            if (!validationResult.IsSuccess)
+            {
+                _logger.ErrorNoEx($"Validation failed for DisableReservationDto");
+                return validationResult;
+            }
+
             var parameters = new Dictionary<string, object>()
             {
                 {"p_reservation_id", disableReservationDto.ReservationId},
@@ -196,47 +231,55 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
 
         }
-        public async Task<OperationResult<CheckRoomAvailabilityResultDto>> CheckAvailability(int RoomId, DateTime StartDate, DateTime EndDate)
+        public async Task<OperationResult<CheckRoomAvailabilityResultDto>> CheckAvailability(int roomId, DateTime startDate, DateTime endDate)
         {
+
+            if (roomId <= 0)
+            {
+                _logger.ErrorNoEx($"Invalid room ID: {roomId}");
+                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("Room ID must be greater than zero.");
+            }
+
+            if (startDate >= endDate)
+            {
+                _logger.ErrorNoEx($"Invalid date range: startDate={startDate}, endDate={endDate}");
+                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("Start date must be before end date.");
+            }
 
             try
             {
-                _logger.Info($"Checking room {RoomId}");
+                _logger.Info($"Checking availability for room {roomId} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd}");
 
-                using (var context = new NpgsqlConnection(_connectionString))
-                {
-                    await context.OpenAsync();
-
-                    using (var command = new NpgsqlCommand("SELECT * from reservationModule.CheckRoomAvailability(@p_room_id, @p_start_date, @p_end_date)", context))
+                var result = await FunctionReaderEx.CallFunctionAsync(
+                    _connectionString,
+                    "SELECT * FROM reservationModule.CheckRoomAvailability(@p_room_id, @p_start_date, @p_end_date)",
+                    reader => new CheckRoomAvailabilityResultDto
                     {
-                        command.Parameters.AddWithValue("@p_room_id", RoomId);
-                        command.Parameters.AddWithValue("@p_start_date", StartDate);
-                        command.Parameters.AddWithValue("@p_end_date", EndDate);
-
-                        using (var reader = await command.ExecuteReaderAsync())
-                        {
-                            if (await reader.ReadAsync())
-                            {
-                                var availability = new CheckRoomAvailabilityResultDto
-                                {
-                                    IsAvailable = reader.GetBoolean(reader.GetOrdinal("is_available")),
-                                    Message = reader.GetString(reader.GetOrdinal("f_message"))
-                                };
-
-                                return OperationResult<CheckRoomAvailabilityResultDto>.Success(availability.Message, availability);
-                            }
-                        }
+                        IsAvailable = reader.GetBoolean(reader.GetOrdinal("is_available")),
+                        Message = reader.GetString(reader.GetOrdinal("f_message"))
+                    },
+                    new Dictionary<string, object>
+                    {
+                { "@p_room_id", roomId },
+                { "@p_start_date", startDate },
+                { "@p_end_date", endDate }
                     }
+                );
+
+                if (!result.Any())
+                {
+                    return OperationResult<CheckRoomAvailabilityResultDto>.Failure($"Room {roomId} not found or could not check availability.");
                 }
-                return OperationResult<CheckRoomAvailabilityResultDto>.Failure($"The room {RoomId} was not found ");
+
+                var availability = result.First();
+                return OperationResult<CheckRoomAvailabilityResultDto>.Success(availability.Message, availability);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.ErrorEx(e, "Error while retrieving data");
-                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("Unable to retrieve data");
+                _logger.ErrorEx(ex, $"Error checking availability for room {roomId}");
+                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("An error occurred while checking room availability.");
             }
-
-
         }
+
     }
 }
