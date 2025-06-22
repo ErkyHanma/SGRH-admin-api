@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.ServiceModule;
+using SGRH.Persistence.Common.Loggers.Interfaces;
 using SGRH.Persistence.Context;
 using System.Linq.Expressions;
 
@@ -13,9 +14,9 @@ namespace SGRH.Persistence.Repositories.Service_Module
     {
 
         private readonly SGRHContext _context;
-        private readonly ILogger<ServiceRepository> _logger;
+        private readonly IAppLogger<ServiceRepository> _logger;
 
-        public ServiceRepository(SGRHContext context, ILogger<ServiceRepository> logger)
+        public ServiceRepository(SGRHContext context, IAppLogger<ServiceRepository> logger)
         {
             _context = context;
             _logger = logger;
@@ -45,7 +46,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Retrieving Service entity with ID: {id}");
+                _logger.Info($"Retrieving Service entity with ID: {id}");
 
                 var existingService = await _context.Service.FindAsync(id);
 
@@ -58,7 +59,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving a service entity by ID");
+                _logger.ErrorEx(ex, "Error while retrieving a service entity by ID");
                 return OperationResult<Service>.Failure("An error occurred while retrieving the service entity");
             }
         }
@@ -66,12 +67,12 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Adding Service entity {entity}");
+                _logger.Info($"Adding Service entity {entity}");
 
 
                 if (entity == null)
                 {
-                    _logger.LogError("Attempted to add a null Service entity ");
+                    _logger.ErrorNoEx("Attempted to add a null Service entity ");
                     return OperationResult<Service>.Failure("The Service entity cannot be null");
                 }
 
@@ -84,7 +85,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while adding a service");
+                _logger.ErrorEx(ex, "Error while adding a service");
                 return OperationResult<Service>.Failure("An error occurred while adding a service");
             }
         }
@@ -92,12 +93,12 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Updating Service {entity.Name}");
+                _logger.Info($"Updating Service {entity.Name}");
 
 
                 if (entity == null)
                 {
-                    _logger.LogError("Attempted to add a null Service entity ");
+                    _logger.ErrorNoEx("Attempted to add a null Service entity ");
                     return OperationResult<Service>.Failure("The Service entity cannot be null");
                 }
 
@@ -122,7 +123,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while updating a service entity");
+                _logger.ErrorEx(ex, "Error while updating a service entity");
                 return OperationResult<Service>.Failure("An error occurred while updating a service entity");
             }
         }
@@ -130,11 +131,11 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Deleting Service with ID {entity?.ServiceId} and Name '{entity?.Name ?? "N/A"}'");
+                _logger.Info($"Deleting Service with ID {entity?.ServiceId} and Name '{entity?.Name ?? "N/A"}'");
 
                 if (entity is null)
                 {
-                    _logger.LogError("Attempted to delete a null Service entity");
+                    _logger.ErrorNoEx("Attempted to delete a null Service entity");
                     return OperationResult<Service>.Failure("The Service entity cannot be null");
                 }
 
@@ -157,7 +158,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while deleting Service entity");
+                _logger.ErrorEx(ex, "Error while deleting Service entity");
                 return OperationResult<Service>.Failure("An error occurred while trying to delete the Service entity");
             }
         }
@@ -165,7 +166,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Retrieving all Service entities where filter is {filter}");
+                _logger.Info($"Retrieving all Service entities where filter is {filter}");
 
                 var services = await _context.Service.Where(filter).ToListAsync();
 
@@ -173,7 +174,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving service entities.");
+                _logger.ErrorEx(ex, "Error while retrieving service entities.");
                 return OperationResult<IEnumerable<Service>>.Failure("An error occurred while retrieving the service entities.");
             }
         }

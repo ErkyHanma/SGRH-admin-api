@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using SGRH.Application.Dtos.ReservationModule.ReservationService;
+﻿using SGRH.Application.Dtos.ReservationModule.ReservationService;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
+using SGRH.Persistence.Common.Loggers.Interfaces;
 using SGRH.Persistence.Helpers;
 
 
@@ -11,9 +11,9 @@ namespace SGRH.Persistence.Repositories.ReservationModule
     {
 
         private readonly string _connectionString;
-        private readonly ILogger<ReservationRepository> _logger;
+        private readonly IAppLogger<ReservationServiceRepository> _logger;
 
-        public ReservationServiceRepository(string connectionString, ILogger<ReservationRepository> logger)
+        public ReservationServiceRepository(string connectionString, IAppLogger<ReservationServiceRepository> logger)
         {
             _connectionString = connectionString;
             _logger = logger;
@@ -21,7 +21,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
         public async Task<OperationResult<CreateReservationServiceDto>> AddAsync(CreateReservationServiceDto createReservationServiceDto)
         {
-            _logger.LogInformation("Add service for a reservation");
+            _logger.Info("Add service for a reservation");
 
             var parameters = new Dictionary<string, object>()
             {
@@ -48,7 +48,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
         public async Task<OperationResult<DeleteReservationServiceDto>> DeleteAsync(DeleteReservationServiceDto deleteReservationServiceDto)
         {
-            _logger.LogInformation("Remove service for a reservation");
+            _logger.Info("Remove service for a reservation");
 
             var parameters = new Dictionary<string, object>()
             {
