@@ -1,7 +1,10 @@
+using SGRH.Persistence.Repositories.UserManagement;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddUserManagementRepositories();
 
 var app = builder.Build();
 
