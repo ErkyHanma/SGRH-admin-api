@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using SGRH.Application.Dtos.ServiceModule.Validator;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Domain.Base;
@@ -27,7 +26,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation("Retrieving all Services entities");
+                _logger.Info("Retrieving all Services entities");
                 var services = await _context.Service.ToListAsync();
 
                 if (!services.Any())
@@ -39,7 +38,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving service entities.");
+                _logger.ErrorEx(ex, "Error while retrieving service entities.");
                 return OperationResult<IEnumerable<Service>>.Failure("An error occurred while retrieving the service entities.");
             }
         }
