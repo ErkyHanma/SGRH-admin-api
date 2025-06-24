@@ -2,7 +2,8 @@
 using Npgsql;
 using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Report;
-using SGRH.Application.Interfaces.Repositories.Report; 
+using SGRH.Application.Dtos.Report.InputDtos;
+using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.Report;
 using SGRH.Domain.Entities.UserManagement;
@@ -26,8 +27,12 @@ namespace SGRH.Persistence.Repositories.Report
             _logger = logger;
         }
 
-        public async Task<OperationResult<IEnumerable<OcuppancyReportDto>>> GetOcuppancyReportAsync(DateTime startDate, DateTime endDate)
+        public async Task<OperationResult<IEnumerable<OcuppancyReportDto>>> GetOcuppancyReportAsync(ReportDateRangeRequestDto request)
         {
+            var validation = ValidateDateRange(request);
+            if (!validation.IsSuccess)
+                return OperationResult<IEnumerable<OcuppancyReportDto>>.Failure(validation.Message);
+
             try
             {
                 var result = await FunctionReaderEx.CallFunctionAsync(
@@ -42,8 +47,8 @@ namespace SGRH.Persistence.Repositories.Report
                     },
                     new Dictionary<string, object>
                     {
-                       { "p_start_date", startDate },
-                       { "p_end_date", endDate }
+                       { "p_start_date", request.StartDate },
+                       { "p_end_date", request.EndDate }
                     });
 
                 return OperationResult<IEnumerable<OcuppancyReportDto>>.Success("Occupancy report generated.", result);
@@ -55,8 +60,12 @@ namespace SGRH.Persistence.Repositories.Report
             }
         }
 
-        public async Task<OperationResult<IEnumerable<RatesReportDto>>> GetRatesReportAsync(DateTime startDate, DateTime endDate)
+        public async Task<OperationResult<IEnumerable<RatesReportDto>>> GetRatesReportAsync(ReportDateRangeRequestDto request)
         {
+            var validation = ValidateDateRange(request);
+            if (!validation.IsSuccess)
+                return OperationResult<IEnumerable<RatesReportDto>>.Failure(validation.Message);
+
             try
             {
                 var result = await FunctionReaderEx.CallFunctionAsync(
@@ -72,8 +81,8 @@ namespace SGRH.Persistence.Repositories.Report
                     },
                     new Dictionary<string, object>
                     {
-                        { "p_start_date", startDate },
-                        { "p_end_date", endDate }
+                        { "p_start_date", request.StartDate },
+                        { "p_end_date", request.EndDate }
                     });
 
                 return OperationResult<IEnumerable<RatesReportDto>>.Success("Rate report generated.", result);
@@ -85,8 +94,12 @@ namespace SGRH.Persistence.Repositories.Report
             }
         }
 
-        public async Task<OperationResult<IEnumerable<RevenueReportDto>>> GetRevenueReportAsync(DateTime startDate, DateTime endDate)
+        public async Task<OperationResult<IEnumerable<RevenueReportDto>>> GetRevenueReportAsync(ReportDateRangeRequestDto request)
         {
+            var validation = ValidateDateRange(request);
+            if (!validation.IsSuccess)
+                return OperationResult<IEnumerable<RevenueReportDto>>.Failure(validation.Message);
+
             try
             {
                 var result = await FunctionReaderEx.CallFunctionAsync(
@@ -101,8 +114,8 @@ namespace SGRH.Persistence.Repositories.Report
                     },
                     new Dictionary<string, object>
                     {
-                        { "p_start_date", startDate },
-                        { "p_end_date", endDate }
+                        { "p_start_date", request.StartDate },
+                        { "p_end_date", request.EndDate }
                     });
 
                 return OperationResult<IEnumerable<RevenueReportDto>>.Success("Revenue report generated.", result);
@@ -114,7 +127,7 @@ namespace SGRH.Persistence.Repositories.Report
             }
         }
 
-        public async Task<OperationResult<IEnumerable<ServiceRevenueReportDto>>> GetServiceRevenueReportAsync(int? categoryId = null)
+        public async Task<OperationResult<IEnumerable<ServiceRevenueReportDto>>> GetServiceRevenueReportAsync(ServiceRevenueRequestDto request)
         {
             try
             {
@@ -131,7 +144,7 @@ namespace SGRH.Persistence.Repositories.Report
                     },
                     new Dictionary<string, object>
                     {
-                        { "p_category_id", categoryId.HasValue ? categoryId.Value : DBNull.Value }  // Verifica si 'categoryId' tiene un valor. De otro modo, usa DBNull.Value
+                        { "p_category_id", request.CategoryId.HasValue ? request.CategoryId.Value : DBNull.Value }  // Verifica si 'categoryId' tiene un valor. De otro modo, usa DBNull.Value
 
                     });
 
@@ -142,6 +155,18 @@ namespace SGRH.Persistence.Repositories.Report
                 _logger.ErrorEx(ex, "Error getting the service report.");
                 return OperationResult<IEnumerable<ServiceRevenueReportDto>>.Failure("Error getting the report.");
             }
+        }
+
+        // Metodo privado para validaciones basicas
+        private OperationResult<string> ValidateDateRange(ReportDateRangeRequestDto request)
+        {
+            if (request == null)
+                return OperationResult<string>.Failure("Request cannot be null.");
+
+            if (request.StartDate > request.EndDate)
+                return OperationResult<string>.Failure("Start date cannot be after end date.");
+
+            return OperationResult<string>.Success("Date range is valid.");
         }
     }
 }

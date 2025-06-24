@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Npgsql;
+using SGRH.Application.Common.Logging;
 using SGRH.Domain.Base;
-using SGRH.Persistence.Common.Loggers.Interfaces;
 using System.Data;
 using System.Drawing;
 
