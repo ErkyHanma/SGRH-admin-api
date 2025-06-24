@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using SGRH.Persistence.Common.Loggers.Interfaces;
 using System.Runtime.CompilerServices;
 
 namespace SGRH.Application.Common.Logging
 {
-    public class AppLogger<T> : IAppLogger<T> 
+    public class AppLogger<T> : IAppLogger<T>
     {
         private readonly ILogger<T> _logger;
 

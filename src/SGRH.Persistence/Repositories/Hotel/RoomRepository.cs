@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Logging;
+using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Interfaces.Repositories.Hotel; 
 using SGRH.Domain.Base;
-using SGRH.Persistence.Common.Loggers.Interfaces;
 using SGRH.Persistence.Helpers;
 
 namespace SGRH.Persistence.Repositories.Hotel

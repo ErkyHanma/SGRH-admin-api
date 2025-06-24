@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using SGRH.Application.Common.Logging;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.Hotel;
-using SGRH.Persistence.Common.Loggers.Interfaces;
 using SGRH.Persistence.Context;
 using System;
 using System.Collections.Generic;
