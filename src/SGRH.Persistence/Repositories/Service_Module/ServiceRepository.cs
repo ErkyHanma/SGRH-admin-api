@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.ServiceModule.Validator;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.ServiceModule;
-using SGRH.Persistence.Common.Loggers.Interfaces;
 using SGRH.Persistence.Context;
 using System.Linq.Expressions;
 
