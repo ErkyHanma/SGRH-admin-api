@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Runtime.CompilerServices;
 
 namespace SGRH.Application.Common.Logging
 {
@@ -27,8 +26,13 @@ namespace SGRH.Application.Common.Logging
         // Registra mensaje de informe, incluyendo su [Type] o tipo de clase
         public void Info(string message, params object[] args)
         {
-            _logger.LogInformation("[{Type}] " + message, typeof(T).Name, args);
+            var newArgs = new object[] { typeof(T).Name }
+         .Concat(args ?? Array.Empty<object>())
+         .ToArray();
+
+            _logger.LogInformation("[{Type}] " + message, newArgs);
         }
+
 
     }
 

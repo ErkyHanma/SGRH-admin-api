@@ -75,6 +75,7 @@ namespace SGRH.Application.Services.ServiceModule
         }
         public async Task<OperationResult<CreateServiceDto>> CreateServicesAsync(CreateServiceDto createServiceDto)
         {
+
             try
             {
                 _logger.Info("Creating service", createServiceDto);
@@ -92,6 +93,7 @@ namespace SGRH.Application.Services.ServiceModule
                 }
 
                 var creationResult = await _serviceRepository.AddAsync(_mapper.ToDomainEntityAdd(createServiceDto));
+
 
                 if (!creationResult.IsSuccess)
                 {

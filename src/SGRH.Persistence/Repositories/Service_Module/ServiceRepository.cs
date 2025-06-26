@@ -39,7 +39,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error while retrieving service entities.");
-                return OperationResult<IEnumerable<Service>>.Failure("An error occurred while retrieving the service entities.");
+                return OperationResult<IEnumerable<Service>>.Failure($"An error occurred while retrieving the service entities. ${ex.Message}");
             }
         }
         public async Task<OperationResult<Service>> GetByIdAsync(int id)

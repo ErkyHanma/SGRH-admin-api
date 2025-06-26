@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Npgsql;
+﻿using Npgsql;
 using SGRH.Application.Common.Logging;
 using SGRH.Domain.Base;
 using System.Data;
-using System.Drawing;
 
 namespace SGRH.Persistence.Helpers
 {
@@ -45,19 +43,19 @@ namespace SGRH.Persistence.Helpers
                 var affectedRows = await command.ExecuteNonQueryAsync();
 
                 // Crear variable y verificar si pResult y su Value no son nulos.
-                
+
                 string message;
                 if (pResult?.Value != null)
                 {
-                    message = pResult.Value.ToString(); 
+                    message = pResult.Value.ToString();
                 }
                 else
                 {
-                    message = "No message"; 
+                    message = "No message";
                 }
 
                 // Verificar resultado
-                if (affectedRows > 0)
+                if (!string.IsNullOrWhiteSpace(message) && message.ToLower().Contains("success") || affectedRows > 0)
                 {
                     result = OperationResult<string>.Success(message);
                 }
@@ -80,5 +78,7 @@ namespace SGRH.Persistence.Helpers
     }
 
 }
+
+
 
 
