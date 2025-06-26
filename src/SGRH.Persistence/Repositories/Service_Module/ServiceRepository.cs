@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using SGRH.Application.Common.Logging;
+using SGRH.Application.Dtos.ServiceModule.Validator;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.ServiceModule;
@@ -13,9 +14,9 @@ namespace SGRH.Persistence.Repositories.Service_Module
     {
 
         private readonly SGRHContext _context;
-        private readonly ILogger<ServiceRepository> _logger;
+        private readonly IAppLogger<ServiceRepository> _logger;
 
-        public ServiceRepository(SGRHContext context, ILogger<ServiceRepository> logger)
+        public ServiceRepository(SGRHContext context, IAppLogger<ServiceRepository> logger)
         {
             _context = context;
             _logger = logger;
@@ -25,7 +26,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation("Retrieving all Services entities");
+                _logger.Info("Retrieving all Services entities");
                 var services = await _context.Service.ToListAsync();
 
                 if (!services.Any())
@@ -37,7 +38,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving service entities.");
+                _logger.ErrorEx(ex, "Error while retrieving service entities.");
                 return OperationResult<IEnumerable<Service>>.Failure("An error occurred while retrieving the service entities.");
             }
         }
@@ -45,7 +46,13 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Retrieving Service entity with ID: {id}");
+                if (id <= 0)
+                {
+                    _logger.ErrorNoEx($"Tried to find Service with invalid ID: {id}.");
+                    return OperationResult<Service>.Failure("Invalid service ID");
+                }
+
+                _logger.Info($"Retrieving Service entity with ID: {id}");
 
                 var existingService = await _context.Service.FindAsync(id);
 
@@ -58,7 +65,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving a service entity by ID");
+                _logger.ErrorEx(ex, "Error while retrieving a service entity by ID");
                 return OperationResult<Service>.Failure("An error occurred while retrieving the service entity");
             }
         }
@@ -66,25 +73,29 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Adding Service entity {entity}");
-
-
                 if (entity == null)
                 {
-                    _logger.LogError("Attempted to add a null Service entity ");
-                    return OperationResult<Service>.Failure("The Service entity cannot be null");
+                    _logger.ErrorNoEx("Tried to add null Service entity.");
+                    return OperationResult<Service>.Failure("Service entity cannot be null.");
+                }
+
+                _logger.Info($"Adding Service entity with Name: {entity.Name}");
+
+                var validationResult = ServiceValidator.Validate(entity);
+
+                if (!validationResult.IsSuccess)
+                {
+                    return validationResult;
                 }
 
                 await _context.Service.AddAsync(entity);
                 await _context.SaveChangesAsync();
 
-                return OperationResult<Service>.Success("Service Entity added succesfully", entity);
-
-
+                return OperationResult<Service>.Success("Service entity added successfully.", entity);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while adding a service");
+                _logger.ErrorEx(ex, "Error while adding a service");
                 return OperationResult<Service>.Failure("An error occurred while adding a service");
             }
         }
@@ -92,16 +103,20 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Updating Service {entity.Name}");
-
-
                 if (entity == null)
                 {
-                    _logger.LogError("Attempted to add a null Service entity ");
-                    return OperationResult<Service>.Failure("The Service entity cannot be null");
+                    _logger.ErrorNoEx("Tried to add null Service entity.");
+                    return OperationResult<Service>.Failure("Service entity cannot be null.");
                 }
 
-                // Validations:
+                _logger.Info($"Updating Service entity with Name: {entity.Name}");
+
+                var validationResult = ServiceValidator.Validate(entity);
+
+                if (!validationResult.IsSuccess)
+                {
+                    return validationResult;
+                }
 
                 var ExistingService = await _context.Service.FindAsync(entity.ServiceId);
 
@@ -122,7 +137,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while updating a service entity");
+                _logger.ErrorEx(ex, "Error while updating a service entity");
                 return OperationResult<Service>.Failure("An error occurred while updating a service entity");
             }
         }
@@ -130,12 +145,19 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                _logger.LogInformation($"Deleting Service with ID {entity?.ServiceId} and Name '{entity?.Name ?? "N/A"}'");
-
-                if (entity is null)
+                if (entity == null)
                 {
-                    _logger.LogError("Attempted to delete a null Service entity");
-                    return OperationResult<Service>.Failure("The Service entity cannot be null");
+                    _logger.ErrorNoEx("Tried to add null Service entity.");
+                    return OperationResult<Service>.Failure("Service entity cannot be null.");
+                }
+
+                _logger.Info($"Deleting Service entity with Name: {entity.Name}");
+
+                var validationResult = ServiceValidator.Validate(entity);
+
+                if (!validationResult.IsSuccess)
+                {
+                    return validationResult;
                 }
 
                 var ExistingService = await _context.Service.FindAsync(entity.ServiceId);
@@ -157,15 +179,21 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while deleting Service entity");
+                _logger.ErrorEx(ex, "Error while deleting Service entity");
                 return OperationResult<Service>.Failure("An error occurred while trying to delete the Service entity");
             }
         }
         public async Task<OperationResult<IEnumerable<Service>>> GetAllAsync(Expression<Func<Service, bool>> filter)
         {
+            if (filter == null)
+            {
+                _logger.ErrorNoEx("Tried to retrieve services with a null filter.");
+                return OperationResult<IEnumerable<Service>>.Failure("Filter expression cannot be null.");
+            }
+
             try
             {
-                _logger.LogInformation($"Retrieving all Service entities where filter is {filter}");
+                _logger.Info($"Retrieving all Service entities with provided filter.");
 
                 var services = await _context.Service.Where(filter).ToListAsync();
 
@@ -173,13 +201,21 @@ namespace SGRH.Persistence.Repositories.Service_Module
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving service entities.");
+                _logger.ErrorEx(ex, "Error while retrieving service entities.");
                 return OperationResult<IEnumerable<Service>>.Failure("An error occurred while retrieving the service entities.");
             }
         }
         public async Task<bool> ExistsAsync(Expression<Func<Service, bool>> filter)
         {
+
+            if (filter == null)
+            {
+                _logger.ErrorNoEx("Tried to check existence of services with a null filter.");
+                return false;
+            }
+
             return await _context.Service.AnyAsync(filter);
+
         }
     }
 }
