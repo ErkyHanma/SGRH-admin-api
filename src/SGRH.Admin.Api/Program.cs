@@ -26,11 +26,15 @@ builder.Services.AddDbContext<SGRHContext>(options => options.UseNpgsql(builder.
 builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));
 
 // Add services to the container.
-//ReservationModule
+// Reservation
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddTransient<IReservationService, ReservationService>();
 
-//ServiceModule
+// ReservationService
+builder.Services.AddScoped<IReservationServiceRepository, ReservationServiceRepository>();
+builder.Services.AddTransient<IReservationServiceService, ReservationServiceService>();
+
+// Service
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddTransient<IServiceService, ServiceService>();
 builder.Services.AddScoped<IServiceMapper, ServiceMapper>();
