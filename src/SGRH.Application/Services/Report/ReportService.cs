@@ -29,8 +29,6 @@ namespace SGRH.Application.Services.Report
 
         public async Task<OperationResult<IEnumerable<OcuppancyReportDto>>> GetOcuppancyReport(ReportDateRangeRequestDto request)
         {
-            OperationResult<IEnumerable<OcuppancyReportDto>> operationResult = new OperationResult<IEnumerable<OcuppancyReportDto>>();
-
             try
             {
                 if (request == null)
@@ -38,17 +36,15 @@ namespace SGRH.Application.Services.Report
                     return OperationResult<IEnumerable<OcuppancyReportDto>>.Failure("Request is null for Occupancy Revenue Report.");
                 }
 
-                _logger.Info($"Getting a Ocuppancy Report from {request.StartDate} to {request.EndDate}");
+                _logger.Info("Getting an Occupancy Report from {Start} to {End}", request.StartDate, request.EndDate);
 
-                if (operationResult.IsSuccess)
+                var operationResult = await _reportService.GetOcuppancyReportAsync(request);
+
+                if (!operationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while getting a report: {operationResult.Message}.");
                     return operationResult;
                 }
-
-                operationResult = await _reportService.GetOcuppancyReportAsync(request);
-
-                //...
 
                 return operationResult;
 
@@ -56,51 +52,40 @@ namespace SGRH.Application.Services.Report
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error generating occupancy report."); // deberia estar en el archivo de configuracion?
-                operationResult = OperationResult<IEnumerable<OcuppancyReportDto>>.Failure($"An error occurred. {ex.Message}");
+                return OperationResult<IEnumerable<OcuppancyReportDto>>.Failure($"An error occurred. {ex.Message}");
             }
-            return operationResult;
 
 
         }
 
-        public async Task<OperationResult<IEnumerable<RatesReportDto>>> GetRatesReport(ReportDateRangeRequestDto request)
+        public async Task<OperationResult<IEnumerable<RatesReportDto>>> GetRatesReport(ReportDateRangeRequestDto request) // ARREGLAR
         {
-            OperationResult<IEnumerable<RatesReportDto>> operationResult = new OperationResult<IEnumerable<RatesReportDto>>();
-
             try
             {
                 if (request == null)
-                {
                     return OperationResult<IEnumerable<RatesReportDto>>.Failure("Request is null for Rates Report.");
-                }
 
-                _logger.Info($"Getting a Rates Report from {request.StartDate} to {request.EndDate}");
+                _logger.Info("Getting a Rates Report from {Start} to {End}", request.StartDate, request.EndDate);
 
-                if (operationResult.IsSuccess)
+                var operationResult = await _reportService.GetRatesReportAsync(request);
+
+                if (!operationResult.IsSuccess)
                 {
-                    _logger.ErrorNoEx($"An error has occured while getting a report: {operationResult.Message}.");
-                    return operationResult;
+                    _logger.ErrorNoEx("An error occurred while getting Rates Report: {Message}", operationResult.Message);
                 }
-
-                operationResult = await _reportService.GetRatesReportAsync(request);
-
-                //...
 
                 return operationResult;
-
             }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Error generating rates report."); // deberia estar en el archivo de configuracion?
-                operationResult = OperationResult<IEnumerable<RatesReportDto>>.Failure($"An error occurred. {ex.Message}");
+                _logger.ErrorEx(ex, "Error generating rates report.");
+                return OperationResult<IEnumerable<RatesReportDto>>.Failure($"An error occurred. {ex.Message}");
             }
-            return operationResult;
         }
+
 
         public async Task<OperationResult<IEnumerable<RevenueReportDto>>> GetRevenueReport(ReportDateRangeRequestDto request)
         {
-            OperationResult<IEnumerable<RevenueReportDto>> operationResult = new OperationResult<IEnumerable<RevenueReportDto>>();
-
             try
             {
                 if (request == null)
@@ -108,17 +93,16 @@ namespace SGRH.Application.Services.Report
                     return OperationResult<IEnumerable<RevenueReportDto>>.Failure("Request is null for Revenue Report.");
                 }
 
-                _logger.Info($"Getting a Revenue Report from {request.StartDate} to {request.EndDate}");
+                _logger.Info("Getting a Revenue Report from {Start} to {End}", request.StartDate, request.EndDate);
 
-                if (operationResult.IsSuccess)
+                var operationResult = await _reportService.GetRevenueReportAsync(request);
+
+
+                if (!operationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while getting a report: {operationResult.Message}.");
                     return operationResult;
                 }
-
-                operationResult = await _reportService.GetRevenueReportAsync(request);
-
-                //...
 
                 return operationResult;
 
@@ -126,9 +110,8 @@ namespace SGRH.Application.Services.Report
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error generating revenue report."); // deberia estar en el archivo de configuracion?
-                operationResult = OperationResult<IEnumerable<RevenueReportDto>>.Failure($"An error occurred. {ex.Message}");
+                return OperationResult<IEnumerable<RevenueReportDto>>.Failure($"An error occurred. {ex.Message}");
             }
-            return operationResult;
         }
 
         public async Task<OperationResult<IEnumerable<ServiceRevenueReportDto>>> GetServiceRevenueReport(ServiceRevenueRequestDto request)
