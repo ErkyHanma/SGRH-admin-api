@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace SGRH.Application.Common.Logging
 {
@@ -11,29 +12,47 @@ namespace SGRH.Application.Common.Logging
             _logger = logger;
         }
 
-        // Registra error con excepcion, incluyendo su [Type] o tipo de clase
         public void ErrorEx(Exception ex, string message, params object[] args)
         {
-            _logger.LogError(ex, "[{Type}] " + message, typeof(T).Name, args);
+            _logger.LogError(ex, "[{Type}] {Message}", typeof(T).Name, FormatMessage(message, args));
         }
 
-        // Registra error sin excepcion, incluyendo su [Type] o tipo de clase
         public void ErrorNoEx(string message, params object[] args)
         {
-            _logger.LogError("[{Type}] " + message, typeof(T).Name, args);
+            _logger.LogError("[{Type}] {Message}", typeof(T).Name, FormatMessage(message, args));
         }
 
-        // Registra mensaje de informe, incluyendo su [Type] o tipo de clase
         public void Info(string message, params object[] args)
         {
-            var newArgs = new object[] { typeof(T).Name }
-         .Concat(args ?? Array.Empty<object>())
-         .ToArray();
-
-            _logger.LogInformation("[{Type}] " + message, newArgs);
+            var newArgs = new object[] { typeof(T).Name }.Concat(args ?? Array.Empty<object>()).ToArray();
+            _logger.LogInformation("[{Type}] {Message}", newArgs.Prepend(message).ToArray());
         }
 
+        private string FormatMessage(string message, object[] args)
+        {
+            if (args == null || args.Length == 0)
+                return message;
 
+            try
+            {
+                return string.Format(message, args.Select(SafeSerialize).ToArray());
+            }
+            catch
+            {
+                return message + " [Argument formatting failed]";
+            }
+        }
+
+        private string SafeSerialize(object obj)
+        {
+            try
+            {
+                return obj == null ? "null" : JsonSerializer.Serialize(obj);
+            }
+            catch
+            {
+                return obj?.ToString() ?? "null";
+            }
+        }
     }
-
 }

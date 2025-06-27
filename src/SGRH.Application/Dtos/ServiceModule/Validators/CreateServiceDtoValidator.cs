@@ -19,6 +19,7 @@ namespace SGRH.Application.Dtos.ServiceModule.Validators
             if (createServiceDto.Price < 0)
                 return OperationResult<CreateServiceDto>.Failure("Service price cannot be negative.");
 
+
             return OperationResult<CreateServiceDto>.Success("Service validated successfully.", createServiceDto);
         }
     }

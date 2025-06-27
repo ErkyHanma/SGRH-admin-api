@@ -29,6 +29,7 @@ namespace SGRH.Application.Services.ServiceModule
             {
                 var result = await _serviceRepository.GetAllAsync();
 
+
                 if (!result.IsSuccess)
                 {
                     return OperationResult<IEnumerable<ServiceDto>>.Failure(result.Message);
@@ -98,7 +99,7 @@ namespace SGRH.Application.Services.ServiceModule
                 if (!creationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while creating Service: {creationResult.Message}.");
-                    return OperationResult<CreateServiceDto>.Failure("Error trying to create a Service");
+                    return OperationResult<CreateServiceDto>.Failure($"Error trying to create a Service {creationResult.Message}");
                 }
 
                 if (creationResult.Data is null)
@@ -133,18 +134,22 @@ namespace SGRH.Application.Services.ServiceModule
 
                 var result = await _serviceRepository.UpdateAsync(_mapper.ToDomainEntity(serviceDto));
 
+
                 if (!result.IsSuccess)
                 {
-                    _logger.ErrorNoEx($"An error has occured while updating Service: {result.Message}.");
-                    return OperationResult<ServiceDto>.Failure("Error while trying to update a Service");
+                    _logger.ErrorNoEx($"An error has occured while updating Service: {result.Data} {result.Message}.");
                 }
+
 
                 if (result.Data is null)
                 {
-                    return OperationResult<ServiceDto>.Failure("No services found.");
+                    return OperationResult<ServiceDto>.Failure($"No services found. {result.Message}");
                 }
 
+
+
                 return OperationResult<ServiceDto>.Success(result.Message, _mapper.ToDto(result.Data));
+
 
             }
             catch (Exception ex)
@@ -153,39 +158,33 @@ namespace SGRH.Application.Services.ServiceModule
                 return OperationResult<ServiceDto>.Failure($"An unexpected error occurred while trying to update the service: {ex.Message}");
             }
         }
-        public async Task<OperationResult<ServiceDto>> DeleteServicesAsync(ServiceDto serviceDto)
+        public async Task<OperationResult<DeleteServiceDto>> DeleteServicesAsync(DeleteServiceDto deleteServiceDto)
         {
             try
             {
-                _logger.Info($"Deleting {serviceDto.Name}");
+                _logger.Info($"Deleting service with Id: {deleteServiceDto.ServiceId}");
 
-                var validationResult = ServiceDtoValidator.Validate(serviceDto);
 
-                if (!validationResult.IsSuccess)
-                {
-                    return validationResult;
-                }
-
-                var result = await _serviceRepository.DeleteAsync(_mapper.ToDomainEntity(serviceDto));
+                var result = await _serviceRepository.DeleteAsync(_mapper.ToDomainEntityDelete(deleteServiceDto));
 
                 if (!result.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while deleting Service: {result.Message}.");
-                    return OperationResult<ServiceDto>.Failure($"Error while trying to delete {serviceDto.Name}");
+                    return OperationResult<DeleteServiceDto>.Failure($"Error while trying to delete Service with ID: {deleteServiceDto.ServiceId}");
                 }
 
                 if (result.Data is null)
                 {
-                    return OperationResult<ServiceDto>.Failure("No services found.");
+                    return OperationResult<DeleteServiceDto>.Failure($"No services found. {result.Message}");
                 }
 
-                return OperationResult<ServiceDto>.Success(result.Message, _mapper.ToDto(result.Data));
+                return OperationResult<DeleteServiceDto>.Success(result.Message);
 
             }
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Unexpected error while deleting the service");
-                return OperationResult<ServiceDto>.Failure($"An unexpected error occurred while trying to delete the service: {ex.Message}");
+                return OperationResult<DeleteServiceDto>.Failure($"An unexpected error occurred while trying to delete the service: {ex.Message}");
             }
         }
 
