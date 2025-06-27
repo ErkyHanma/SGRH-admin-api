@@ -1,3 +1,7 @@
+using FluentValidation;
+using SGRH.Application.Common.Logging;
+using SGRH.Application.Dtos.Hotel.Room;
+using SGRH.Application.Dtos.Hotel.Room.Validators;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Hotel;
@@ -18,6 +22,17 @@ namespace SGRH.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            // Logger
+
+            builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
+
+            // Fluent Validation
+
+            builder.Services.AddScoped<IValidator<CreateRoomDto>, CreateRoomValidator>();
+            builder.Services.AddScoped<IValidator<ModifyRoomDto>, ModifyRoomValidator>();
+            builder.Services.AddScoped<IValidator<DisableRoomDto>, DisableRoomValidator>();
+
 
             // Modulo de habitaciones
 
