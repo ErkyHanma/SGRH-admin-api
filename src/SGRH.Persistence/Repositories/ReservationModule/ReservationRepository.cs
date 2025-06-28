@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Npgsql;
+﻿using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.ReservationModule.Reservation;
+using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Helpers;
@@ -10,9 +10,9 @@ namespace SGRH.Persistence.Repositories.ReservationModule
     public class ReservationRepository : IReservationRepository
     {
         private readonly string _connectionString;
-        private readonly ILogger<ReservationRepository> _logger;
+        private readonly IAppLogger<ReservationRepository> _logger;
 
-        public ReservationRepository(string connectionString, ILogger<ReservationRepository> logger)
+        public ReservationRepository(string connectionString, IAppLogger<ReservationRepository> logger)
         {
             _connectionString = connectionString;
             _logger = logger;
@@ -20,43 +20,31 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
         public async Task<OperationResult<IEnumerable<ReservationDto>>> GetAllAsync()
         {
-            var reservations = new List<ReservationDto>();
             try
             {
-                _logger.LogInformation("Getting all Reservations");
+                _logger.Info("Getting all Reservations");
 
-                using (var context = new NpgsqlConnection(_connectionString))
-                {
-                    await context.OpenAsync();
 
-                    using (var command = new NpgsqlCommand("SELECT * FROM reservationModule.GetAllReservationsWithServices", context))
+                var reservations = await FunctionReaderEx.CallFunctionAsync(
+                    _connectionString,
+                    "SELECT * FROM reservationModule.GetAllReservationsWithServices",
+                    reader => new ReservationDto
                     {
-                        using var reader = await command.ExecuteReaderAsync();
-
-                        while (await reader.ReadAsync())
-                        {
-                            var reservation = new ReservationDto
-                            {
-                                ReservationId = reader.GetInt32(0),
-                                ClientId = reader.GetInt32(1),
-                                RoomId = reader.GetInt32(2),
-                                StartDate = reader.GetDateTime(3),
-                                EndDate = reader.GetDateTime(4),
-                                ReservationDate = reader.GetDateTime(5),
-                                Status = reader.GetString(6),
-                                GuestCount = reader.GetInt32(7),
-                                PaymentAmount = reader.GetDecimal(8),
-                                ServicesCount = reader.GetInt32(9),
-                                TotalServicesCost = reader.GetDecimal(10),
-                                ServiceNames = reader.IsDBNull(11) ? "" : reader.GetString(11),
-                                CreatedAt = reader.GetDateTime(12),
-                                UpdatedAt = reader.GetDateTime(13)
-                            };
-
-                            reservations.Add(reservation);
-                        }
-                    }
-                }
+                        ReservationId = reader.GetInt32(0),
+                        ClientId = reader.GetInt32(1),
+                        RoomId = reader.GetInt32(2),
+                        StartDate = reader.GetDateTime(3),
+                        EndDate = reader.GetDateTime(4),
+                        ReservationDate = reader.GetDateTime(5),
+                        Status = reader.GetString(6),
+                        GuestCount = reader.GetInt32(7),
+                        PaymentAmount = reader.GetDecimal(8),
+                        ServicesCount = reader.GetInt32(9),
+                        TotalServicesCost = reader.GetDecimal(10),
+                        ServiceNames = reader.IsDBNull(11) ? "" : reader.GetString(11),
+                        CreatedAt = reader.GetDateTime(12),
+                        UpdatedAt = reader.GetDateTime(13)
+                    });
 
                 if (reservations.Count == 0)
                 {
@@ -67,7 +55,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving reservations");
+                _logger.ErrorEx(ex, "Error retrieving reservations");
                 return OperationResult<IEnumerable<ReservationDto>>.Failure("Error retrieving reservations");
             }
         }
@@ -75,59 +63,68 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         {
             try
             {
-                _logger.LogInformation($"Getting reservation {id}");
+                _logger.Info($"Getting reservation {id}");
 
-                using (var context = new NpgsqlConnection(_connectionString))
+                if (id <= 0)
                 {
-                    await context.OpenAsync();
-
-                    using (var command = new NpgsqlCommand("SELECT * FROM reservationModule.GetReservationByID(@p_reservationId)", context))
-                    {
-                        command.Parameters.AddWithValue("@p_reservationId", id);
-
-                        using (var reader = await command.ExecuteReaderAsync())
-                        {
-                            if (await reader.ReadAsync())
-                            {
-                                var reservation = new ReservationDto
-                                {
-                                    ReservationId = reader.GetInt32(reader.GetOrdinal("reservation_id")),
-                                    ClientId = reader.GetInt32(reader.GetOrdinal("client_id")),
-                                    RoomId = reader.GetInt32(reader.GetOrdinal("room_id")),
-                                    StartDate = reader.GetDateTime(reader.GetOrdinal("start_date")),
-                                    EndDate = reader.GetDateTime(reader.GetOrdinal("end_date")),
-                                    ReservationDate = reader.GetDateTime(reader.GetOrdinal("reservation_date")),
-                                    Status = reader.GetString(reader.GetOrdinal("status")),
-                                    GuestCount = reader.GetInt32(reader.GetOrdinal("guest_count")),
-                                    PaymentAmount = reader.GetDecimal(reader.GetOrdinal("payment_amount")),
-                                    ServicesCount = reader.GetInt32(reader.GetOrdinal("services_count")),
-                                    TotalServicesCost = reader.GetDecimal(reader.GetOrdinal("total_services_cost")),
-                                    ServiceNames = reader.IsDBNull(reader.GetOrdinal("service_names")) ? "" : reader.GetString(reader.GetOrdinal("service_names")),
-                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
-                                    UpdatedAt = reader.GetDateTime(reader.GetOrdinal("updated_at")),
-
-                                };
-
-
-
-                                return OperationResult<ReservationDto>.Success("Reservation retrieved successfully", reservation);
-                            }
-                        }
-                    }
+                    _logger.ErrorNoEx($"Trying to find reservation with invalid id {id}.");
+                    return OperationResult<ReservationDto>.Failure("Invalid reservation ID");
                 }
 
-                return OperationResult<ReservationDto>.Failure("Reservation not found");
+
+                var reservation = await FunctionReaderEx.CallFunctionAsync(
+                    _connectionString,
+                    "SELECT * FROM reservationModule.GetReservationByID(@p_reservationId)",
+                    reader => new ReservationDto
+                    {
+                        ReservationId = reader.GetInt32(reader.GetOrdinal("reservation_id")),
+                        ClientId = reader.GetInt32(reader.GetOrdinal("client_id")),
+                        RoomId = reader.GetInt32(reader.GetOrdinal("room_id")),
+                        StartDate = reader.GetDateTime(reader.GetOrdinal("start_date")),
+                        EndDate = reader.GetDateTime(reader.GetOrdinal("end_date")),
+                        ReservationDate = reader.GetDateTime(reader.GetOrdinal("reservation_date")),
+                        Status = reader.GetString(reader.GetOrdinal("status")),
+                        GuestCount = reader.GetInt32(reader.GetOrdinal("guest_count")),
+                        PaymentAmount = reader.GetDecimal(reader.GetOrdinal("payment_amount")),
+                        ServicesCount = reader.GetInt32(reader.GetOrdinal("services_count")),
+                        TotalServicesCost = reader.GetDecimal(reader.GetOrdinal("total_services_cost")),
+                        ServiceNames = reader.IsDBNull(reader.GetOrdinal("service_names")) ? "" : reader.GetString(reader.GetOrdinal("service_names")),
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
+                        UpdatedAt = reader.GetDateTime(reader.GetOrdinal("updated_at")),
+
+                    },
+                    new Dictionary<string, object>
+                    {
+                        {"@p_reservationId", id}
+                    }
+                    );
+
+                if (!reservation.Any())
+                {
+                    return OperationResult<ReservationDto>.Failure("Reservation not found");
+                }
+                return OperationResult<ReservationDto>.Success("Reservation retrieved successfully", reservation.First());
+
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error while retrieving reservation");
+                _logger.ErrorEx(e, "Error while retrieving reservation");
                 return OperationResult<ReservationDto>.Failure("Unable to retrieve data");
             }
         }
         public async Task<OperationResult<CreateReservationDto>> AddAsync(CreateReservationDto createReservationDto)
         {
 
-            _logger.LogInformation($"Creating Reservation for client {createReservationDto.ClientId}");
+            _logger.Info($"Creating Reservation for client {createReservationDto.ClientId}");
+
+            // Validation
+            var validationResult = CreateReservationDtoValidator.Validate(createReservationDto);
+
+            if (!validationResult.IsSuccess)
+            {
+                _logger.ErrorNoEx($"Validation failed for CreateReservationDto");
+                return validationResult;
+            }
 
             var parameters = new Dictionary<string, object>
             {
@@ -158,7 +155,16 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         }
         public async Task<OperationResult<UpdateReservationDto>> UpdateAsync(UpdateReservationDto updateReservationDto)
         {
-            _logger.LogInformation($"Update reservation {updateReservationDto.ReservationId}");
+            _logger.Info($"Update reservation {updateReservationDto.ReservationId}");
+
+            // Validation
+            var validationResult = UpdateReservationDtoValidator.Validate(updateReservationDto);
+
+            if (!validationResult.IsSuccess)
+            {
+                _logger.ErrorNoEx($"Validation failed for UpdateReservationDto");
+                return validationResult;
+            }
 
             var parameters = new Dictionary<string, object>()
             {
@@ -190,7 +196,16 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         }
         public async Task<OperationResult<DisableReservationDto>> DeleteAsync(DisableReservationDto disableReservationDto)
         {
-            _logger.LogInformation($"Disable reservation {disableReservationDto.ReservationId}");
+            _logger.Info($"Disable reservation {disableReservationDto.ReservationId}");
+
+            // Validation
+            var validationResult = DisableReservationDtoValidator.Validate(disableReservationDto);
+
+            if (!validationResult.IsSuccess)
+            {
+                _logger.ErrorNoEx($"Validation failed for DisableReservationDto");
+                return validationResult;
+            }
 
             var parameters = new Dictionary<string, object>()
             {
@@ -216,47 +231,55 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
 
         }
-        public async Task<OperationResult<CheckRoomAvailabilityResultDto>> CheckAvailability(int RoomId, DateTime StartDate, DateTime EndDate)
+        public async Task<OperationResult<CheckRoomAvailabilityResultDto>> CheckAvailability(int roomId, DateTime startDate, DateTime endDate)
         {
+
+            if (roomId <= 0)
+            {
+                _logger.ErrorNoEx($"Invalid room ID: {roomId}");
+                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("Room ID must be greater than zero.");
+            }
+
+            if (startDate >= endDate)
+            {
+                _logger.ErrorNoEx($"Invalid date range: startDate={startDate}, endDate={endDate}");
+                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("Start date must be before end date.");
+            }
 
             try
             {
-                _logger.LogInformation($"Checking room {RoomId}");
+                _logger.Info($"Checking availability for room {roomId} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd}");
 
-                using (var context = new NpgsqlConnection(_connectionString))
-                {
-                    await context.OpenAsync();
-
-                    using (var command = new NpgsqlCommand("SELECT * from reservationModule.CheckRoomAvailability(@p_room_id, @p_start_date, @p_end_date)", context))
+                var result = await FunctionReaderEx.CallFunctionAsync(
+                    _connectionString,
+                    "SELECT * FROM reservationModule.CheckRoomAvailability(@p_room_id, @p_start_date, @p_end_date)",
+                    reader => new CheckRoomAvailabilityResultDto
                     {
-                        command.Parameters.AddWithValue("@p_room_id", RoomId);
-                        command.Parameters.AddWithValue("@p_start_date", StartDate);
-                        command.Parameters.AddWithValue("@p_end_date", EndDate);
-
-                        using (var reader = await command.ExecuteReaderAsync())
-                        {
-                            if (await reader.ReadAsync())
-                            {
-                                var availability = new CheckRoomAvailabilityResultDto
-                                {
-                                    IsAvailable = reader.GetBoolean(reader.GetOrdinal("is_available")),
-                                    Message = reader.GetString(reader.GetOrdinal("f_message"))
-                                };
-
-                                return OperationResult<CheckRoomAvailabilityResultDto>.Success(availability.Message, availability);
-                            }
-                        }
+                        IsAvailable = reader.GetBoolean(reader.GetOrdinal("is_available")),
+                        Message = reader.GetString(reader.GetOrdinal("f_message"))
+                    },
+                    new Dictionary<string, object>
+                    {
+                { "@p_room_id", roomId },
+                { "@p_start_date", startDate },
+                { "@p_end_date", endDate }
                     }
+                );
+
+                if (!result.Any())
+                {
+                    return OperationResult<CheckRoomAvailabilityResultDto>.Failure($"Room {roomId} not found or could not check availability.");
                 }
-                return OperationResult<CheckRoomAvailabilityResultDto>.Failure($"The room {RoomId} was not found ");
+
+                var availability = result.First();
+                return OperationResult<CheckRoomAvailabilityResultDto>.Success(availability.Message, availability);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogError(e, "Error while retrieving data");
-                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("Unable to retrieve data");
+                _logger.ErrorEx(ex, $"Error checking availability for room {roomId}");
+                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("An error occurred while checking room availability.");
             }
-
-
         }
+
     }
 }

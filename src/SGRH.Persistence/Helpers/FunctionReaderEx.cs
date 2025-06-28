@@ -1,10 +1,5 @@
 ﻿using Npgsql;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SGRH.Persistence.Helpers
 {
@@ -14,8 +9,8 @@ namespace SGRH.Persistence.Helpers
             string connectionString,
             string functionName,
             Func<NpgsqlDataReader, T> functionMapper, //Para mapear parametros
-            Dictionary<string, object>? parameters = null) // Puede ser null para buscar por id
-        { 
+            Dictionary<string, object>? parameters = null) // Puede ser null, solo para buscar por id
+        {
             var result = new List<T>();
 
             try
@@ -25,14 +20,15 @@ namespace SGRH.Persistence.Helpers
 
                 using var command = new NpgsqlCommand(functionName, connection)
                 {
-                    CommandType = CommandType.Text
+                    CommandType = CommandType.Text // Definimos como .Text a falta de una alternativa para funciones
                 };
 
                 if (parameters != null)
                 {
                     foreach (var parameter in parameters)
                     {
-                        command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
+                        var npgsqlParam = CreateNpgsqlParameter(parameter.Key, parameter.Value); //Llamamos a la funcion
+                        command.Parameters.Add(npgsqlParam);
                     }
                 }
 
@@ -40,18 +36,45 @@ namespace SGRH.Persistence.Helpers
                 using var reader = await command.ExecuteReaderAsync();
 
                 // Itera cada fila, transforma en tipo T y agrega a la lista resultado
-                while (await reader.ReadAsync()) 
+                while (await reader.ReadAsync())
                 {
                     result.Add(functionMapper(reader));
                 }
 
                 return result;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                throw new Exception($"Error ejecutando la función SQL: {ex.Message}", ex);
+                throw new Exception($"Error executing SQL function: {ex.Message}", ex);
+            }
+        }
+        // Esta funcion nos permite asignar un tipo explicito como parametro de entrada para la funcion BD 
+        private static NpgsqlParameter CreateNpgsqlParameter(string name, object? value)
+        {
+            var parameter = new NpgsqlParameter(name, value ?? DBNull.Value); // Crear parametro de consulta (maneja null)
+
+            if (value is DateTime)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Date;
+            }
+            else if (value is int)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Integer;
+            }
+            else if (value is decimal)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Numeric;
+            }
+            else if (value is bool)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Boolean;
+            }
+            else if (value is string)
+            {
+                parameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Varchar;
             }
 
+            return parameter;
         }
 
     }

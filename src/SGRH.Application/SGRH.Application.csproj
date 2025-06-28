@@ -12,10 +12,13 @@
     <Folder Include="Dtos\ServiceModule\" />
     <Folder Include="Interfaces\Services\" />
     <Folder Include="Services\" />
+    <Folder Include="Interfaces\Repositories\UserManagement\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="8.6.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>

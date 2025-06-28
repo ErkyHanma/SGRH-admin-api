@@ -7,7 +7,7 @@
         public DateTime? UpdatedAt { get; set; }
         public int UpdatedBy { get; set; }
         public int DeletedBy { get; set; }
-        public DateTime? DeleteAt { get; set; }
+        public DateTime? DeleteAt { get; set; } // <----- there's a typo
         public bool IsDeleted { get; set; }
         public bool IsActive { get; set; } = true;
     }
