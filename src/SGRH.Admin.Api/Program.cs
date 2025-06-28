@@ -1,13 +1,18 @@
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using SGRH.Application.Common.Logging;
+using SGRH.Application.Dtos.Hotel.Rate;
+using SGRH.Application.Dtos.Hotel.Rate.Validators;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Dtos.Hotel.Room.Validators;
+using SGRH.Application.Interfaces.Mappers.Hotel;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Application.Interfaces.Services.Report;
 using SGRH.Application.Services.Hotel;
 using SGRH.Application.Services.Report;
+using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
 using SGRH.Persistence.Repositories.Report;
 
@@ -33,6 +38,17 @@ namespace SGRH.Api
             builder.Services.AddScoped<IValidator<ModifyRoomDto>, ModifyRoomValidator>();
             builder.Services.AddScoped<IValidator<DisableRoomDto>, DisableRoomValidator>();
 
+            builder.Services.AddScoped<IValidator<CreateRateDto>, CreateRateValidator>();
+            builder.Services.AddScoped<IValidator<UpdateRateDto>, UpdateRateValidator>(); 
+            builder.Services.AddScoped<IValidator<DeleteRateDto>, DeleteRateValidator >();
+
+
+            // Db Context
+
+            builder.Services.AddDbContext<SGRHContext>(options =>
+            {
+                options.UseNpgsql(builder.Configuration.GetConnectionString("SGRH"));
+            });
 
             // Modulo de habitaciones
 
@@ -44,7 +60,12 @@ namespace SGRH.Api
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddTransient<IReportService, ReportService>();
 
-            // Modulo Tarifa (esperando)
+            // Modulo Tarifa (!!!!!!!!!!!!!)
+
+            builder.Services.AddScoped<IRatesRepository, RatesRepository>();
+            builder.Services.AddTransient<IRatesService, RatesService>();
+            builder.Services.AddTransient<IRateMapper, RateMapper>();
+
 
             // ...
 
