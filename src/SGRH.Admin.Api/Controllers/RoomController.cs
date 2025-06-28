@@ -12,8 +12,8 @@ namespace SGRH.Api.Controllers
     public class RoomController : ControllerBase
     {
         private readonly IRoomService _roomService;
-        //private readonly IAppLogger<RoomController> _logger;
-        //private readonly IConfiguration _configuration;
+        private readonly IAppLogger<RoomController> _logger;
+        private readonly IConfiguration _configuration;
 
         public RoomController(IRoomService roomService)
         {
