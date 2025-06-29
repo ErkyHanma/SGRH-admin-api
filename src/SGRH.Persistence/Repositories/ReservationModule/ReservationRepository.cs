@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿/*using Microsoft.Extensions.Logging;
 using Npgsql;
 using SGRH.Application.Dtos.ReservationModule.Reservation;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
@@ -260,3 +260,4 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         }
     }
 }
+*/

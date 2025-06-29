@@ -27,11 +27,13 @@ namespace SGRH.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+           /*builder.Services.AddDbContext<SGRHDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+           */
             // Logger
-            
+
             ////////////////////////////////// comentado de mientras
-            //builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
+            builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
 
             // Validadores para Floor
             builder.Services.AddScoped<IValidator<CreateFloorDto>, CreateFloorValidator>();

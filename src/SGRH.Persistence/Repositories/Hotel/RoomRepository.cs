@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿/*using FluentValidation;
 using Microsoft.Extensions.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Interfaces.Repositories.Hotel; // Cuidado con esto?
@@ -212,3 +212,4 @@ namespace SGRH.Persistence.Repositories.Hotel
 
     }
 }
+*/

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿/* using Microsoft.Extensions.Logging;
 using SGRH.Application.Dtos.ReservationModule.ReservationService;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
@@ -74,3 +74,4 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         }
     }
 }
+*/

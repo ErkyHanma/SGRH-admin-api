@@ -1,5 +1,8 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.Logging;
+// using FluentValidation.Internal; // No es necesario si no se usa directamente
+using Microsoft.Extensions.Configuration; // Nuevo using
+// using Microsoft.Extensions.Logging; // Reemplazado por SGRH.Application.Common.Logging
+using SGRH.Application.Common.Logging; // Nuevo using
 using SGRH.Application.Dtos.Hotel.RoomCategory;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
@@ -10,17 +13,22 @@ namespace SGRH.Persistence.Repositories.Hotel
     public class RoomCategoryRepository : IRoomCategoryRepository
     {
         private readonly string _connectionString;
-        private readonly ILogger<RoomCategoryRepository> _logger;
+        private readonly IConfiguration _configuration; // Nuevo
+        private readonly IAppLogger<RoomCategoryRepository> _logger; // Cambio de ILogger a IAppLogger
         private readonly IValidator<CreateRoomCategoryDto> _createValidator;
         private readonly IValidator<ModifyRoomCategoryDto> _modifyValidator;
         private readonly IValidator<DisableRoomCategoryDto> _disableValidator;
 
-        public RoomCategoryRepository(string connectionString, ILogger<RoomCategoryRepository> logger,
+        public RoomCategoryRepository(IConfiguration configuration, // Cambio en el constructor
+                                     IAppLogger<RoomCategoryRepository> logger, // Cambio en el constructor
                                      IValidator<CreateRoomCategoryDto> createValidator,
                                      IValidator<ModifyRoomCategoryDto> modifyValidator,
                                      IValidator<DisableRoomCategoryDto> disableValidator)
         {
-            _connectionString = connectionString;
+            _configuration = configuration; // Asignación de IConfiguration
+            //_connectionString = _configuration.GetConnectionString("SGRH"); // Obtener connection string de IConfiguration
+
+            _connectionString = _configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
             _logger = logger;
             _createValidator = createValidator;
             _modifyValidator = modifyValidator;
@@ -29,76 +37,90 @@ namespace SGRH.Persistence.Repositories.Hotel
 
         public async Task<OperationResult<CreateRoomCategoryDto>> AddAsync(CreateRoomCategoryDto createRoomCategoryDto)
         {
-            var validationResult = _createValidator.Validate(createRoomCategoryDto);
-
-            if (!validationResult.IsValid)
+            try // Añadir try-catch
             {
-                var message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                _logger.LogWarning("Validation failed for CreateRoomCategoryDto: {Message}", message);
-                return OperationResult<CreateRoomCategoryDto>.Failure(message);
+                var validationResult = _createValidator.Validate(createRoomCategoryDto);
+
+                if (!validationResult.IsValid)
+                {
+                    // Usa el nuevo método HandleValidationFailure
+                    return HandleValidationFailure<CreateRoomCategoryDto>(validationResult);
+                }
+
+                _logger.Info("Creating Room Category {Name}", createRoomCategoryDto.Name); // Cambio de LogInformation a Info
+
+                var parameters = new Dictionary<string, object>
+                {
+                    {"p_name", createRoomCategoryDto.Name },
+                    {"p_description", createRoomCategoryDto.Description },
+                    {"p_max_capacity", createRoomCategoryDto.MaxCapacity },
+                    {"p_amenities", createRoomCategoryDto.Amenities },
+                    {"p_created_by", createRoomCategoryDto.CreatedBy }
+                };
+
+                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<RoomCategoryRepository>( // Cambio de tipo genérico
+                    _connectionString,
+                    "hotel.CreateRoomCategory",
+                    parameters,
+                    _logger
+                );
+
+                if (storedProcedureResult.IsSuccess)
+                {
+                    return OperationResult<CreateRoomCategoryDto>.Success(storedProcedureResult.Message, createRoomCategoryDto);
+                }
+                else
+                {
+                    return OperationResult<CreateRoomCategoryDto>.Failure(storedProcedureResult.Message);
+                }
             }
-
-            _logger.LogInformation("Creating Room Category {Name}", createRoomCategoryDto.Name);
-
-            var parameters = new Dictionary<string, object>
+            catch (Exception ex)
             {
-                {"p_name", createRoomCategoryDto.Name },
-                {"p_description", createRoomCategoryDto.Description },
-                {"p_max_capacity", createRoomCategoryDto.MaxCapacity },
-                {"p_amenities", createRoomCategoryDto.Amenities },
-                {"p_created_by", createRoomCategoryDto.CreatedBy }
-            };
-
-            var storedProcedureResult = await StoreProcedureEx.ExecuteAsync(
-                _connectionString,
-                "hotel.CreateRoomCategory",
-                parameters,
-                _logger
-            );
-
-            if (storedProcedureResult.IsSuccess)
-            {
-                return OperationResult<CreateRoomCategoryDto>.Success(storedProcedureResult.Message, createRoomCategoryDto);
-            }
-            else
-            {
-                return OperationResult<CreateRoomCategoryDto>.Failure(storedProcedureResult.Message);
+                _logger.ErrorEx(ex, "Exception thrown during AddAsync() for RoomCategoryRepository"); // Cambio de LogError a ErrorEx
+                return OperationResult<CreateRoomCategoryDto>.Failure("An error occurred while creating the room category.");
             }
         }
 
         public async Task<OperationResult<DisableRoomCategoryDto>> DeleteAsync(DisableRoomCategoryDto disableRoomCategoryDto)
         {
-            var validationResult = _disableValidator.Validate(disableRoomCategoryDto);
-
-            if (!validationResult.IsValid)
+            try // Añadir try-catch
             {
-                var message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                _logger.LogWarning("Validation failed for DisableRoomCategoryDto: {Message}", message);
-                return OperationResult<DisableRoomCategoryDto>.Failure(message);
+                var validationResult = _disableValidator.Validate(disableRoomCategoryDto);
+
+                if (!validationResult.IsValid)
+                {
+                    // Usa el nuevo método HandleValidationFailure
+                    return HandleValidationFailure<DisableRoomCategoryDto>(validationResult);
+                }
+
+                _logger.Info("Disabling Room Category ID {CategoryId}", disableRoomCategoryDto.CategoryId); // Cambio de LogInformation a Info
+
+                var parameters = new Dictionary<string, object>
+                {
+                    { "p_category_id", disableRoomCategoryDto.CategoryId },
+                    { "p_updated_by", disableRoomCategoryDto.UpdatedBy }
+                };
+
+                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<RoomCategoryRepository>( // Cambio de tipo genérico
+                    _connectionString,
+                    "hotel.DisableRoomCategory",
+                    parameters,
+                    _logger
+                );
+
+                if (storedProcedureResult.IsSuccess)
+                {
+                    return OperationResult<DisableRoomCategoryDto>.Success(storedProcedureResult.Message, disableRoomCategoryDto);
+                }
+                else
+                {
+                    return OperationResult<DisableRoomCategoryDto>.Failure(storedProcedureResult.Message);
+                }
             }
-
-            _logger.LogInformation("Disabling Room Category ID {CategoryId}", disableRoomCategoryDto.CategoryId);
-
-            var parameters = new Dictionary<string, object>
+            catch (Exception ex)
             {
-                { "p_category_id", disableRoomCategoryDto.CategoryId },
-                { "p_updated_by", disableRoomCategoryDto.UpdatedBy }
-            };
-
-            var storedProcedureResult = await StoreProcedureEx.ExecuteAsync(
-                _connectionString,
-                "hotel.DisableRoomCategory",
-                parameters,
-                _logger
-            );
-
-            if (storedProcedureResult.IsSuccess)
-            {
-                return OperationResult<DisableRoomCategoryDto>.Success(storedProcedureResult.Message, disableRoomCategoryDto);
-            }
-            else
-            {
-                return OperationResult<DisableRoomCategoryDto>.Failure(storedProcedureResult.Message);
+                _logger.ErrorEx(ex, "Exception thrown during DeleteAsync() for RoomCategoryRepository"); // Cambio de LogError a ErrorEx
+                return OperationResult<DisableRoomCategoryDto>.Failure("An error occurred while disabling the room category.");
             }
         }
 
@@ -106,7 +128,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                _logger.LogInformation("Getting all room categories");
+                _logger.Info("Getting all room categories"); // Cambio de LogInformation a Info
 
                 var data = await FunctionReaderEx.CallFunctionAsync(
                     _connectionString,
@@ -115,9 +137,9 @@ namespace SGRH.Persistence.Repositories.Hotel
                     {
                         CategoryId = reader.GetInt32(reader.GetOrdinal("category_id")),
                         Name = reader.GetString(reader.GetOrdinal("name")),
-                        Description = reader.GetString(reader.GetOrdinal("description")), // Changed to non-nullable string
+                        Description = reader.GetString(reader.GetOrdinal("description")),
                         MaxCapacity = reader.GetInt32(reader.GetOrdinal("max_capacity")),
-                        Amenities = reader.GetString(reader.GetOrdinal("amenities")),     // Changed to non-nullable string
+                        Amenities = reader.GetString(reader.GetOrdinal("amenities")),
                         CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                         CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by"))
                     });
@@ -126,7 +148,7 @@ namespace SGRH.Persistence.Repositories.Hotel
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in GetAllAsync() for RoomCategoryRepository");
+                _logger.ErrorEx(ex, "Error in GetAllAsync() for RoomCategoryRepository"); // Cambio de LogError a ErrorEx
                 return OperationResult<IEnumerable<RoomCategoryDto>>.Failure("Error al obtener categorías de habitación.");
             }
         }
@@ -135,7 +157,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                _logger.LogInformation("Getting room category by ID {CategoryId}", id);
+                _logger.Info("Getting room category by ID {CategoryId}", id); // Cambio de LogInformation a Info
 
                 var data = await FunctionReaderEx.CallFunctionAsync(
                     _connectionString,
@@ -144,9 +166,9 @@ namespace SGRH.Persistence.Repositories.Hotel
                     {
                         CategoryId = reader.GetInt32(reader.GetOrdinal("category_id")),
                         Name = reader.GetString(reader.GetOrdinal("name")),
-                        Description = reader.GetString(reader.GetOrdinal("description")), // Changed to non-nullable string
+                        Description = reader.GetString(reader.GetOrdinal("description")),
                         MaxCapacity = reader.GetInt32(reader.GetOrdinal("max_capacity")),
-                        Amenities = reader.GetString(reader.GetOrdinal("amenities")),     // Changed to non-nullable string
+                        Amenities = reader.GetString(reader.GetOrdinal("amenities")),
                         CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                         CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by"))
                     },
@@ -164,49 +186,65 @@ namespace SGRH.Persistence.Repositories.Hotel
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in GetByIdAsync() for RoomCategoryRepository");
+                _logger.ErrorEx(ex, "Error in GetByIdAsync() for RoomCategoryRepository"); // Cambio de LogError a ErrorEx
                 return OperationResult<RoomCategoryDto>.Failure("Error al obtener categoría de habitación.");
             }
         }
 
         public async Task<OperationResult<ModifyRoomCategoryDto>> UpdateAsync(ModifyRoomCategoryDto modifyRoomCategoryDto)
         {
-            var validationResult = _modifyValidator.Validate(modifyRoomCategoryDto);
-
-            if (!validationResult.IsValid)
+            try // Añadir try-catch
             {
-                var message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                _logger.LogWarning("Validation failed for ModifyRoomCategoryDto: {Message}", message);
-                return OperationResult<ModifyRoomCategoryDto>.Failure(message);
+                var validationResult = _modifyValidator.Validate(modifyRoomCategoryDto);
+
+                if (!validationResult.IsValid)
+                {
+                    // Usa el nuevo método HandleValidationFailure
+                    return HandleValidationFailure<ModifyRoomCategoryDto>(validationResult);
+                }
+
+                _logger.Info("Updating Room Category {Name}", modifyRoomCategoryDto.Name); // Cambio de LogInformation a Info
+
+                var parameters = new Dictionary<string, object>
+                {
+                    { "p_category_id", modifyRoomCategoryDto.CategoryId },
+                    { "p_name", modifyRoomCategoryDto.Name },
+                    { "p_description", modifyRoomCategoryDto.Description },
+                    { "p_max_capacity", modifyRoomCategoryDto.MaxCapacity },
+                    { "p_amenities", modifyRoomCategoryDto.Amenities },
+                    { "p_updated_by", modifyRoomCategoryDto.UpdatedBy }
+                };
+
+                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<RoomCategoryRepository>( // Cambio de tipo genérico
+                    _connectionString,
+                    "hotel.ModifyRoomCategory",
+                    parameters,
+                    _logger
+                );
+
+                if (storedProcedureResult.IsSuccess)
+                {
+                    return OperationResult<ModifyRoomCategoryDto>.Success(storedProcedureResult.Message, modifyRoomCategoryDto);
+                }
+                else
+                {
+                    return OperationResult<ModifyRoomCategoryDto>.Failure(storedProcedureResult.Message);
+                }
             }
-
-            _logger.LogInformation("Updating Room Category {Name}", modifyRoomCategoryDto.Name);
-
-            var parameters = new Dictionary<string, object>
+            catch (Exception ex)
             {
-                { "p_category_id", modifyRoomCategoryDto.CategoryId },
-                { "p_name", modifyRoomCategoryDto.Name },
-                { "p_description", modifyRoomCategoryDto.Description },
-                { "p_max_capacity", modifyRoomCategoryDto.MaxCapacity },
-                { "p_amenities", modifyRoomCategoryDto.Amenities },
-                { "p_updated_by", modifyRoomCategoryDto.UpdatedBy }
-            };
-
-            var storedProcedureResult = await StoreProcedureEx.ExecuteAsync(
-                _connectionString,
-                "hotel.ModifyRoomCategory",
-                parameters,
-                _logger
-            );
-
-            if (storedProcedureResult.IsSuccess)
-            {
-                return OperationResult<ModifyRoomCategoryDto>.Success(storedProcedureResult.Message, modifyRoomCategoryDto);
+                _logger.ErrorEx(ex, "Exception thrown during UpdateAsync() for RoomCategoryRepository"); // Cambio de LogError a ErrorEx
+                return OperationResult<ModifyRoomCategoryDto>.Failure("An error occurred while updating the room category.");
             }
-            else
-            {
-                return OperationResult<ModifyRoomCategoryDto>.Failure(storedProcedureResult.Message);
-            }
+        }
+
+        // Nuevo método para manejar fallos de validación, replicando el de RoomRepository
+        private OperationResult<TDto> HandleValidationFailure<TDto>(FluentValidation.Results.ValidationResult validationResult)
+        {
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage);
+            var message = string.Join("; ", errors);
+            _logger.ErrorNoEx("Validation failed: {Message}", message);
+            return OperationResult<TDto>.Failure(message);
         }
     }
 }

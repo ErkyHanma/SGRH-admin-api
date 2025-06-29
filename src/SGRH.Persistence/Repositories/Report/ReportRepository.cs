@@ -1,4 +1,4 @@
-﻿using SGRH.Application.Dtos.Report;
+﻿/*using SGRH.Application.Dtos.Report;
 using SGRH.Application.Interfaces.Repositories.Report; // Cuidado con esto?
 using SGRH.Domain.Base;// Cuidado con esto?
 using System;
@@ -32,3 +32,4 @@ namespace SGRH.Persistence.Repositories.Report
         }
     }
 }
+*/
