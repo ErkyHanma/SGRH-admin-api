@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SGRH.Domain.Entities.ServiceModule;
 
-namespace SGRH.Persistence.Context.EntityConfigurations
+namespace SGRH.Persistence.Context.EntityConfiguration
 {
     public class ServiceConfiguration
     {
