@@ -59,8 +59,13 @@ namespace SGRH.Persistence.Helpers
                 {
                     result = OperationResult<string>.Success(message);
                 }
+                else if (!string.IsNullOrWhiteSpace(message) && message.ToLower().Contains("success")) {
+                   
+                    result = OperationResult<string>.Success(message);
+                }
                 else
                 {
+
                     result = OperationResult<string>.Failure(message);
                 }
 

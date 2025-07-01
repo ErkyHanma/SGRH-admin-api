@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Report;
@@ -18,12 +19,14 @@ namespace SGRH.Persistence.Repositories.Report
 {
     public class ReportRepository : IReportRepository
     {
+        private readonly IConfiguration _configuration;
         private readonly string _connectionString;
-        private readonly AppLogger<ReportRepository> _logger;
+        private readonly IAppLogger<ReportRepository> _logger;
 
-        public ReportRepository(string connectionString, AppLogger<ReportRepository> logger)
+        public ReportRepository(IConfiguration configuration,  IAppLogger<ReportRepository> logger)
         {
-            _connectionString = connectionString;
+            _configuration = configuration;
+            _connectionString = _configuration.GetConnectionString("SGRH");
             _logger = logger;
         }
 

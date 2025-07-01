@@ -43,7 +43,7 @@ namespace SGRH.Application.Services.Hotel
 
                 // Validaciones (agregar mas)
 
-                if (operationResult.IsSuccess)
+                if (!operationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while creating: {operationResult.Message} Persisting room.");
                     return operationResult;
@@ -58,9 +58,8 @@ namespace SGRH.Application.Services.Hotel
             {
                 _logger.ErrorEx(ex, "Error"); // deberia estar en el archivo de configuracion?
                 operationResult = OperationResult<CreateRoomDto>.Failure($"Error creating a room {ex.Message}");
+                return operationResult;
             }
-
-            return OperationResult<CreateRoomDto>.Success("Success");
         }
 
         public async Task<OperationResult<DisableRoomDto>> DeleteRoom(DisableRoomDto disableRoomDto)
@@ -81,7 +80,7 @@ namespace SGRH.Application.Services.Hotel
 
                 // Validaciones (agregar mas)
 
-                if (operationResult.IsSuccess)
+                if (!operationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while deleting a room: {operationResult.Message} Persisting room.");
                     return operationResult;
@@ -160,16 +159,19 @@ namespace SGRH.Application.Services.Hotel
 
                 // Validaciones (agregar mas)
 
-                if (operationResult.IsSuccess)
+                if (!operationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while updating a room: {operationResult.Message} Persisting room.");
                     return operationResult;
                 }
 
+                _logger.Info($"The room {modifyRoomDto.RoomNumber} was updated successfully.");
+                return operationResult;
+
             } 
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Error"); // deberia estar en el archivo de configuracion?
+                _logger.ErrorEx(ex, "Error during UpdateRoom"); // deberia estar en el archivo de configuracion?
                 operationResult = OperationResult<ModifyRoomDto>.Failure($"Error trying to update a room {ex.Message}");
             }
             return operationResult;

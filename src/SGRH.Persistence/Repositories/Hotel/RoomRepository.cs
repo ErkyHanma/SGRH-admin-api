@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using FluentValidation.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
@@ -11,17 +13,20 @@ namespace SGRH.Persistence.Repositories.Hotel
     public class RoomRepository : IRoomRepository
     {
         private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
         private readonly IAppLogger<RoomRepository> _logger;
         private readonly IValidator<CreateRoomDto> _createValidator;
         private readonly IValidator<ModifyRoomDto> _modifyValidator;
         private readonly IValidator<DisableRoomDto> _disableValidator;
 
-        public RoomRepository(string connetionString, IAppLogger<RoomRepository> logger, 
+        public RoomRepository(IConfiguration configuration, 
+                              IAppLogger<RoomRepository> logger, 
                               IValidator<CreateRoomDto> createValidator, 
                               IValidator<ModifyRoomDto> modifyValidator, 
                               IValidator<DisableRoomDto> disableValidator)
         {
-            _connectionString = connetionString;
+            _configuration = configuration;
+            _connectionString = _configuration.GetConnectionString("SGRH"); 
             _logger = logger;
             _createValidator = createValidator;
             _modifyValidator = modifyValidator;
