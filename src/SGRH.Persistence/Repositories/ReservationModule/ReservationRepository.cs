@@ -1,4 +1,5 @@
-﻿using SGRH.Application.Common.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.ReservationModule.Reservation;
 using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
@@ -9,12 +10,14 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 {
     public class ReservationRepository : IReservationRepository
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
         private readonly IAppLogger<ReservationRepository> _logger;
+        private readonly IConfiguration _configuration;
 
-        public ReservationRepository(string connectionString, IAppLogger<ReservationRepository> logger)
+        public ReservationRepository(IAppLogger<ReservationRepository> logger, IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _configuration = configuration;
+            _connectionString = _configuration["ConnectionStrings:SGRHConnection"]; ;
             _logger = logger;
         }
 
@@ -27,7 +30,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
                 var reservations = await FunctionReaderEx.CallFunctionAsync(
                     _connectionString,
-                    "SELECT * FROM reservationModule.GetAllReservationsWithServices",
+                    "SELECT * FROM reservationModule.GetAllReservationsWithServices()",
                     reader => new ReservationDto
                     {
                         ReservationId = reader.GetInt32(0),
@@ -38,12 +41,12 @@ namespace SGRH.Persistence.Repositories.ReservationModule
                         ReservationDate = reader.GetDateTime(5),
                         Status = reader.GetString(6),
                         GuestCount = reader.GetInt32(7),
-                        PaymentAmount = reader.GetDecimal(8),
+                        PaymentAmount = reader.IsDBNull(8) ? 0 : reader.GetDecimal(8),
                         ServicesCount = reader.GetInt32(9),
                         TotalServicesCost = reader.GetDecimal(10),
                         ServiceNames = reader.IsDBNull(11) ? "" : reader.GetString(11),
                         CreatedAt = reader.GetDateTime(12),
-                        UpdatedAt = reader.GetDateTime(13)
+                        UpdatedAt = reader.IsDBNull(13) ? null : reader.GetDateTime(13),
                     });
 
                 if (reservations.Count == 0)
@@ -56,7 +59,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error retrieving reservations");
-                return OperationResult<IEnumerable<ReservationDto>>.Failure("Error retrieving reservations");
+                return OperationResult<IEnumerable<ReservationDto>>.Failure($"Error retrieving reservations {ex.Message}");
             }
         }
         public async Task<OperationResult<ReservationDto>> GetByIdAsync(int id)
@@ -85,12 +88,12 @@ namespace SGRH.Persistence.Repositories.ReservationModule
                         ReservationDate = reader.GetDateTime(reader.GetOrdinal("reservation_date")),
                         Status = reader.GetString(reader.GetOrdinal("status")),
                         GuestCount = reader.GetInt32(reader.GetOrdinal("guest_count")),
-                        PaymentAmount = reader.GetDecimal(reader.GetOrdinal("payment_amount")),
+                        PaymentAmount = reader.IsDBNull(reader.GetOrdinal("payment_amount")) ? 0 : reader.GetDecimal(reader.GetOrdinal("payment_amount")),
                         ServicesCount = reader.GetInt32(reader.GetOrdinal("services_count")),
                         TotalServicesCost = reader.GetDecimal(reader.GetOrdinal("total_services_cost")),
                         ServiceNames = reader.IsDBNull(reader.GetOrdinal("service_names")) ? "" : reader.GetString(reader.GetOrdinal("service_names")),
                         CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
-                        UpdatedAt = reader.GetDateTime(reader.GetOrdinal("updated_at")),
+                        UpdatedAt = reader.IsDBNull(reader.GetOrdinal("updated_at")) ? null : reader.GetDateTime(reader.GetOrdinal("updated_at")),
 
                     },
                     new Dictionary<string, object>
@@ -109,7 +112,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             catch (Exception e)
             {
                 _logger.ErrorEx(e, "Error while retrieving reservation");
-                return OperationResult<ReservationDto>.Failure("Unable to retrieve data");
+                return OperationResult<ReservationDto>.Failure($"Unable to retrieve data {e.Message}");
             }
         }
         public async Task<OperationResult<CreateReservationDto>> AddAsync(CreateReservationDto createReservationDto)
@@ -130,12 +133,14 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             {
                 {"p_client_id", createReservationDto.ClientId },
                 { "p_room_id", createReservationDto.RoomId },
-                { "p_start_date", createReservationDto.StartDate },
-                { "p_end_date", createReservationDto.EndDate },
+                { "p_start_date", createReservationDto.StartDate.Date },
+                { "p_end_date", createReservationDto.EndDate.Date },
                 { "p_status", createReservationDto.Status },
                 { "p_guest_count",createReservationDto.GuestCount },
-                { "p_created_by", createReservationDto.CreatedBy }
+                { "p_payment_amount",createReservationDto.PaymentAmount },
+                { "p_created_by", createReservationDto.CreatedBy },
             };
+
 
             var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync(
                 _connectionString,
@@ -150,6 +155,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             }
             else
             {
+                Console.WriteLine("Fake");
                 return OperationResult<CreateReservationDto>.Failure(StoredProcedureResult.Message);
             }
         }
@@ -169,18 +175,19 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             var parameters = new Dictionary<string, object>()
             {
                 { "p_reservation_id", updateReservationDto.ReservationId},
-                { "p_client_id", updateReservationDto.ReservationId},
-                { "p_room_id", updateReservationDto.ReservationId},
-                { "p_start_date", updateReservationDto.ReservationId},
-                { "p_end_date", updateReservationDto.ReservationId},
-                { "p_status", updateReservationDto.ReservationId},
-                { "p_guest_count", updateReservationDto.ReservationId},
-                { "p_updated_by", updateReservationDto.ReservationId},
+                { "p_client_id", updateReservationDto.ClientId},
+                { "p_room_id", updateReservationDto.RoomId},
+                { "p_start_date", updateReservationDto.StartDate.Date},
+                { "p_end_date", updateReservationDto.EndDate.Date},
+                { "p_status", updateReservationDto.Status},
+                { "p_guest_count", updateReservationDto.GuestCount},
+                { "p_payment_amount", updateReservationDto.PaymentAmount},
+                { "p_updated_by", updateReservationDto.UpdatedBy},
             };
 
             var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync(
              _connectionString,
-             "reservationModule.CreateReservation",
+             "reservationModule.UpdateReservation",
              parameters,
              _logger
             );

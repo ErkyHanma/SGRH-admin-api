@@ -27,10 +27,20 @@ namespace SGRH.Application.Common.Mappers.ServiceModule
             };
         }
 
+        public Service ToDomainEntityDelete(DeleteServiceDto dto)
+        {
+            return new Service
+            {
+                ServiceId = dto.ServiceId,
+
+            };
+        }
+
         public ServiceDto ToDto(Service entity)
         {
             return new ServiceDto
             {
+                ServiceId = entity.ServiceId,
                 Name = entity.Name,
                 Description = entity.Description,
                 Price = entity.Price,
@@ -45,6 +55,9 @@ namespace SGRH.Application.Common.Mappers.ServiceModule
                 Price = entity.Price,
             };
         }
+
+
+
 
     }
 }
