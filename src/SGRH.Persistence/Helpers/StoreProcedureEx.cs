@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using SGRH.Application.Common.Logging;
 using SGRH.Domain.Base;
@@ -48,32 +48,32 @@ namespace SGRH.Persistence.Helpers
                 // Crear variable y verificar si pResult y su Value no son nulos.
                 string message;
                 if (pResult?.Value != null && pResult.Value != DBNull.Value)
+
                 {
                     message = pResult.Value.ToString();
                 }
                 else
                 {
-                    message = "No message provided by stored procedure.";
+                logger.Info("Stored procedure {Procedure} executed. Message: {Message}. Affected rows: {AffectedRows}", procedureName, message, affectedRows);
+                    message = "No message";
                 }
 
-            
-                if (!string.IsNullOrWhiteSpace(message) &&
-                    (message.ToLower().Contains("exitosamente") || message.ToLower().Contains("correctamente")))
+                // Verificar resultado
+                if (!string.IsNullOrWhiteSpace(message) && message.ToLower().Contains("success") || affectedRows > 0)
                 {
                     result = OperationResult<string>.Success(message);
                 }
-                // condición para `affectedRows` para SPs
-                // else if (affectedRows > 0)
-                // {
-                //     result = OperationResult<string>.Success(message);
-                // }
+                else if (!string.IsNullOrWhiteSpace(message) && message.ToLower().Contains("success")) {
+                   
+                    result = OperationResult<string>.Success(message);
+                }
                 else
                 {
-                   
+
                     result = OperationResult<string>.Failure(message);
                 }
 
-                logger.Info("Stored procedure {Procedure} executed. Message: {Message}. Affected rows: {AffectedRows}", procedureName, message, affectedRows);
+                logger.Info("Stored procedure {Procedure} executed. Message: {Message}", procedureName, message);
             }
             catch (Exception ex)
             {
@@ -86,3 +86,7 @@ namespace SGRH.Persistence.Helpers
         }
     }
 }
+
+
+
+

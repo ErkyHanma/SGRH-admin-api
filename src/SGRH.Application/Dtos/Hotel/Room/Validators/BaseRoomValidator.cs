@@ -16,7 +16,7 @@ namespace SGRH.Application.Dtos.Hotel.Room.Validators
         protected abstract string? GetDescription(T dto);
         protected abstract string? GetRoomImgUrl(T dto);
 
-        protected BaseRoomValidator() 
+        protected BaseRoomValidator() // Inicializamos y asignamos reglas segun el tipo de dato
         {
             RuleFor(x => GetRoomNumber(x))
                 .NotEmpty().WithMessage("Room number is required.")
@@ -40,7 +40,7 @@ namespace SGRH.Application.Dtos.Hotel.Room.Validators
                 .MaximumLength(500).WithMessage("Image URL can't exceed 500 characters.")
                 .When(x => !string.IsNullOrEmpty(GetRoomImgUrl(x)));
         }
-        private static bool IsValidStatus(string status)
+        private static bool IsValidStatus(string status) // Validar estado de habitacion
         {
             return status == "available" || status == "maintenance" || status == "occupied";
         }
