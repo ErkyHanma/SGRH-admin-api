@@ -30,6 +30,7 @@ using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Application.Interfaces.Services.Service_Module;
 using SGRH.Application.Services.ServiceModule;
 using SGRH.Persistence.Repositories.Service_Module;
+using SGRH.Persistence.Repositories.UserManagement;
 
 namespace SGRH.Api
 {
@@ -47,7 +48,7 @@ namespace SGRH.Api
             // Logger
             builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));
 
-
+            // Validators
             builder.Services.AddScoped<IValidator<CreateRoomDto>, CreateRoomValidator>();
             builder.Services.AddScoped<IValidator<ModifyRoomDto>, ModifyRoomValidator>();
             builder.Services.AddScoped<IValidator<DisableRoomDto>, DisableRoomValidator>();
@@ -64,12 +65,13 @@ namespace SGRH.Api
             builder.Services.AddScoped<IValidator<ModifyRoomCategoryDto>, ModifyRoomCategoryValidator>();
             builder.Services.AddScoped<IValidator<DisableRoomCategoryDto>, DisableRoomCategoryValidator>();
 
-            // ----------------- DbContext -----------------
+            // DbContext
             builder.Services.AddDbContext<SGRHContext>(options =>
             {
                 options.UseNpgsql(builder.Configuration.GetConnectionString("SGRHConnection"));
             });
 
+            // Hotel Module
             builder.Services.AddScoped<IRoomRepository, RoomRepository>();
             builder.Services.AddTransient<IRoomService, RoomService>();
 
@@ -83,20 +85,26 @@ namespace SGRH.Api
             builder.Services.AddScoped<IRoomCategoryRepository, RoomCategoryRepository>();
             builder.Services.AddTransient<IRoomCategoryService, RoomCategoryService>();
 
+            // Report Module
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddTransient<IReportService, ReportService>();
 
+            // Reservation Module
             builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
             builder.Services.AddTransient<IReservationService, ReservationService>();
 
             builder.Services.AddScoped<IReservationServiceRepository, ReservationServiceRepository>();
             builder.Services.AddTransient<IReservationServiceService, ReservationServiceService>();
 
+            // Service Module
             builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
             builder.Services.AddTransient<IServiceService, ServiceService>();
             builder.Services.AddScoped<IServiceMapper, ServiceMapper>();
 
-            // ----------------- API setup -----------------
+            // User Management Module
+            builder.Services.AddUserManagementRepositories(builder.Configuration);
+
+            // API setup
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

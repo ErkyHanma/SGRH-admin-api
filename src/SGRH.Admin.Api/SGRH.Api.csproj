@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SGRH.Application\SGRH.Application.csproj" />
+    <ProjectReference Include="..\SGRH.Domain\SGRH.Domain.csproj" />
     <ProjectReference Include="..\SGRH.Persistence\SGRH.Persistence.csproj" />
   </ItemGroup>
 
