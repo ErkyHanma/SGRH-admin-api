@@ -2,18 +2,13 @@
 
 namespace SGRH.Application.Dtos.ReservationModule.ReservationService.Validators
 {
-    public class DeleteReservationServiceDtoValidator
+    public class DeleteReservationServiceDtoValidator : BaseReservationServiceDtoValidator<DeleteReservationServiceDto>
     {
-        public static OperationResult<DeleteReservationServiceDto> Validate(DeleteReservationServiceDto dto)
+        public override OperationResult<DeleteReservationServiceDto> Validate(DeleteReservationServiceDto dto)
         {
-            if (dto == null)
-                return OperationResult<DeleteReservationServiceDto>.Failure("Dto cannot be null.");
-
-            if (dto.ReservationId <= 0)
-                return OperationResult<DeleteReservationServiceDto>.Failure("ReservationId must be greater than zero.");
-
-            if (dto.ServiceId <= 0)
-                return OperationResult<DeleteReservationServiceDto>.Failure("ServiceId must be greater than zero.");
+            var result = base.Validate(dto);
+            if (!result.IsSuccess)
+                return result;
 
             return OperationResult<DeleteReservationServiceDto>.Success("All fields validated! ", dto);
         }

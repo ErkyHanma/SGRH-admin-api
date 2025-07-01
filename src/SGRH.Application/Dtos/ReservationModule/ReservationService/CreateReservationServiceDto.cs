@@ -1,8 +1,7 @@
 ﻿namespace SGRH.Application.Dtos.ReservationModule.ReservationService
 {
-    public record class CreateReservationServiceDto
+    public class CreateReservationServiceDto : BaseReservationServiceDto
     {
-        public int ReservationId { get; set; }
-        public int ServiceId { get; set; }
+
     }
 }

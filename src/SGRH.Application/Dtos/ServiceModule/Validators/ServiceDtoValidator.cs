@@ -2,24 +2,19 @@
 
 namespace SGRH.Application.Dtos.ServiceModule.Validators
 {
-    public class ServiceDtoValidator
+    public class ServiceDtoValidator : BaseServiceValidator<ServiceDto>
     {
-        public static OperationResult<ServiceDto> Validate(ServiceDto dto)
+        public override OperationResult<ServiceDto> Validate(ServiceDto serviceDto)
         {
 
-            if (dto == null)
-                return OperationResult<ServiceDto>.Failure("Service entity cannot be null.");
+            var baseResult = base.Validate(serviceDto);
+            if (!baseResult.IsSuccess)
+                return baseResult;
 
-            if (string.IsNullOrWhiteSpace(dto.Name))
-                return OperationResult<ServiceDto>.Failure("Service name is required.");
+            if (serviceDto.ServiceId <= 0)
+                return OperationResult<ServiceDto>.Failure("ServiceID must be greater than zero.");
 
-            if (string.IsNullOrWhiteSpace(dto.Description))
-                return OperationResult<ServiceDto>.Failure("Service description is required.");
-
-            if (dto.Price < 0)
-                return OperationResult<ServiceDto>.Failure("Service price cannot be negative.");
-
-            return OperationResult<ServiceDto>.Success("Service validated successfully.", dto);
+            return OperationResult<ServiceDto>.Success("Service validated successfully.", serviceDto);
         }
     }
 }

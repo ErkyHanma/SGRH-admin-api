@@ -28,7 +28,8 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             _logger.Info("Add service for a reservation");
 
             // Validation
-            var validationResult = CreateReservationServiceDtoValidator.Validate(createReservationServiceDto);
+            var createReservationServiceDtoValidator = new CreateReservationServiceDtoValidator();
+            var validationResult = createReservationServiceDtoValidator.Validate(createReservationServiceDto);
 
             if (!validationResult.IsSuccess)
             {
@@ -63,7 +64,8 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             _logger.Info("Remove service for a reservation");
 
             // Validation
-            var validationResult = DeleteReservationServiceDtoValidator.Validate(deleteReservationServiceDto);
+            var deleteReservationServiceDtoValidator = new DeleteReservationServiceDtoValidator();
+            var validationResult = deleteReservationServiceDtoValidator.Validate(deleteReservationServiceDto);
 
             if (!validationResult.IsSuccess)
             {
