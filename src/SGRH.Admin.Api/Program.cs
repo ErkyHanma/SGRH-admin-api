@@ -1,6 +1,45 @@
+using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
+using SGRH.Application.Common.Logging;
+using SGRH.Application.Common.Mappers.ServiceModule;
+using SGRH.Application.Interfaces.Mappers.ServiceModule;
+using SGRH.Application.Interfaces.Repositories.ReservationModule;
+using SGRH.Application.Interfaces.Repositories.ServiceModule;
+using SGRH.Application.Interfaces.Services.ReservationModule;
+using SGRH.Application.Interfaces.Services.Service_Module;
+using SGRH.Application.Services.ReservationModule;
+using SGRH.Application.Services.ServiceModule;
+using SGRH.Persistence.Context;
+using SGRH.Persistence.Repositories.ReservationModule;
+using SGRH.Persistence.Repositories.Service_Module;
+
 var builder = WebApplication.CreateBuilder(args);
 
+Env.Load();
+
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+builder.Configuration["ConnectionStrings:SGRHConnection"] = connectionString;
+
+
+builder.Services.AddDbContext<SGRHContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("SGRHConnection")));
+builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));
+
 // Add services to the container.
+// Reservation
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddTransient<IReservationService, ReservationService>();
+
+// ReservationService
+builder.Services.AddScoped<IReservationServiceRepository, ReservationServiceRepository>();
+builder.Services.AddTransient<IReservationServiceService, ReservationServiceService>();
+
+// Service
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddTransient<IServiceService, ServiceService>();
+builder.Services.AddScoped<IServiceMapper, ServiceMapper>();
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

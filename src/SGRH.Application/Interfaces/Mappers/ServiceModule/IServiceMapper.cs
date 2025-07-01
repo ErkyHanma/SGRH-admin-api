@@ -7,6 +7,7 @@ namespace SGRH.Application.Interfaces.Mappers.ServiceModule
     {
         Service ToDomainEntity(ServiceDto dto);
         Service ToDomainEntityAdd(CreateServiceDto dto);
+        Service ToDomainEntityDelete(DeleteServiceDto deleteServiceDto);
         ServiceDto ToDto(Service entity);
         CreateServiceDto ToCreateDto(Service entity);
     }
