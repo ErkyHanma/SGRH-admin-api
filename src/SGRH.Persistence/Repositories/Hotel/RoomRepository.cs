@@ -10,7 +10,7 @@ using SGRH.Persistence.Helpers;
 
 namespace SGRH.Persistence.Repositories.Hotel
 {
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : IRoomRepository // Las validaciones estan en observacion
     {
         private readonly string _connectionString;
         private readonly IConfiguration _configuration;

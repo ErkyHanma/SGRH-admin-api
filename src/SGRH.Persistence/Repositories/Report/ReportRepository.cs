@@ -32,9 +32,6 @@ namespace SGRH.Persistence.Repositories.Report
 
         public async Task<OperationResult<IEnumerable<OcuppancyReportDto>>> GetOcuppancyReportAsync(ReportDateRangeRequestDto request)
         {
-            var validation = ValidateDateRange(request);
-            if (!validation.IsSuccess)
-                return OperationResult<IEnumerable<OcuppancyReportDto>>.Failure(validation.Message);
 
             try
             {
@@ -65,9 +62,6 @@ namespace SGRH.Persistence.Repositories.Report
 
         public async Task<OperationResult<IEnumerable<RatesReportDto>>> GetRatesReportAsync(ReportDateRangeRequestDto request)
         {
-            var validation = ValidateDateRange(request);
-            if (!validation.IsSuccess)
-                return OperationResult<IEnumerable<RatesReportDto>>.Failure(validation.Message);
 
             try
             {
@@ -99,10 +93,6 @@ namespace SGRH.Persistence.Repositories.Report
 
         public async Task<OperationResult<IEnumerable<RevenueReportDto>>> GetRevenueReportAsync(ReportDateRangeRequestDto request)
         {
-            var validation = ValidateDateRange(request);
-            if (!validation.IsSuccess)
-                return OperationResult<IEnumerable<RevenueReportDto>>.Failure(validation.Message);
-
             try
             {
                 var result = await FunctionReaderEx.CallFunctionAsync(
@@ -160,16 +150,6 @@ namespace SGRH.Persistence.Repositories.Report
             }
         }
 
-        // Metodo privado para validaciones basicas
-        private OperationResult<string> ValidateDateRange(ReportDateRangeRequestDto request)
-        {
-            if (request == null)
-                return OperationResult<string>.Failure("Request cannot be null.");
-
-            if (request.StartDate > request.EndDate)
-                return OperationResult<string>.Failure("Start date cannot be after end date.");
-
-            return OperationResult<string>.Success("Date range is valid.");
-        }
+        
     }
 }
