@@ -2,7 +2,6 @@ using DotNetEnv;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SGRH.Application.Common.Logging;
-using SGRH.Application.Common.Mappers.ServiceModule;
 using SGRH.Application.Dtos.Hotel.Floor;
 using SGRH.Application.Dtos.Hotel.Floor.Validators;
 using SGRH.Application.Dtos.Hotel.Rate;
@@ -12,24 +11,20 @@ using SGRH.Application.Dtos.Hotel.Room.Validators;
 using SGRH.Application.Dtos.Hotel.RoomCategory;
 using SGRH.Application.Dtos.Hotel.RoomCategory.Validators;
 using SGRH.Application.Interfaces.Mappers.Hotel;
-using SGRH.Application.Interfaces.Mappers.ServiceModule;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
-using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Application.Interfaces.Services.Report;
 using SGRH.Application.Interfaces.Services.ReservationModule;
-using SGRH.Application.Interfaces.Services.Service_Module;
 using SGRH.Application.Services.Hotel;
 using SGRH.Application.Services.Report;
 using SGRH.Application.Services.ReservationModule;
-using SGRH.Application.Services.ServiceModule;
+using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
 using SGRH.Persistence.Repositories.Report;
 using SGRH.Persistence.Repositories.ReservationModule;
-using SGRH.Persistence.Repositories.Service_Module;
 using SGRH.Persistence.Repositories.UserManagement;
 
 namespace SGRH.Api
@@ -97,9 +92,8 @@ namespace SGRH.Api
             builder.Services.AddTransient<IReservationServiceService, ReservationServiceService>();
 
             // Service Module
-            builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
-            builder.Services.AddTransient<IServiceService, ServiceService>();
-            builder.Services.AddScoped<IServiceMapper, ServiceMapper>();
+            builder.Services.AddServiceDependency();
+
 
             // User Management Module
             builder.Services.AddUserManagementRepositories(builder.Configuration);
