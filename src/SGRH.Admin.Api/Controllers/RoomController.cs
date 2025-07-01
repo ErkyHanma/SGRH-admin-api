@@ -18,29 +18,29 @@ namespace SGRH.Api.Controllers
         public RoomController(IRoomService roomService)
         {
             _roomService = roomService;
-           
+
         }
 
         // GET: api/<RoomController>
         [HttpGet("GetRooms")]
         public async Task<IActionResult> Get()
         {
-           var result = await _roomService.GetRooms();
+            var result = await _roomService.GetRooms();
             if (result.IsSuccess)
                 return Ok(result);
             else
                 return BadRequest(result);
-            
+
         }
 
         // GET api/<RoomController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-           var result = await _roomService.GetRoomsById(id);
+            var result = await _roomService.GetRoomsById(id);
             if (result.IsSuccess)
                 return Ok(result);
-            else 
+            else
                 return BadRequest(result);
         }
 
@@ -57,7 +57,7 @@ namespace SGRH.Api.Controllers
 
         // PUT api/<RoomController>/5
         [HttpPut("ModifyRoom")]
-        public async Task<IActionResult> ModifyRoom([FromBody] ModifyRoomDto modifyRoomDto) 
+        public async Task<IActionResult> ModifyRoom([FromBody] ModifyRoomDto modifyRoomDto)
         {
             var result = await _roomService.UpdateRoom(modifyRoomDto);
             if (result.IsSuccess)
@@ -68,7 +68,7 @@ namespace SGRH.Api.Controllers
 
         // PUT api/<RoomController>/5
         [HttpPut("DisableRoom")]
-        public async Task<IActionResult> DeleteRoom([FromBody] DisableRoomDto disableRoomDto) 
+        public async Task<IActionResult> DeleteRoom([FromBody] DisableRoomDto disableRoomDto)
         {
             var result = await _roomService.DeleteRoom(disableRoomDto);
             if (result.IsSuccess)
