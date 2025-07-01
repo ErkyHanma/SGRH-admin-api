@@ -1,4 +1,5 @@
-﻿using SGRH.Application.Common.Logging;
+using Microsoft.Extensions.Configuration;
+using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.ReservationModule.ReservationService;
 using SGRH.Application.Dtos.ReservationModule.ReservationService.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
@@ -11,12 +12,14 @@ namespace SGRH.Persistence.Repositories.ReservationModule
     public class ReservationServiceRepository : IReservationServiceRepository
     {
 
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
         private readonly IAppLogger<ReservationServiceRepository> _logger;
+        private readonly IConfiguration _configuration;
 
-        public ReservationServiceRepository(string connectionString, IAppLogger<ReservationServiceRepository> logger)
+        public ReservationServiceRepository(IAppLogger<ReservationServiceRepository> logger, IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _configuration = configuration;
+            _connectionString = _configuration["ConnectionStrings:SGRHConnection"];
             _logger = logger;
         }
 

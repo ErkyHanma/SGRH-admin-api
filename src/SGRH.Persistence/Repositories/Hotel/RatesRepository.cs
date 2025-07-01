@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SGRH.Application.Common.Logging;
+using SGRH.Application.Dtos.Hotel.Rate;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.Hotel;
@@ -36,7 +37,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                 if (!validation.IsSuccess)
                     return validation;
 
-                entity.CreatedAt = DateTime.UtcNow.Date;
+                entity.CreatedAt = DateTime.Now.Date;
                 entity.IsActive = true;
                 entity.IsDeleted = false;
 
@@ -56,16 +57,17 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                var existing = await _context.Rate.FindAsync(entity.RateId);
-                if (existing == null || existing.IsDeleted)
+                var existing = await _context.Rate
+                    .FirstOrDefaultAsync(r => r.RateId == entity.RateId && !r.IsDeleted && r.IsActive);
+
+                if (existing == null)
                     return OperationResult<Rate>.Failure("Rate not found or already deleted.");
 
                 existing.IsActive = false;
                 existing.IsDeleted = true;
-                existing.DeleteAt = DateTime.UtcNow.Date;
                 existing.DeletedBy = entity.DeletedBy;
+                existing.DeleteAt = DateTime.Now;
 
-                _context.Rate.Update(existing);
                 await _context.SaveChangesAsync();
 
                 return OperationResult<Rate>.Success("Rate deleted successfully.", existing);
@@ -77,12 +79,13 @@ namespace SGRH.Persistence.Repositories.Hotel
             }
         }
 
+
         public async Task<bool> ExistsAsync(Expression<Func<Rate, bool>> filter)
         {
             return await _context.Rate.AnyAsync(filter);
         }
 
-        public async Task<OperationResult<IEnumerable<Rate>>> GetAllAsync()
+        public async Task<OperationResult<IEnumerable<Rate>>> GetAllAsync() 
         {
             try
             {
@@ -172,7 +175,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                 existing.CategoryId = entity.CategoryId;
                 existing.SeasonId = entity.SeasonId;
                 existing.NightPrice = entity.NightPrice;
-                existing.UpdatedAt = DateTime.UtcNow.Date;
+                existing.UpdatedAt = DateTime.Now.Date; // aquiiiiiiiiii
                 existing.UpdatedBy = entity.UpdatedBy;
 
                 _context.Rate.Update(existing);

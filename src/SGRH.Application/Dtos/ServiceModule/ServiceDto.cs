@@ -1,4 +1,5 @@
-﻿namespace SGRH.Application.Dtos.ServiceModule
+﻿
+namespace SGRH.Application.Dtos.ServiceModule
 {
     public class ServiceDto
     {
@@ -6,5 +7,6 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+
     }
 }

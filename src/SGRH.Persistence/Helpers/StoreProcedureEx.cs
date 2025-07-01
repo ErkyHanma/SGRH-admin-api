@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using SGRH.Application.Common.Logging;
 using SGRH.Domain.Base;
 using System.Data;
-using System.Drawing;
 
 namespace SGRH.Persistence.Helpers
 {
@@ -15,7 +14,9 @@ namespace SGRH.Persistence.Helpers
             Dictionary<string, object> parameters, // Nombre del procedimiento + Dto con un valor
             IAppLogger<T> logger)
         {
-            var result = new OperationResult<string>();
+            // Inicializar result con un fallo por defecto. Si una excepción ocurre antes de cualquier asignación
+            // en el try, este será el valor inicial. El catch lo sobrescribirá si hay una excepción.
+            var result = OperationResult<string>.Failure("Operación no completada. Mensaje por defecto.");
 
             try
             {
@@ -45,24 +46,30 @@ namespace SGRH.Persistence.Helpers
                 var affectedRows = await command.ExecuteNonQueryAsync();
 
                 // Crear variable y verificar si pResult y su Value no son nulos.
-                
                 string message;
-                if (pResult?.Value != null)
+                if (pResult?.Value != null && pResult.Value != DBNull.Value)
+
                 {
-                    message = pResult.Value.ToString(); 
+                    message = pResult.Value.ToString();
                 }
                 else
                 {
-                    message = "No message"; 
+                logger.Info("Stored procedure {Procedure} executed. Message: {Message}. Affected rows: {AffectedRows}", procedureName, message, affectedRows);
+                    message = "No message";
                 }
 
                 // Verificar resultado
-                if (affectedRows > 0)
+                if (!string.IsNullOrWhiteSpace(message) && message.ToLower().Contains("success") || affectedRows > 0)
                 {
+                    result = OperationResult<string>.Success(message);
+                }
+                else if (!string.IsNullOrWhiteSpace(message) && message.ToLower().Contains("success")) {
+                   
                     result = OperationResult<string>.Success(message);
                 }
                 else
                 {
+
                     result = OperationResult<string>.Failure(message);
                 }
 
@@ -78,7 +85,8 @@ namespace SGRH.Persistence.Helpers
             return result;
         }
     }
-
 }
+
+
 
 

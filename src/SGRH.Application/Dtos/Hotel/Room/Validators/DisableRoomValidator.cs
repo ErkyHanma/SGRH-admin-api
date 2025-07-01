@@ -12,8 +12,8 @@ namespace SGRH.Application.Dtos.Hotel.Room.Validators
     {
         public DisableRoomValidator() // En su lugar solo implementa lo necesario
         {
-            RuleFor(x => x.RoomId).GreaterThan(0);
-            RuleFor(x => x.UpdatedBy).GreaterThan(0);
+            RuleFor(x => x.RoomId).GreaterThan(0).WithMessage("RoomId must be greater than zero.");
+            RuleFor(x => x.UpdatedBy).GreaterThan(0).WithMessage("UpdatedBy must be greater than zero.");
         }
     }
 

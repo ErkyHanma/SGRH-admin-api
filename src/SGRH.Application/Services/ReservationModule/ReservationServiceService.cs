@@ -36,7 +36,7 @@ namespace SGRH.Application.Services.ReservationModule
                 if (!creationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while creating a Reservation service: {creationResult.Message}.");
-                    return OperationResult<CreateReservationServiceDto>.Failure("Error trying to create a Reservation service");
+                    return OperationResult<CreateReservationServiceDto>.Failure($"Error trying to create a Reservation service: {creationResult.Message}");
                 }
 
                 if (creationResult.Data is null)
@@ -70,7 +70,7 @@ namespace SGRH.Application.Services.ReservationModule
                 if (!deletionResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"Failed to delete reservation service: {deletionResult.Message}");
-                    return OperationResult<DeleteReservationServiceDto>.Failure("An error occurred while deleting the reservation service.");
+                    return OperationResult<DeleteReservationServiceDto>.Failure($"An error occurred while deleting the reservation service: {deletionResult.Message}");
                 }
 
                 if (deletionResult.Data is null)
