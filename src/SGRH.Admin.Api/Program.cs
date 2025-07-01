@@ -60,7 +60,7 @@ namespace SGRH.Api
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddTransient<IReportService, ReportService>();
 
-            // Modulo Tarifa (!!!!!!!!!!!!!)
+            // Modulo Tarifa 
 
             builder.Services.AddScoped<IRatesRepository, RatesRepository>();
             builder.Services.AddTransient<IRatesService, RatesService>();
