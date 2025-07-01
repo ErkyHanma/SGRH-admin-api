@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Npgsql;
 using SGRH.Application.Common.Logging;
 using SGRH.Domain.Base;
@@ -11,69 +10,49 @@ namespace SGRH.Persistence.Helpers
         public static async Task<OperationResult<string>> ExecuteAsync<T>(
             string connectionString,
             string procedureName,
-            Dictionary<string, object> parameters, // Nombre del procedimiento + Dto con un valor
+            Dictionary<string, object> parameters,
             IAppLogger<T> logger)
         {
-            // Inicializar result con un fallo por defecto. Si una excepción ocurre antes de cualquier asignación
-            // en el try, este será el valor inicial. El catch lo sobrescribirá si hay una excepción.
             var result = OperationResult<string>.Failure("Operación no completada. Mensaje por defecto.");
 
             try
             {
-                // Crear la conexion y el comando en BD pasándole la conexion.
                 using var connection = new NpgsqlConnection(connectionString);
                 using var command = new NpgsqlCommand(procedureName, connection)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
 
-                // Bucle. Agrega nombre del parametro (key) + valor real (value) en base al diccionario (acepta nulls).
                 foreach (var parameter in parameters)
                 {
                     command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
                 }
 
-                // Crear parametro de salida y agregar al comando.
                 var pResult = new NpgsqlParameter("presult", NpgsqlTypes.NpgsqlDbType.Text)
                 {
                     Direction = ParameterDirection.Output
                 };
-
                 command.Parameters.Add(pResult);
 
-                // Abrir conexion y esperar
                 await connection.OpenAsync();
                 var affectedRows = await command.ExecuteNonQueryAsync();
 
-                // Crear variable y verificar si pResult y su Value no son nulos.
-                string message;
-                if (pResult?.Value != null && pResult.Value != DBNull.Value)
+                var message = pResult?.Value != null && pResult.Value != DBNull.Value
+                    ? pResult.Value.ToString()
+                    : "No message provided by stored procedure.";
 
-                {
-                    message = pResult.Value.ToString();
-                }
-                else
-                {
+                var isSuccess =
+                    !string.IsNullOrWhiteSpace(message) &&
+                    (message.ToLower().Contains("exitosamente") ||
+                     message.ToLower().Contains("correctamente") ||
+                     message.ToLower().Contains("success") ||
+                     affectedRows > 0);
+
+                result = isSuccess
+                    ? OperationResult<string>.Success(message)
+                    : OperationResult<string>.Failure(message);
+
                 logger.Info("Stored procedure {Procedure} executed. Message: {Message}. Affected rows: {AffectedRows}", procedureName, message, affectedRows);
-                    message = "No message";
-                }
-
-                // Verificar resultado
-                if (!string.IsNullOrWhiteSpace(message) && message.ToLower().Contains("success") || affectedRows > 0)
-                {
-                    result = OperationResult<string>.Success(message);
-                }
-                else if (!string.IsNullOrWhiteSpace(message) && message.ToLower().Contains("success")) {
-                   
-                    result = OperationResult<string>.Success(message);
-                }
-                else
-                {
-
-                    result = OperationResult<string>.Failure(message);
-                }
-
-                logger.Info("Stored procedure {Procedure} executed. Message: {Message}", procedureName, message);
             }
             catch (Exception ex)
             {
@@ -86,7 +65,3 @@ namespace SGRH.Persistence.Helpers
         }
     }
 }
-
-
-
-
