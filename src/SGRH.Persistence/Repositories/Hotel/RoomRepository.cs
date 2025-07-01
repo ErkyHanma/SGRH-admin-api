@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using FluentValidation.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

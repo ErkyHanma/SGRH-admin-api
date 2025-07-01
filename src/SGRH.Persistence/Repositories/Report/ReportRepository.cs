@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using SGRH.Application.Common.Logging;
@@ -173,3 +173,4 @@ namespace SGRH.Persistence.Repositories.Report
         }
     }
 }
+
