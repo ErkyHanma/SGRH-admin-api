@@ -39,8 +39,8 @@ namespace SGRH.Api
             // Load environment variables
             Env.Load();
 
-            var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-            builder.Configuration["ConnectionStrings:SGRHConnection"] = connectionString;
+            //var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+            //builder.Configuration["ConnectionStrings:SGRHConnection"] = connectionString;
 
             // Add services to the container
 
@@ -48,6 +48,7 @@ namespace SGRH.Api
             builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));
 
             // FluentValidation - Hotel module
+
             builder.Services.AddScoped<IValidator<CreateRoomDto>, CreateRoomValidator>();
             builder.Services.AddScoped<IValidator<ModifyRoomDto>, ModifyRoomValidator>();
             builder.Services.AddScoped<IValidator<DisableRoomDto>, DisableRoomValidator>();
@@ -62,6 +63,8 @@ namespace SGRH.Api
                 options.UseNpgsql(builder.Configuration.GetConnectionString("SGRHConnection"));
             });
 
+            // ======================================================================
+
             // Hotel Module
             builder.Services.AddScoped<IRoomRepository, RoomRepository>();
             builder.Services.AddTransient<IRoomService, RoomService>();
@@ -71,13 +74,16 @@ namespace SGRH.Api
             builder.Services.AddTransient<IRateMapper, RateMapper>();
 
             // Report Module
+
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddTransient<IReportService, ReportService>();
 
-            // Modulo Tarifa (!!!!!!!!!!!!!)
+            // Hotel Module 
 
             builder.Services.AddScoped<IRatesRepository, RatesRepository>();
             builder.Services.AddTransient<IRatesService, RatesService>();
+
+            // ======================================================================
 
             // Reservations 
             builder.Services.AddTransient<IRateMapper, RateMapper>();
