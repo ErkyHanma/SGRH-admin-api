@@ -33,9 +33,10 @@ namespace SGRH.Persistence.Repositories.Hotel
 
                 // Validaciones 
 
+                /**
                 var validation = ValidateRateEntity(entity, isUpdate: false);
                 if (!validation.IsSuccess)
-                    return validation;
+                    return validation; **/
 
                 entity.CreatedAt = DateTime.Now.Date;
                 entity.IsActive = true;
@@ -168,9 +169,9 @@ namespace SGRH.Persistence.Repositories.Hotel
                 if (existing == null || existing.IsDeleted)
                     return OperationResult<Rate>.Failure("Rate not found or already deleted.");
 
-                var validation = ValidateRateEntity(entity, isUpdate: true);
+                /** var validation = ValidateRateEntity(entity, isUpdate: true);
                 if (!validation.IsSuccess)
-                    return validation;
+                    return validation; **/
 
                 existing.CategoryId = entity.CategoryId;
                 existing.SeasonId = entity.SeasonId;
@@ -189,7 +190,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                 return OperationResult<Rate>.Failure("Error occurred while updating rate.");
             }
         }
-
+        /**
         private OperationResult<Rate> ValidateRateEntity(Rate entity, bool isUpdate)
         {
             if (entity == null)
@@ -214,6 +215,6 @@ namespace SGRH.Persistence.Repositories.Hotel
                 return OperationResult<Rate>.Failure("UpdatedBy is required.");
 
             return OperationResult<Rate>.Success("Validation passed.");
-        }
+        } **/
     }
 }

@@ -10,7 +10,7 @@ using SGRH.Persistence.Helpers;
 
 namespace SGRH.Persistence.Repositories.Hotel
 {
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : IRoomRepository // Las validaciones estan en observacion
     {
         private readonly string _connectionString;
         private readonly IConfiguration _configuration;
@@ -26,7 +26,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                               IValidator<DisableRoomDto> disableValidator)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("SGRH"); 
+            _connectionString = _configuration.GetConnectionString("SGRHConnection"); 
             _logger = logger;
             _createValidator = createValidator;
             _modifyValidator = modifyValidator;

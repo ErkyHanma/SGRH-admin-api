@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGRH.Persistence.Context.EntityConfiguration
+namespace SGRH.Persistence.Context.EntityConfigurations.Hotel
 {
     public class RateConfiguration : IEntityTypeConfiguration<Rate>
     {
@@ -35,12 +35,12 @@ namespace SGRH.Persistence.Context.EntityConfiguration
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at")
-                .HasColumnType("timestamp without time zone"); 
-            
+                .HasColumnType("timestamp without time zone");
+
             entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
 
             entity.Property(e => e.DeleteAt).HasColumnName("deleted_at")
-                .HasColumnType("timestamp without time zone"); 
+                .HasColumnType("timestamp without time zone");
 
             entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
         }

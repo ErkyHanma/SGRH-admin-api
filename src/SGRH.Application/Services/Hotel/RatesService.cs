@@ -44,18 +44,23 @@ namespace SGRH.Application.Services.Hotel
             {
                 _logger.Info("Creating Rate for Category {0}, Season {1}", createRateDto.CategoryId, createRateDto.SeasonId);
 
+                if (createRateDto == null)
+                    return OperationResult<CreateRateDto>.Failure("Input data is required.");
+
                 var validation = _createRateValidator.Validate(createRateDto);
                 if (!validation.IsValid)
                 {
                     return OperationResult<CreateRateDto>.Failure(string.Join(" | ", validation.Errors.Select(e => e.ErrorMessage)));
                 }
 
-                bool exists = await _ratesRepository.ExistsAsync(r =>
+                // Regla: No puede haber dos tarifas para la misma categoría y temporada
+
+                var overlappingRates = await _ratesRepository.GetAllAsync(r =>
                     r.CategoryId == createRateDto.CategoryId &&
                     r.SeasonId == createRateDto.SeasonId &&
                     !r.IsDeleted);
 
-                if (exists)
+                if (overlappingRates.Data.Any())
                 {
                     return OperationResult<CreateRateDto>.Failure("A rate already exists for this category and season.");
                 }
@@ -78,26 +83,29 @@ namespace SGRH.Application.Services.Hotel
             }
         }
 
-        public async Task<OperationResult<bool>> DeleteRatesAsync(DeleteRateDto dto)
+        public async Task<OperationResult<bool>> DeleteRatesAsync(DeleteRateDto deleteRateDto)
         {
             try
             {
-                _logger.Info("Deleting Rate with ID {0}", dto.RateId);
+                _logger.Info("Deleting Rate with ID {0}", deleteRateDto.RateId);
 
-                var validation = _deleteRateValidator.Validate(dto);
+                if (deleteRateDto == null)
+                    return OperationResult<bool>.Failure("Input data is required.");
+
+                var validation = _deleteRateValidator.Validate(deleteRateDto);
                 if (!validation.IsValid)
                 {
                     return OperationResult<bool>.Failure(string.Join(" | ", validation.Errors.Select(e => e.ErrorMessage)));
                 }
 
-                var existingRate = await _ratesRepository.GetByIdAsync(dto.RateId);
+                var existingRate = await _ratesRepository.GetByIdAsync(deleteRateDto.RateId);
 
                 if (!existingRate.IsSuccess || existingRate.Data == null)
                 {
                     return OperationResult<bool>.Failure("Rate not found.");
                 }
 
-                _mapper.ApplyDeleteDto(existingRate.Data, dto);
+                _mapper.ApplyDeleteDto(existingRate.Data, deleteRateDto);
 
                 var result = await _ratesRepository.DeleteAsync(existingRate.Data);
 
@@ -160,26 +168,30 @@ namespace SGRH.Application.Services.Hotel
             }
         }
 
-        public async Task<OperationResult<RateDto>> UpdateRatesAsync(UpdateRateDto dto)
+        public async Task<OperationResult<RateDto>> UpdateRatesAsync(UpdateRateDto updateRateDto) //Abierto a una futura implementacion "reservas activas no deben verse afectadas"
+
         {
             try
             {
-                _logger.Info("Updating Rate with ID {0}", dto.RateId);
+                _logger.Info("Updating Rate with ID {0}", updateRateDto.RateId);
 
-                var validation = _updateRateValidator.Validate(dto);
+                if (updateRateDto == null)
+                    return OperationResult<RateDto>.Failure("Input data is required.");
+
+                var validation = _updateRateValidator.Validate(updateRateDto);
                 if (!validation.IsValid)
                 {
                     return OperationResult<RateDto>.Failure(string.Join(" | ", validation.Errors.Select(e => e.ErrorMessage)));
                 }
 
-                var existingRate = await _ratesRepository.GetByIdAsync(dto.RateId);
+                var existingRate = await _ratesRepository.GetByIdAsync(updateRateDto.RateId);
 
                 if (!existingRate.IsSuccess || existingRate.Data == null)
                 {
                     return OperationResult<RateDto>.Failure("Rate not found.");
                 }
 
-                _mapper.ApplyUpdateDto(existingRate.Data, dto);
+                _mapper.ApplyUpdateDto(existingRate.Data, updateRateDto);
 
                 var result = await _ratesRepository.UpdateAsync(existingRate.Data);
 

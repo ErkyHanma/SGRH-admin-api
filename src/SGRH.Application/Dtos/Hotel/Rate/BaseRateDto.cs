@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace SGRH.Application.Dtos.Hotel.Rate
 {
-    public record CreateRateDto : BaseRateDto
+    public abstract record BaseRateDto
     {
-        public int CreatedBy { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public int CategoryId { get; set; }
+        public int SeasonId { get; set; }
+        public decimal NightPrice { get; set; }
+
     }
 }
