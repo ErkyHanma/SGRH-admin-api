@@ -86,7 +86,7 @@ namespace SGRH.Application.Services.ReservationModule
                 if (!creationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while creating Reservation: {creationResult.Message}.");
-                    return OperationResult<CreateReservationDto>.Failure("Error trying to create a Reservation");
+                    return OperationResult<CreateReservationDto>.Failure($"Error trying to create a Reservation {creationResult.Message}");
                 }
 
                 if (creationResult.Data is null)
@@ -100,7 +100,7 @@ namespace SGRH.Application.Services.ReservationModule
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error");
-                return OperationResult<CreateReservationDto>.Failure($"Error creating Reservation {ex.Message}");
+                return OperationResult<CreateReservationDto>.Failure($"Error creating Reservation: {ex.Message}");
             }
         }
         public async Task<OperationResult<UpdateReservationDto>> UpdateReservationAsync(UpdateReservationDto updateReservationDto)
@@ -121,7 +121,7 @@ namespace SGRH.Application.Services.ReservationModule
                 if (!result.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while updating Reservation: {result.Message}.");
-                    return OperationResult<UpdateReservationDto>.Failure("Error trying to update a Reservation");
+                    return OperationResult<UpdateReservationDto>.Failure($"Error trying to update a Reservation {result.Message}");
                 }
 
                 if (result.Data is null)
@@ -156,7 +156,7 @@ namespace SGRH.Application.Services.ReservationModule
                 if (!result.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while deleting Reservation: {result.Message}.");
-                    return OperationResult<DisableReservationDto>.Failure("Error trying to delete a Reservation");
+                    return OperationResult<DisableReservationDto>.Failure($"Error trying to delete a Reservation {result.Message}");
                 }
 
                 if (result.Data is null)

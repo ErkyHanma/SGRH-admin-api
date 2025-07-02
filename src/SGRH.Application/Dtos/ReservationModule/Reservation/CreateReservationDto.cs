@@ -9,8 +9,7 @@
         public DateTime EndDate { get; set; }
         public string Status { get; set; }
         public int GuestCount { get; set; }
-        public decimal PaymentAmount { get; set; }
-
+        public decimal PaymentAmount { get; set; } = 0.00m;
         public int CreatedBy { get; set; }
 
 

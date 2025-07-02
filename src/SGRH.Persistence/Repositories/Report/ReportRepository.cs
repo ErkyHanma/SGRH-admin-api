@@ -26,7 +26,7 @@ namespace SGRH.Persistence.Repositories.Report
         public ReportRepository(IConfiguration configuration,  IAppLogger<ReportRepository> logger)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("SGRH");
+            _connectionString = _configuration.GetConnectionString("SGRHConnection");
             _logger = logger;
         }
 

@@ -26,7 +26,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                               IValidator<DisableRoomDto> disableValidator)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("SGRH"); 
+            _connectionString = _configuration.GetConnectionString("SGRHConnection"); 
             _logger = logger;
             _createValidator = createValidator;
             _modifyValidator = modifyValidator;
