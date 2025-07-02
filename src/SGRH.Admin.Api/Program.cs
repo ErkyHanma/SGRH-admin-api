@@ -20,6 +20,8 @@ using SGRH.Application.Interfaces.Services.ReservationModule;
 using SGRH.Application.Services.Hotel;
 using SGRH.Application.Services.Report;
 using SGRH.Application.Services.ReservationModule;
+using SGRH.IOC.Dependencies.Hotel;
+using SGRH.IOC.Dependencies.Report;
 using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
@@ -46,14 +48,6 @@ namespace SGRH.Api
 
             // FluentValidation - Hotel module
 
-            builder.Services.AddScoped<IValidator<CreateRoomDto>, CreateRoomValidator>();
-            builder.Services.AddScoped<IValidator<ModifyRoomDto>, ModifyRoomValidator>();
-            builder.Services.AddScoped<IValidator<DisableRoomDto>, DisableRoomValidator>();
-
-            builder.Services.AddScoped<IValidator<CreateRateDto>, CreateRateValidator>();
-            builder.Services.AddScoped<IValidator<UpdateRateDto>, UpdateRateValidator>();
-            builder.Services.AddScoped<IValidator<DeleteRateDto>, DeleteRateValidator>();
-
             builder.Services.AddScoped<IValidator<CreateFloorDto>, CreateFloorValidator>();
             builder.Services.AddScoped<IValidator<ModifyFloorDto>, ModifyFloorValidator>();
             builder.Services.AddScoped<IValidator<DisableFloorDto>, DisableFloorValidator>();
@@ -69,8 +63,9 @@ namespace SGRH.Api
             });
 
             // Hotel Module
-            builder.Services.AddScoped<IRoomRepository, RoomRepository>();
-            builder.Services.AddTransient<IRoomService, RoomService>();
+
+            builder.Services.AddRoomDependency();
+            builder.Services.AddRatesDependency();
 
             builder.Services.AddScoped<IRatesRepository, RatesRepository>();
             builder.Services.AddTransient<IRatesService, RatesService>();
@@ -84,16 +79,9 @@ namespace SGRH.Api
 
             // Report Module
 
-            builder.Services.AddScoped<IReportRepository, ReportRepository>();
-            builder.Services.AddTransient<IReportService, ReportService>();
-
-            // Hotel Module 
-
-            builder.Services.AddScoped<IRatesRepository, RatesRepository>();
-            builder.Services.AddTransient<IRatesService, RatesService>();
+            builder.Services.AddReportDependency();
 
             // Reservations 
-            builder.Services.AddTransient<IRateMapper, RateMapper>();
 
             builder.Services.AddScoped<IReservationServiceRepository, ReservationServiceRepository>();
             builder.Services.AddTransient<IReservationServiceService, ReservationServiceService>();
