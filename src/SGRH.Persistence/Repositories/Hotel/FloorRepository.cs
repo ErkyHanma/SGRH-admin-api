@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-// using FluentValidation.Internal; // No es necesario si no se usa directamente
-using Microsoft.Extensions.Configuration; // Nuevo using
-// using Microsoft.Extensions.Logging; // Reemplazado por SGRH.Application.Common.Logging
-using SGRH.Application.Common.Logging; // Nuevo using
+
+using Microsoft.Extensions.Configuration;
+
+using SGRH.Application.Common.Logging; 
 using SGRH.Application.Dtos.Hotel.Floor;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
@@ -13,20 +13,20 @@ namespace SGRH.Persistence.Repositories.Hotel
     public class FloorRepository : IFloorRepository
     {
         private readonly string _connectionString;
-        private readonly IConfiguration _configuration; // Nuevo
-        private readonly IAppLogger<FloorRepository> _logger; // Cambio de ILogger a IAppLogger
+        private readonly IConfiguration _configuration;
+        private readonly IAppLogger<FloorRepository> _logger; 
         private readonly IValidator<CreateFloorDto> _createValidator;
         private readonly IValidator<ModifyFloorDto> _modifyValidator;
         private readonly IValidator<DisableFloorDto> _disableValidator;
 
-        public FloorRepository(IConfiguration configuration, // Cambio en el constructor
-                               IAppLogger<FloorRepository> logger, // Cambio en el constructor
+        public FloorRepository(IConfiguration configuration, 
+                               IAppLogger<FloorRepository> logger, 
                                IValidator<CreateFloorDto> createValidator,
                                IValidator<ModifyFloorDto> modifyValidator,
                                IValidator<DisableFloorDto> disableValidator)
         {
-            _configuration = configuration; // Asignación de IConfiguration
-                                            //_connectionString = _configuration.GetConnectionString("SGRH"); // Obtener connection string de IConfiguration
+            _configuration = configuration; 
+                                           
             _connectionString = _configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
 
             _logger = logger;
@@ -37,17 +37,17 @@ namespace SGRH.Persistence.Repositories.Hotel
 
         public async Task<OperationResult<CreateFloorDto>> AddAsync(CreateFloorDto createFloorDto)
         {
-            try // Añadir try-catch
+            try 
             {
                 var validationResult = _createValidator.Validate(createFloorDto);
 
                 if (!validationResult.IsValid)
                 {
-                    // Usa el nuevo método HandleValidationFailure
+                    
                     return HandleValidationFailure<CreateFloorDto>(validationResult);
                 }
 
-                _logger.Info("Creating Floor Number {FloorNumber}", createFloorDto.FloorNumber); // Cambio de LogInformation a Info
+                _logger.Info("Creating Floor Number {FloorNumber}", createFloorDto.FloorNumber); 
 
                 var parameters = new Dictionary<string, object>
                 {
@@ -57,7 +57,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                     {"p_created_by", createFloorDto.CreatedBy }
                 };
 
-                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<FloorRepository>( // Cambio de tipo genérico
+                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<FloorRepository>( 
                     _connectionString,
                     "hotel.CreateFloor",
                     parameters,
@@ -75,24 +75,24 @@ namespace SGRH.Persistence.Repositories.Hotel
             }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Exception thrown during AddAsync() for FloorRepository"); // Cambio de LogError a ErrorEx
+                _logger.ErrorEx(ex, "Exception thrown during AddAsync() for FloorRepository"); 
                 return OperationResult<CreateFloorDto>.Failure("An error occurred while creating the floor.");
             }
         }
 
         public async Task<OperationResult<DisableFloorDto>> DeleteAsync(DisableFloorDto disableFloorDto)
         {
-            try // Añadir try-catch
+            try 
             {
                 var validationResult = _disableValidator.Validate(disableFloorDto);
 
                 if (!validationResult.IsValid)
                 {
-                    // Usa el nuevo método HandleValidationFailure
+                    
                     return HandleValidationFailure<DisableFloorDto>(validationResult);
                 }
 
-                _logger.Info("Disabling Floor ID {FloorId}", disableFloorDto.FloorId); // Cambio de LogInformation a Info
+                _logger.Info("Disabling Floor ID {FloorId}", disableFloorDto.FloorId); 
 
                 var parameters = new Dictionary<string, object>
                 {
@@ -100,7 +100,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                     { "p_updated_by", disableFloorDto.UpdatedBy }
                 };
 
-                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<FloorRepository>( // Cambio de tipo genérico
+                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<FloorRepository>( 
                     _connectionString,
                     "hotel.DisableFloor",
                     parameters,
@@ -118,7 +118,7 @@ namespace SGRH.Persistence.Repositories.Hotel
             }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Exception thrown during DeleteAsync() for FloorRepository"); // Cambio de LogError a ErrorEx
+                _logger.ErrorEx(ex, "Exception thrown during DeleteAsync() for FloorRepository"); 
                 return OperationResult<DisableFloorDto>.Failure("An error occurred while disabling the floor.");
             }
         }
@@ -127,7 +127,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                _logger.Info("Getting all floors"); // Cambio de LogInformation a Info
+                _logger.Info("Getting all floors"); 
 
                 var data = await FunctionReaderEx.CallFunctionAsync(
                     _connectionString,
@@ -146,7 +146,7 @@ namespace SGRH.Persistence.Repositories.Hotel
             }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Error in GetAllAsync() for FloorRepository"); // Cambio de LogError a ErrorEx
+                _logger.ErrorEx(ex, "Error in GetAllAsync() for FloorRepository"); 
                 return OperationResult<IEnumerable<FloorDto>>.Failure("Error al obtener pisos.");
             }
         }
@@ -155,7 +155,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                _logger.Info("Getting floor by ID {FloorId}", id); // Cambio de LogInformation a Info
+                _logger.Info("Getting floor by ID {FloorId}", id); 
 
                 var data = await FunctionReaderEx.CallFunctionAsync(
                     _connectionString,
@@ -183,25 +183,24 @@ namespace SGRH.Persistence.Repositories.Hotel
             }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Error in GetByIdAsync() for FloorRepository"); // Cambio de LogError a ErrorEx
+                _logger.ErrorEx(ex, "Error in GetByIdAsync() for FloorRepository"); 
                 return OperationResult<FloorDto>.Failure("Error al obtener piso.");
             }
         }
 
         public async Task<OperationResult<ModifyFloorDto>> UpdateAsync(ModifyFloorDto modifyFloorDto)
         {
-            try // Añadir try-catch
+            try 
             {
                 var validationResult = _modifyValidator.Validate(modifyFloorDto);
 
                 if (!validationResult.IsValid)
                 {
-                    // Usa el nuevo método HandleValidationFailure
+                    
                     return HandleValidationFailure<ModifyFloorDto>(validationResult);
                 }
 
-                _logger.Info("Updating Floor {FloorNumber}", modifyFloorDto.FloorNumber); // Cambio de LogInformation a Info
-
+                _logger.Info("Updating Floor {FloorNumber}", modifyFloorDto.FloorNumber); 
                 var parameters = new Dictionary<string, object>
                 {
                     { "p_floor_id", modifyFloorDto.FloorId },
@@ -211,7 +210,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                     { "p_updated_by", modifyFloorDto.UpdatedBy }
                 };
 
-                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<FloorRepository>( // Cambio de tipo genérico
+                var storedProcedureResult = await StoreProcedureEx.ExecuteAsync<FloorRepository>(
                     _connectionString,
                     "hotel.ModifyFloor",
                     parameters,
@@ -229,7 +228,7 @@ namespace SGRH.Persistence.Repositories.Hotel
             }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Exception thrown during UpdateAsync() for FloorRepository"); // Cambio de LogError a ErrorEx
+                _logger.ErrorEx(ex, "Exception thrown during UpdateAsync() for FloorRepository"); 
                 return OperationResult<ModifyFloorDto>.Failure("An error occurred while updating the floor.");
             }
         }
