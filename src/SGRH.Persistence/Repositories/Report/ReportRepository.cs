@@ -1,19 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Npgsql;
+using Microsoft.Extensions.Configuration;
 using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Report;
 using SGRH.Application.Dtos.Report.InputDtos;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Domain.Base;
-using SGRH.Domain.Entities.Report;
-using SGRH.Domain.Entities.UserManagement;
 using SGRH.Persistence.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SGRH.Persistence.Repositories.Report
 {
@@ -23,7 +14,7 @@ namespace SGRH.Persistence.Repositories.Report
         private readonly string _connectionString;
         private readonly IAppLogger<ReportRepository> _logger;
 
-        public ReportRepository(IConfiguration configuration,  IAppLogger<ReportRepository> logger)
+        public ReportRepository(IConfiguration configuration, IAppLogger<ReportRepository> logger)
         {
             _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("SGRHConnection");
@@ -153,3 +144,4 @@ namespace SGRH.Persistence.Repositories.Report
         
     }
 }
+

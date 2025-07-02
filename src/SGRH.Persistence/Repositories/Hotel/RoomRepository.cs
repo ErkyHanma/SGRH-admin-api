@@ -1,10 +1,8 @@
-﻿using FluentValidation;
-using FluentValidation.Internal;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
-using SGRH.Application.Interfaces.Repositories.Hotel; 
+using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Helpers;
 
@@ -19,10 +17,10 @@ namespace SGRH.Persistence.Repositories.Hotel
         private readonly IValidator<ModifyRoomDto> _modifyValidator;
         private readonly IValidator<DisableRoomDto> _disableValidator;
 
-        public RoomRepository(IConfiguration configuration, 
-                              IAppLogger<RoomRepository> logger, 
-                              IValidator<CreateRoomDto> createValidator, 
-                              IValidator<ModifyRoomDto> modifyValidator, 
+        public RoomRepository(IConfiguration configuration,
+                              IAppLogger<RoomRepository> logger,
+                              IValidator<CreateRoomDto> createValidator,
+                              IValidator<ModifyRoomDto> modifyValidator,
                               IValidator<DisableRoomDto> disableValidator)
         {
             _configuration = configuration;
@@ -81,7 +79,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                     return OperationResult<CreateRoomDto>.Failure(StoredProcedureResult.Message);
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Exception thrown during AddAsync()");
                 return OperationResult<CreateRoomDto>.Failure("An error occurred while creating the room.");
@@ -121,12 +119,12 @@ namespace SGRH.Persistence.Repositories.Hotel
                     return OperationResult<DisableRoomDto>.Failure(StoredProcedureResult.Message);
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Exception thrown during DeleteAsync()");
                 return OperationResult<DisableRoomDto>.Failure("An error occurred while disabling the room.");
             }
-           
+
         }
 
         public async Task<OperationResult<IEnumerable<RoomDto>>> GetAllAsync()
