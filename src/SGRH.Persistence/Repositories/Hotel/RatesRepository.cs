@@ -29,7 +29,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                _logger.Info("Adding new rate entity");
+                _logger.Info("Adding new rate entity"); 
 
                 // Validaciones 
 
