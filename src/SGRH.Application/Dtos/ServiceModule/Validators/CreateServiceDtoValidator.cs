@@ -3,22 +3,13 @@
 
 namespace SGRH.Application.Dtos.ServiceModule.Validators
 {
-    public static class CreateServiceDtoValidator
+    public class CreateServiceDtoValidator : BaseServiceValidator<CreateServiceDto>
     {
-        public static OperationResult<CreateServiceDto> Validate(CreateServiceDto createServiceDto)
+        public override OperationResult<CreateServiceDto> Validate(CreateServiceDto createServiceDto)
         {
-            if (createServiceDto == null)
-                return OperationResult<CreateServiceDto>.Failure("Service entity cannot be null.");
-
-            if (string.IsNullOrWhiteSpace(createServiceDto.Name))
-                return OperationResult<CreateServiceDto>.Failure("Service name is required.");
-
-            if (string.IsNullOrWhiteSpace(createServiceDto.Description))
-                return OperationResult<CreateServiceDto>.Failure("Service description is required.");
-
-            if (createServiceDto.Price < 0)
-                return OperationResult<CreateServiceDto>.Failure("Service price cannot be negative.");
-
+            var baseResult = base.Validate(createServiceDto);
+            if (!baseResult.IsSuccess)
+                return baseResult;
 
             return OperationResult<CreateServiceDto>.Success("Service validated successfully.", createServiceDto);
         }

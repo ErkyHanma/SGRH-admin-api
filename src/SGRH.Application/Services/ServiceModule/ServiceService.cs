@@ -81,7 +81,8 @@ namespace SGRH.Application.Services.ServiceModule
             {
                 _logger.Info("Creating service", createServiceDto);
 
-                var validationResult = CreateServiceDtoValidator.Validate(createServiceDto);
+                var createDtoValidator = new CreateServiceDtoValidator();
+                var validationResult = createDtoValidator.Validate(createServiceDto);
 
                 if (!validationResult.IsSuccess)
                 {
@@ -125,7 +126,8 @@ namespace SGRH.Application.Services.ServiceModule
             {
                 _logger.Info($"Updating {serviceDto.Name}");
 
-                var validationResult = ServiceDtoValidator.Validate(serviceDto);
+                var serviceDtoValidator = new ServiceDtoValidator();
+                var validationResult = serviceDtoValidator.Validate(serviceDto);
 
                 if (!validationResult.IsSuccess)
                 {
