@@ -74,7 +74,9 @@ namespace SGRH.Application.Services.ReservationModule
             {
                 _logger.Info("Creating reservation", createReservationDto);
 
-                var validationResult = CreateReservationDtoValidator.Validate(createReservationDto);
+
+                var createReservationDtoValidator = new CreateReservationDtoValidator();
+                var validationResult = createReservationDtoValidator.Validate(createReservationDto);
 
                 if (!validationResult.IsSuccess)
                 {
@@ -109,7 +111,8 @@ namespace SGRH.Application.Services.ReservationModule
             {
                 _logger.Info("Updating reservation", updateReservationDto);
 
-                var validationResult = UpdateReservationDtoValidator.Validate(updateReservationDto);
+                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
+                var validationResult = updateReservationDtoValidator.Validate(updateReservationDto);
 
                 if (!validationResult.IsSuccess)
                 {

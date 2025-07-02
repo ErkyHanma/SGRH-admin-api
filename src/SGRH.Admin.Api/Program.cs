@@ -13,18 +13,15 @@ using SGRH.Application.Dtos.Hotel.RoomCategory.Validators;
 using SGRH.Application.Interfaces.Mappers.Hotel;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Repositories.Report;
-using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Application.Interfaces.Services.Report;
-using SGRH.Application.Interfaces.Services.ReservationModule;
 using SGRH.Application.Services.Hotel;
 using SGRH.Application.Services.Report;
-using SGRH.Application.Services.ReservationModule;
+using SGRH.IOC.Dependencies.ReservationModule;
 using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
 using SGRH.Persistence.Repositories.Report;
-using SGRH.Persistence.Repositories.ReservationModule;
 using SGRH.Persistence.Repositories.UserManagement;
 
 namespace SGRH.Api
@@ -85,11 +82,9 @@ namespace SGRH.Api
             builder.Services.AddTransient<IReportService, ReportService>();
 
             // Reservation Module
-            builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-            builder.Services.AddTransient<IReservationService, ReservationService>();
 
-            builder.Services.AddScoped<IReservationServiceRepository, ReservationServiceRepository>();
-            builder.Services.AddTransient<IReservationServiceService, ReservationServiceService>();
+            builder.Services.AddReservationDependency();
+            builder.Services.AddReservationServiceDependency();
 
             // Service Module
             builder.Services.AddServiceDependency();

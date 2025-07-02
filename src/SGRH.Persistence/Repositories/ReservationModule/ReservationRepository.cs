@@ -121,7 +121,8 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             _logger.Info($"Creating Reservation for client {createReservationDto.ClientId}");
 
             // Validation
-            var validationResult = CreateReservationDtoValidator.Validate(createReservationDto);
+            var createReservationDtoValidator = new CreateReservationDtoValidator();
+            var validationResult = createReservationDtoValidator.Validate(createReservationDto);
 
             if (!validationResult.IsSuccess)
             {
@@ -164,7 +165,8 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             _logger.Info($"Update reservation {updateReservationDto.ReservationId}");
 
             // Validation
-            var validationResult = UpdateReservationDtoValidator.Validate(updateReservationDto);
+            var updateReservationDtoValidator = new UpdateReservationDtoValidator();
+            var validationResult = updateReservationDtoValidator.Validate(updateReservationDto);
 
             if (!validationResult.IsSuccess)
             {
