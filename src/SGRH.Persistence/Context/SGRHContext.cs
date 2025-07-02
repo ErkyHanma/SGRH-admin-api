@@ -3,7 +3,9 @@
 using SGRH.Domain.Entities.Hotel;
 
 using SGRH.Domain.Entities.ServiceModule;
-using SGRH.Persistence.Context.EntityConfiguration;
+using SGRH.Persistence.Context.EntityConfigurations;
+using SGRH.Persistence.Context.EntityConfigurations.Hotel;
+using SGRH.Persistence.Context.EntityConfigurations.Service_Module;
 
 namespace SGRH.Persistence.Context
 {
@@ -13,10 +15,10 @@ namespace SGRH.Persistence.Context
 
         public DbSet<Service> Service { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            ServiceConfiguration.OnServiceModelCreating(modelBuilder);
-        }
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+            //ServiceConfiguration.OnServiceModelCreating(modelBuilder);
+        //}
 
 
         public DbSet<Rate> Rate { get; set; }
@@ -24,6 +26,8 @@ namespace SGRH.Persistence.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new RateConfiguration());
+
+            ServiceConfiguration.OnServiceModelCreating(modelBuilder); // <- Movido
 
             base.OnModelCreating(modelBuilder);
         }
