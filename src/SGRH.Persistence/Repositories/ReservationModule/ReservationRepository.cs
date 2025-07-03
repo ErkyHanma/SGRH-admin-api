@@ -17,7 +17,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         public ReservationRepository(IAppLogger<ReservationRepository> logger, IConfiguration configuration)
         {
             _configuration = configuration;
-            _connectionString = _configuration["ConnectionStrings:SGRHConnection"]; ;
+            _connectionString = _configuration["ConnectionStrings:SGRHConnection"]; 
             _logger = logger;
         }
 

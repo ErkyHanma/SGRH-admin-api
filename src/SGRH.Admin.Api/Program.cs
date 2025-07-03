@@ -4,10 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Floor;
 using SGRH.Application.Dtos.Hotel.Floor.Validators;
-using SGRH.Application.Dtos.Hotel.Rate;
-using SGRH.Application.Dtos.Hotel.Rate.Validators;
-using SGRH.Application.Dtos.Hotel.Room;
-using SGRH.Application.Dtos.Hotel.Room.Validators;
 using SGRH.Application.Dtos.Hotel.RoomCategory;
 using SGRH.Application.Dtos.Hotel.RoomCategory.Validators;
 using SGRH.Application.Interfaces.Mappers.Hotel;
@@ -16,7 +12,8 @@ using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Application.Interfaces.Services.Report;
 using SGRH.Application.Services.Hotel;
-using SGRH.Application.Services.Report;
+using SGRH.IOC.Dependencies.Hotel;
+using SGRH.IOC.Dependencies.Report;
 using SGRH.IOC.Dependencies.ReservationModule;
 using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
@@ -34,20 +31,14 @@ namespace SGRH.Api
 
             // Load .env variables
             Env.Load();
-            var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-            builder.Configuration["ConnectionStrings:SGRHConnection"] = connectionString;
+
+            //var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+            //builder.Configuration["ConnectionStrings:SGRHConnection"] = connectionString;
 
             // Logger
             builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));
 
-            // Validators
-            builder.Services.AddScoped<IValidator<CreateRoomDto>, CreateRoomValidator>();
-            builder.Services.AddScoped<IValidator<ModifyRoomDto>, ModifyRoomValidator>();
-            builder.Services.AddScoped<IValidator<DisableRoomDto>, DisableRoomValidator>();
-
-            builder.Services.AddScoped<IValidator<CreateRateDto>, CreateRateValidator>();
-            builder.Services.AddScoped<IValidator<UpdateRateDto>, UpdateRateValidator>();
-            builder.Services.AddScoped<IValidator<DeleteRateDto>, DeleteRateValidator>();
+            // FluentValidation - Hotel module
 
             builder.Services.AddScoped<IValidator<CreateFloorDto>, CreateFloorValidator>();
             builder.Services.AddScoped<IValidator<ModifyFloorDto>, ModifyFloorValidator>();
@@ -64,8 +55,9 @@ namespace SGRH.Api
             });
 
             // Hotel Module
-            builder.Services.AddScoped<IRoomRepository, RoomRepository>();
-            builder.Services.AddTransient<IRoomService, RoomService>();
+
+            builder.Services.AddRoomDependency();
+            builder.Services.AddRatesDependency();
 
             builder.Services.AddScoped<IRatesRepository, RatesRepository>();
             builder.Services.AddTransient<IRatesService, RatesService>();
@@ -78,10 +70,10 @@ namespace SGRH.Api
             builder.Services.AddTransient<IRoomCategoryService, RoomCategoryService>();
 
             // Report Module
-            builder.Services.AddScoped<IReportRepository, ReportRepository>();
-            builder.Services.AddTransient<IReportService, ReportService>();
 
-            // Reservation Module
+            builder.Services.AddReportDependency();
+
+            // Reservations 
 
             builder.Services.AddReservationDependency();
             builder.Services.AddReservationServiceDependency();

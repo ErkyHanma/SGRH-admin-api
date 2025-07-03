@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SGRH.Domain.Entities.Hotel;
 
-namespace SGRH.Persistence.Context.EntityConfiguration
+namespace SGRH.Persistence.Context.EntityConfigurations.Hotel
 {
     public class RateConfiguration : IEntityTypeConfiguration<Rate>
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SGRH.Application.Dtos.Hotel.Rate
 {
-    public record RateDto
+    public record RateDto // No hereda directamente porque funciona como un DTO de salida.
     {
         public int RateId { get; set; }
         public int CategoryId { get; set; }

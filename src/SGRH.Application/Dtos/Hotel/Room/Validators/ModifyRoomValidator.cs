@@ -17,14 +17,5 @@ namespace SGRH.Application.Dtos.Hotel.Room.Validators
             RuleFor(x => x.UpdatedBy)
                 .GreaterThan(0).WithMessage("UpdatedBy must be greater than zero.");
         }
-
-        // Sobreescriben sus metodos de la clase BaseRoomValidator.
-        protected override string GetRoomNumber(ModifyRoomDto dto) => dto.RoomNumber;
-        protected override string GetStatus(ModifyRoomDto dto) => dto.Status;
-        protected override int GetCategoryId(ModifyRoomDto dto) => dto.CategoryId;
-        protected override int GetFloorId(ModifyRoomDto dto) => dto.FloorId;
-        protected override string? GetDescription(ModifyRoomDto dto) => dto.Description;
-        protected override string? GetRoomImgUrl(ModifyRoomDto dto) => dto.RoomImgUrl;
-
     }
 }
