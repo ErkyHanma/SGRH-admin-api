@@ -3,178 +3,202 @@ using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
+using SGRH.Application.UseCases.Hotel.Room;
 using SGRH.Domain.Base;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SGRH.Application.Services.Hotel
 {
-    public sealed class RoomService : IRoomService // HARDCODED
+    public sealed class RoomService : IRoomService
     {
         private readonly IRoomRepository _roomRepository;
+        private readonly IRoomCategoryRepository _roomCategoryRepository;
+        private readonly IFloorRepository _floorRepository;
         private readonly IAppLogger<RoomService> _logger;
         private readonly IConfiguration _configuration;
-        public RoomService(IRoomRepository roomRepository, IAppLogger<RoomService> logger, IConfiguration configuration)
+        private readonly RoomMustNotBeOccupied _roomMustNotBeOccupied;
+
+        public RoomService(
+            IRoomRepository roomRepository,
+            IRoomCategoryRepository roomCategoryRepository,
+            IFloorRepository floorRepository,
+            IAppLogger<RoomService> logger,
+            IConfiguration configuration,
+            RoomMustNotBeOccupied roomMustNotBeOccupied)
         {
             _roomRepository = roomRepository;
+            _roomCategoryRepository = roomCategoryRepository;
+            _floorRepository = floorRepository;
             _logger = logger;
             _configuration = configuration;
+            _roomMustNotBeOccupied = roomMustNotBeOccupied;
         }
+
         public async Task<OperationResult<CreateRoomDto>> CreateRoom(CreateRoomDto createRoomDto)
         {
-            //Estructura basica (Esto es lo que se quiere?)
-
-            OperationResult<CreateRoomDto> operationResult = new OperationResult<CreateRoomDto>();
-
             try
             {
                 _logger.Info("Creating room", createRoomDto);
 
+                // Validaciones
+
                 if (createRoomDto is null)
-                {
-                    operationResult = OperationResult<CreateRoomDto>.Failure("Object CreateRoomDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<CreateRoomDto>.Failure("CreateRoomDto is required.");
 
-                operationResult = await _roomRepository.AddAsync(createRoomDto);
+                if (!await CategoryExists(createRoomDto.CategoryId))
+                    return OperationResult<CreateRoomDto>.Failure($"CategoryId {createRoomDto.CategoryId} does not exist.");
 
-                // Validaciones (agregar mas)
+                if (!await FloorExists(createRoomDto.FloorId))
+                    return OperationResult<CreateRoomDto>.Failure($"FloorId {createRoomDto.FloorId} does not exist.");
+
+                var operationResult = await _roomRepository.AddAsync(createRoomDto);
 
                 if (!operationResult.IsSuccess)
                 {
-                    _logger.ErrorNoEx($"An error has occured while creating: {operationResult.Message} Persisting room.");
+                    _logger.ErrorNoEx($"An error occurred while creating: {operationResult.Message}");
                     return operationResult;
                 }
 
-                _logger.Info($"The room {createRoomDto} was created successfully.", createRoomDto);
-
+                _logger.Info($"Room {createRoomDto} created successfully.");
                 return operationResult;
 
-            } 
+            }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Error"); // deberia estar en el archivo de configuracion?
-                operationResult = OperationResult<CreateRoomDto>.Failure($"Error creating a room {ex.Message}");
-                return operationResult;
+                _logger.ErrorEx(ex, "Error");
+                return OperationResult<CreateRoomDto>.Failure($"Error creating room: {ex.Message}");
             }
         }
 
         public async Task<OperationResult<DisableRoomDto>> DeleteRoom(DisableRoomDto disableRoomDto)
         {
-            OperationResult<DisableRoomDto> operationResult = new OperationResult<DisableRoomDto>();
             try
             {
-                ///
-                _logger.Info("Deleting a room", disableRoomDto);
+                _logger.Info("Deleting room", disableRoomDto);
+
+                // Validaciones
 
                 if (disableRoomDto is null)
-                {
-                    operationResult = OperationResult<DisableRoomDto>.Failure("Object DisableRoomDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<DisableRoomDto>.Failure("DisableRoomDto is required.");
 
-                operationResult = await _roomRepository.DeleteAsync(disableRoomDto);
+                var roomResult = await _roomRepository.GetByIdAsync(disableRoomDto.RoomId);
 
-                // Validaciones (agregar mas)
+                if (!roomResult.IsSuccess || roomResult.Data == null)
+                    return OperationResult<DisableRoomDto>.Failure($"RoomId {disableRoomDto.RoomId} does not exist.");
+
+                if (!_roomMustNotBeOccupied.Validate(roomResult.Data).IsSuccess)
+                    return OperationResult<DisableRoomDto>.Failure("The room is occupied and cannot be modified.");
+
+                var operationResult = await _roomRepository.DeleteAsync(disableRoomDto);
 
                 if (!operationResult.IsSuccess)
                 {
-                    _logger.ErrorNoEx($"An error has occured while deleting a room: {operationResult.Message} Persisting room.");
+                    _logger.ErrorNoEx($"An error occurred while deleting room: {operationResult.Message}");
                     return operationResult;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorEx(ex, "Error"); // deberia estar en el archivo de configuracion?
-                operationResult = OperationResult<DisableRoomDto>.Failure($"Error trying to update a room {ex.Message}");
-            }
-            return operationResult;
-        }
-    
-        public async Task<OperationResult<IEnumerable<RoomDto>>> GetRooms()
-        {
-            OperationResult<IEnumerable<RoomDto>> operationResult = new OperationResult<IEnumerable<RoomDto>>();
-
-            try
-            {
-                operationResult = await _roomRepository.GetAllAsync();
-                
-                if (!operationResult.IsSuccess)
-                {
-                    _logger.ErrorNoEx($"An error has occured on _roomRepository.GetAllAsync() while retrieving rooms: {operationResult.Message}");
                 }
 
                 return operationResult;
-
-            } 
+            }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Error"); // deberia estar en el archivo de configuracion?
-                operationResult = OperationResult<IEnumerable<RoomDto>>.Failure($"Error retrieving rooms {ex.Message}");
+                _logger.ErrorEx(ex, "Error");
+                return OperationResult<DisableRoomDto>.Failure($"Error deleting room: {ex.Message}");
             }
-            return operationResult;
+        }
+
+        public async Task<OperationResult<IEnumerable<RoomDto>>> GetRooms()
+        {
+            try
+            {
+                var operationResult = await _roomRepository.GetAllAsync();
+
+                if (!operationResult.IsSuccess)
+                    _logger.ErrorNoEx($"Error retrieving rooms: {operationResult.Message}");
+
+                return operationResult;
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorEx(ex, "Error retrieving rooms");
+                return OperationResult<IEnumerable<RoomDto>>.Failure($"Error retrieving rooms: {ex.Message}");
+            }
         }
 
         public async Task<OperationResult<RoomDto>> GetRoomsById(int roomId)
         {
-            OperationResult<RoomDto> operationResult = new OperationResult<RoomDto>();
             try
             {
-                operationResult = await _roomRepository.GetByIdAsync(roomId);
+                var operationResult = await _roomRepository.GetByIdAsync(roomId);
 
                 if (!operationResult.IsSuccess)
-                {
-                    _logger.ErrorNoEx($"An error has occured on _roomRepository.GetByIdAsync(roomId) while retrieving a room: {operationResult.Message}");
-                }
-                return operationResult;
+                    _logger.ErrorNoEx($"Error retrieving room: {operationResult.Message}");
 
-            } 
+                return operationResult;
+            }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Error"); // deberia estar en el archivo de configuracion?
-                operationResult = OperationResult<RoomDto>.Failure($"Error retrieving a room {ex.Message}");
+                _logger.ErrorEx(ex, "Error retrieving room");
+                return OperationResult<RoomDto>.Failure($"Error retrieving room: {ex.Message}");
             }
-            return operationResult;
         }
 
         public async Task<OperationResult<ModifyRoomDto>> UpdateRoom(ModifyRoomDto modifyRoomDto)
         {
-            OperationResult<ModifyRoomDto> operationResult = new OperationResult<ModifyRoomDto>();
             try
             {
-                ///
-                _logger.Info("Updating a room", modifyRoomDto);
+                _logger.Info("Updating room", modifyRoomDto);
+
+                // Validaciones
 
                 if (modifyRoomDto is null)
-                {
-                    operationResult = OperationResult<ModifyRoomDto>.Failure("Object ModifyRoomDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<ModifyRoomDto>.Failure("ModifyRoomDto is required.");
 
-                operationResult = await _roomRepository.UpdateAsync(modifyRoomDto);
+                if (!await CategoryExists(modifyRoomDto.CategoryId))
+                    return OperationResult<ModifyRoomDto>.Failure($"CategoryId {modifyRoomDto.CategoryId} does not exist.");
 
-                // Validaciones (agregar mas)
+                if (!await FloorExists(modifyRoomDto.FloorId))
+                    return OperationResult<ModifyRoomDto>.Failure($"FloorId {modifyRoomDto.FloorId} does not exist.");
+
+                var roomResult = await _roomRepository.GetByIdAsync(modifyRoomDto.RoomId);
+                if (!roomResult.IsSuccess || roomResult.Data == null)
+                    return OperationResult<ModifyRoomDto>.Failure($"RoomId {modifyRoomDto.RoomId} does not exist.");
+
+                if (!_roomMustNotBeOccupied.Validate(roomResult.Data).IsSuccess)
+                    return OperationResult<ModifyRoomDto>.Failure("The room is occupied and cannot be modified.");
+
+                var operationResult = await _roomRepository.UpdateAsync(modifyRoomDto);
 
                 if (!operationResult.IsSuccess)
                 {
-                    _logger.ErrorNoEx($"An error has occured while updating a room: {operationResult.Message} Persisting room.");
+                    _logger.ErrorNoEx($"An error occurred while updating room: {operationResult.Message}");
                     return operationResult;
                 }
 
-                _logger.Info($"The room {modifyRoomDto.RoomNumber} was updated successfully.");
+                _logger.Info($"Room {modifyRoomDto.RoomNumber} updated successfully.");
                 return operationResult;
 
-            } 
+            }
             catch (Exception ex)
             {
-                _logger.ErrorEx(ex, "Error during UpdateRoom"); // deberia estar en el archivo de configuracion?
-                operationResult = OperationResult<ModifyRoomDto>.Failure($"Error trying to update a room {ex.Message}");
+                _logger.ErrorEx(ex, "Error updating room");
+                return OperationResult<ModifyRoomDto>.Failure($"Error updating room: {ex.Message}");
             }
-            return operationResult;
+        }
+
+        // Métodos auxiliares
+
+        private async Task<bool> CategoryExists(int categoryId)
+        {
+            var result = await _roomCategoryRepository.GetByIdAsync(categoryId);
+            return result.IsSuccess && result.Data != null;
+        }
+
+        private async Task<bool> FloorExists(int floorId)
+        {
+            var result = await _floorRepository.GetByIdAsync(floorId);
+            return result.IsSuccess && result.Data != null;
         }
     }
 }
