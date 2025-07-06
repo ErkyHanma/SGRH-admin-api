@@ -2,6 +2,8 @@
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Report;
 using SGRH.Application.Services.Report;
+using SGRH.Application.UseCases.Report;
+using SGRH.Domain.Entities.ServiceModule;
 using SGRH.Persistence.Repositories.Report;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,11 @@ namespace SGRH.IOC.Dependencies.Report
         {
            service.AddScoped<IReportRepository, ReportRepository>();
            service.AddTransient<IReportService, ReportService>();
+
+           //Use cases
+
+           service.AddScoped<ReportDateMustBeCorrect>();
+
         }
     }
 }
