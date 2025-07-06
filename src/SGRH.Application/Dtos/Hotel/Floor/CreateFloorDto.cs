@@ -1,10 +1,7 @@
 ﻿namespace SGRH.Application.Dtos.Hotel.Floor
 {
-    public record class CreateFloorDto
+    public record class CreateFloorDto : BaseFloorDto
     {
-        public int FloorNumber { get; set; }
-        public string? Description { get; set; }
-        public string? Status { get; set; } // 'active', 'inactive', 'maintenance'
         public int CreatedBy { get; set; }
     }
 }

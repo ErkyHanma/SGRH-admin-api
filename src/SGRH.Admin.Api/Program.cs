@@ -2,14 +2,14 @@ using DotNetEnv;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SGRH.Application.Common.Logging;
-using SGRH.Application.Dtos.Hotel.Floor;
-using SGRH.Application.Dtos.Hotel.Floor.Validators;
+//using SGRH.Application.Dtos.Hotel.Floor;
+//using SGRH.Application.Dtos.Hotel.Floor.Validators;
 using SGRH.Application.Dtos.Hotel.Rate;
 using SGRH.Application.Dtos.Hotel.Rate.Validators;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Dtos.Hotel.Room.Validators;
-using SGRH.Application.Dtos.Hotel.RoomCategory;
-using SGRH.Application.Dtos.Hotel.RoomCategory.Validators;
+//using SGRH.Application.Dtos.Hotel.RoomCategory;
+//using SGRH.Application.Dtos.Hotel.RoomCategory.Validators;
 using SGRH.Application.Interfaces.Mappers.Hotel;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Repositories.Report;
@@ -23,6 +23,7 @@ using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
 using SGRH.Persistence.Repositories.Report;
 using SGRH.Persistence.Repositories.UserManagement;
+using SGRH.IOC.Dependencies.Hotel;
 
 namespace SGRH.Api
 {
@@ -48,15 +49,7 @@ namespace SGRH.Api
             builder.Services.AddScoped<IValidator<CreateRateDto>, CreateRateValidator>();
             builder.Services.AddScoped<IValidator<UpdateRateDto>, UpdateRateValidator>();
             builder.Services.AddScoped<IValidator<DeleteRateDto>, DeleteRateValidator>();
-
-            builder.Services.AddScoped<IValidator<CreateFloorDto>, CreateFloorValidator>();
-            builder.Services.AddScoped<IValidator<ModifyFloorDto>, ModifyFloorValidator>();
-            builder.Services.AddScoped<IValidator<DisableFloorDto>, DisableFloorValidator>();
-
-            builder.Services.AddScoped<IValidator<CreateRoomCategoryDto>, CreateRoomCategoryValidator>();
-            builder.Services.AddScoped<IValidator<ModifyRoomCategoryDto>, ModifyRoomCategoryValidator>();
-            builder.Services.AddScoped<IValidator<DisableRoomCategoryDto>, DisableRoomCategoryValidator>();
-
+         
             // DbContext
             builder.Services.AddDbContext<SGRHContext>(options =>
             {
@@ -64,18 +57,21 @@ namespace SGRH.Api
             });
 
             // Hotel Module
+
+            // Dependencias de Floor
+            builder.Services.AddFloorDependency();
+
+            // Dependencias de RoomCategory
+            builder.Services.AddRoomCategoryDependency();
+
+
+
             builder.Services.AddScoped<IRoomRepository, RoomRepository>();
             builder.Services.AddTransient<IRoomService, RoomService>();
 
             builder.Services.AddScoped<IRatesRepository, RatesRepository>();
             builder.Services.AddTransient<IRatesService, RatesService>();
             builder.Services.AddTransient<IRateMapper, RateMapper>();
-
-            builder.Services.AddScoped<IFloorRepository, FloorRepository>();
-            builder.Services.AddTransient<IFloorService, FloorService>();
-
-            builder.Services.AddScoped<IRoomCategoryRepository, RoomCategoryRepository>();
-            builder.Services.AddTransient<IRoomCategoryService, RoomCategoryService>();
 
             // Report Module
             builder.Services.AddScoped<IReportRepository, ReportRepository>();

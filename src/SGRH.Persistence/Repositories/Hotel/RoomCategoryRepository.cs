@@ -26,9 +26,9 @@ namespace SGRH.Persistence.Repositories.Hotel
                                      IValidator<DisableRoomCategoryDto> disableValidator)
         {
             _configuration = configuration; 
-            //_connectionString = _configuration.GetConnectionString("SGRH"); // Obtener connection string de IConfiguration
+            _connectionString = _configuration.GetConnectionString("SGRH"); // Obtener connection string de IConfiguration
 
-            _connectionString = _configuration.GetConnectionString("SGRHConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
+            //_connectionString = _configuration.GetConnectionString("SGRHConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
             _logger = logger;
             _createValidator = createValidator;
             _modifyValidator = modifyValidator;

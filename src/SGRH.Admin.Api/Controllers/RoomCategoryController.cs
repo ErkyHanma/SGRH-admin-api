@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SGRH.Application.Common.Logging;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,8 +15,8 @@ namespace SGRH.Api.Controllers
     public class RoomCategoryController : ControllerBase
     {
         private readonly IRoomCategoryService _roomCategoryService;
-        // private readonly IAppLogger<RoomCategoryController> _logger; // Comentado por consistencia con RoomController
-        // private readonly IConfiguration _configuration; // Comentado por consistencia con RoomController
+        private readonly IAppLogger<RoomCategoryController> _logger;
+        private readonly IConfiguration _configuration;
 
         public RoomCategoryController(IRoomCategoryService roomCategoryService)
         {

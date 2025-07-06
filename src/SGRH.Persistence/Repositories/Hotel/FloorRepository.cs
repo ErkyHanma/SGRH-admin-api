@@ -25,9 +25,10 @@ namespace SGRH.Persistence.Repositories.Hotel
                                IValidator<ModifyFloorDto> modifyValidator,
                                IValidator<DisableFloorDto> disableValidator)
         {
-            _configuration = configuration; 
-                                           
-            _connectionString = _configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
+            _configuration = configuration;
+
+            _connectionString = _configuration.GetConnectionString("SGRH");
+            //_connectionString = _configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
 
             _logger = logger;
             _createValidator = createValidator;

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SGRH.Application.Common.Logging;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,8 +15,8 @@ namespace SGRH.Api.Controllers
     public class FloorController : ControllerBase
     {
         private readonly IFloorService _floorService;
-        // private readonly IAppLogger<FloorController> _logger; //
-        // private readonly IConfiguration _configuration;
+        private readonly IAppLogger<FloorController> _logger;
+        private readonly IConfiguration _configuration;     
 
         public FloorController(IFloorService floorService)
         {
