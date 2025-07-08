@@ -3,6 +3,7 @@ using SGRH.Application.Dtos.ReservationModule.ReservationService;
 using SGRH.Application.Dtos.ReservationModule.ReservationService.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.ReservationModule;
+using SGRH.Application.UseCases.ReservationModule;
 using SGRH.Domain.Base;
 
 namespace SGRH.Application.Services.ReservationModule
@@ -11,11 +12,20 @@ namespace SGRH.Application.Services.ReservationModule
     {
         private readonly IReservationServiceRepository _reservationServiceRepository;
         private readonly IAppLogger<ReservationServiceService> _logger;
+        private readonly AddReservationServiceUseCase _addReservationServiceUseCase;
+        private readonly DeleteReservationServiceUseCase _deleteReservationServiceUseCase;
 
-        public ReservationServiceService(IReservationServiceRepository reservationServiceRepository, IAppLogger<ReservationServiceService> logger)
+        public ReservationServiceService(
+            IReservationServiceRepository reservationServiceRepository,
+            IAppLogger<ReservationServiceService> logger,
+            AddReservationServiceUseCase addReservationServiceUseCase,
+            DeleteReservationServiceUseCase deleteReservationServiceUseCase
+            )
         {
             _reservationServiceRepository = reservationServiceRepository;
             _logger = logger;
+            _addReservationServiceUseCase = addReservationServiceUseCase;
+            _deleteReservationServiceUseCase = deleteReservationServiceUseCase;
         }
 
         public async Task<OperationResult<CreateReservationServiceDto>> AddReservationServiceAsync(CreateReservationServiceDto createReservationServiceDto)
@@ -33,7 +43,7 @@ namespace SGRH.Application.Services.ReservationModule
                     return validationResult;
                 }
 
-                var creationResult = await _reservationServiceRepository.AddAsync(createReservationServiceDto);
+                var creationResult = await _addReservationServiceUseCase.AddReservationServiceAsync(createReservationServiceDto);
 
                 if (!creationResult.IsSuccess)
                 {
@@ -70,7 +80,7 @@ namespace SGRH.Application.Services.ReservationModule
                     return validationResult;
                 }
 
-                var deletionResult = await _reservationServiceRepository.DeleteAsync(deleteReservationServiceDto);
+                var deletionResult = await _deleteReservationServiceUseCase.DeleteAsync(deleteReservationServiceDto);
                 if (!deletionResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"Failed to delete reservation service: {deletionResult.Message}");

@@ -104,7 +104,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
                 if (!reservation.Any())
                 {
-                    return OperationResult<ReservationDto>.Failure("Reservation not found");
+                    return OperationResult<ReservationDto>.Failure($"Reservation with ID: {id} was not found");
                 }
                 return OperationResult<ReservationDto>.Success("Reservation retrieved successfully", reservation.First());
 
@@ -289,6 +289,45 @@ namespace SGRH.Persistence.Repositories.ReservationModule
                 return OperationResult<CheckRoomAvailabilityResultDto>.Failure("An error occurred while checking room availability.");
             }
         }
+        public async Task<OperationResult<bool>> ExistsAsync(int reservationID)
+        {
+            if (reservationID <= 0)
+            {
+                _logger.ErrorNoEx($"Invalid room ID: {reservationID}");
+                return OperationResult<bool>.Failure("Invalid reservation ID it must be greater than zero.");
+            }
 
+            try
+            {
+                _logger.Info($"Checking reservation {reservationID} existence");
+
+                var result = await FunctionReaderEx.CallFunctionAsync(
+                    _connectionString,
+                    "SELECT * FROM reservationModule.CheckReservationExistence(@p_reservation_id)",
+                     reader => reader.GetBoolean(reader.GetOrdinal("is_true")),
+                    new Dictionary<string, object>
+                    {
+                        { "@p_reservation_id", reservationID }
+                    }
+                );
+
+
+                var exists = result.First();
+
+                if (exists)
+                {
+                    return OperationResult<bool>.Success("Reservation exists", true);
+                }
+
+                return OperationResult<bool>.Success($"The reservation with ID {reservationID} does not exists", false);
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorEx(ex, $"Error checking availability for room {reservationID}");
+                return OperationResult<bool>.Failure("An error occurred while checking room availability.");
+            }
+        }
     }
 }

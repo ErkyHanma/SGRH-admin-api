@@ -18,7 +18,7 @@ namespace SGRH.Api.Controllers.ReservationModule
 
 
         // POST api/<ReservationController>
-        [HttpPost("CreateReservationService")]
+        [HttpPost("AddReservationService")]
         public async Task<IActionResult> Post([FromBody] CreateReservationServiceDto createReservationServiceDto)
         {
             var result = await _reservationServiceService.AddReservationServiceAsync(createReservationServiceDto);
@@ -30,7 +30,7 @@ namespace SGRH.Api.Controllers.ReservationModule
         }
 
 
-        [HttpPost("DisableReservationService")]
+        [HttpPost("DeleteReservationService")]
         public async Task<IActionResult> Post([FromBody] DeleteReservationServiceDto deleteReservationServiceDto)
         {
             var result = await _reservationServiceService.DeleteReservationServiceAsync(deleteReservationServiceDto);

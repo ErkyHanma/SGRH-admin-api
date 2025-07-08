@@ -2,6 +2,7 @@
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.ReservationModule;
 using SGRH.Application.Services.ReservationModule;
+using SGRH.Application.UseCases.ReservationModule;
 using SGRH.Persistence.Repositories.ReservationModule;
 
 namespace SGRH.IOC.Dependencies.ReservationModule
@@ -12,6 +13,8 @@ namespace SGRH.IOC.Dependencies.ReservationModule
         {
             service.AddScoped<IReservationServiceRepository, ReservationServiceRepository>();
             service.AddTransient<IReservationServiceService, ReservationServiceService>();
+            service.AddScoped<AddReservationServiceUseCase>();
+            service.AddScoped<DeleteReservationServiceUseCase>();
         }
     }
 }
