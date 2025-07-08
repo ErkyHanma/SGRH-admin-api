@@ -4,6 +4,7 @@ using SGRH.Application.Dtos.Hotel.Floor;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Domain.Base;
+using SGRH.Application.UseCases.Hotel.Floor;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,28 +16,43 @@ namespace SGRH.Application.Services.Hotel
         private readonly IFloorRepository _floorRepository;
         private readonly IAppLogger<FloorService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly FloorNumberMustBeUnique _floorNumberMustBeUnique; 
+        private readonly FloorMustNotHaveActiveReservations _floorMustNotHaveActiveReservations; 
 
-        public FloorService(IFloorRepository floorRepository, IAppLogger<FloorService> logger, IConfiguration configuration)
+        public FloorService(
+            IFloorRepository floorRepository,
+            IAppLogger<FloorService> logger,
+            IConfiguration configuration,
+            FloorNumberMustBeUnique floorNumberMustBeUnique, 
+            FloorMustNotHaveActiveReservations floorMustNotHaveActiveReservations 
+        )
         {
             _floorRepository = floorRepository;
             _logger = logger;
             _configuration = configuration;
+            _floorNumberMustBeUnique = floorNumberMustBeUnique;
+            _floorMustNotHaveActiveReservations = floorMustNotHaveActiveReservations;
         }
 
         public async Task<OperationResult<CreateFloorDto>> CreateFloor(CreateFloorDto createFloorDto)
         {
-            OperationResult<CreateFloorDto> operationResult = new OperationResult<CreateFloorDto>();
             try
             {
                 _logger.Info("Creating floor", createFloorDto);
 
                 if (createFloorDto is null)
-                {
-                    operationResult = OperationResult<CreateFloorDto>.Failure("Object CreateFloorDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<CreateFloorDto>.Failure("CreateFloorDto is required.");
 
-                operationResult = await _floorRepository.AddAsync(createFloorDto);
+                //Caso de Uso: FloorNumberMustBeUnique (para creación)
+                var uniqueNumberValidation = await _floorNumberMustBeUnique.ValidateCreate(createFloorDto.FloorNumber);
+                if (!uniqueNumberValidation.IsSuccess)
+                {
+                    _logger.ErrorNoEx($"Validation failed for CreateFloor: {uniqueNumberValidation.Message}");
+                    return OperationResult<CreateFloorDto>.Failure(uniqueNumberValidation.Message);
+                }
+                //Fin Caso de Uso
+
+                var operationResult = await _floorRepository.AddAsync(createFloorDto);
 
                 if (!operationResult.IsSuccess)
                 {
@@ -50,25 +66,29 @@ namespace SGRH.Application.Services.Hotel
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error creating a floor");
-                operationResult = OperationResult<CreateFloorDto>.Failure($"Error creating a floor: {ex.Message}");
-                return operationResult;
+                return OperationResult<CreateFloorDto>.Failure($"Error creating a floor: {ex.Message}");
             }
         }
 
         public async Task<OperationResult<DisableFloorDto>> DeleteFloor(DisableFloorDto disableFloorDto)
         {
-            OperationResult<DisableFloorDto> operationResult = new OperationResult<DisableFloorDto>();
             try
             {
                 _logger.Info("Disabling floor ID {FloorId}", disableFloorDto.FloorId);
 
                 if (disableFloorDto is null)
-                {
-                    operationResult = OperationResult<DisableFloorDto>.Failure("Object DisableFloorDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<DisableFloorDto>.Failure("DisableFloorDto is required.");
 
-                operationResult = await _floorRepository.DeleteAsync(disableFloorDto);
+                //Caso de Uso: FloorMustNotHaveActiveReservations
+                var activeReservationsValidation = await _floorMustNotHaveActiveReservations.Validate(disableFloorDto.FloorId);
+                if (!activeReservationsValidation.IsSuccess)
+                {
+                    _logger.ErrorNoEx($"Validation failed for DeleteFloor: {activeReservationsValidation.Message}");
+                    return OperationResult<DisableFloorDto>.Failure(activeReservationsValidation.Message);
+                }
+                //Fin Caso de Uso
+
+                var operationResult = await _floorRepository.DeleteAsync(disableFloorDto);
 
                 if (!operationResult.IsSuccess)
                 {
@@ -82,70 +102,68 @@ namespace SGRH.Application.Services.Hotel
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error disabling a floor");
-                operationResult = OperationResult<DisableFloorDto>.Failure($"Error trying to disable a floor: {ex.Message}");
-                return operationResult;
+                return OperationResult<DisableFloorDto>.Failure($"Error trying to disable a floor: {ex.Message}");
             }
         }
 
+        //(GetFloors y GetFloorsById solo lectura)
         public async Task<OperationResult<IEnumerable<FloorDto>>> GetFloors()
         {
-            OperationResult<IEnumerable<FloorDto>> operationResult = new OperationResult<IEnumerable<FloorDto>>();
             try
             {
                 _logger.Info("Retrieving all floors");
-                operationResult = await _floorRepository.GetAllAsync();
+                var operationResult = await _floorRepository.GetAllAsync();
 
                 if (!operationResult.IsSuccess)
-                {
                     _logger.ErrorNoEx($"An error has occurred on _floorRepository.GetAllAsync() while retrieving floors: {operationResult.Message}");
-                }
 
                 return operationResult;
             }
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error retrieving floors");
-                operationResult = OperationResult<IEnumerable<FloorDto>>.Failure($"Error retrieving floors: {ex.Message}");
-                return operationResult;
+                return OperationResult<IEnumerable<FloorDto>>.Failure($"Error retrieving floors: {ex.Message}");
             }
         }
 
         public async Task<OperationResult<FloorDto>> GetFloorsById(int floorId)
         {
-            OperationResult<FloorDto> operationResult = new OperationResult<FloorDto>();
             try
             {
                 _logger.Info("Retrieving floor by ID {FloorId}", floorId);
-                operationResult = await _floorRepository.GetByIdAsync(floorId);
+                var operationResult = await _floorRepository.GetByIdAsync(floorId);
 
                 if (!operationResult.IsSuccess)
-                {
                     _logger.ErrorNoEx($"An error has occurred on _floorRepository.GetByIdAsync({floorId}) while retrieving a floor: {operationResult.Message}");
-                }
+
                 return operationResult;
             }
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error retrieving a floor by ID");
-                operationResult = OperationResult<FloorDto>.Failure($"Error retrieving a floor: {ex.Message}");
-                return operationResult;
+                return OperationResult<FloorDto>.Failure($"Error retrieving a floor: {ex.Message}");
             }
         }
 
         public async Task<OperationResult<ModifyFloorDto>> UpdateFloor(ModifyFloorDto modifyFloorDto)
         {
-            OperationResult<ModifyFloorDto> operationResult = new OperationResult<ModifyFloorDto>();
             try
             {
                 _logger.Info("Updating floor ID {FloorId}", modifyFloorDto.FloorId);
 
                 if (modifyFloorDto is null)
-                {
-                    operationResult = OperationResult<ModifyFloorDto>.Failure("Object ModifyFloorDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<ModifyFloorDto>.Failure("ModifyFloorDto is required.");
 
-                operationResult = await _floorRepository.UpdateAsync(modifyFloorDto);
+                //Caso de Uso: FloorNumberMustBeUnique (para modificación)
+                var uniqueNumberValidation = await _floorNumberMustBeUnique.ValidateModify(modifyFloorDto.FloorId, modifyFloorDto.FloorNumber);
+                if (!uniqueNumberValidation.IsSuccess)
+                {
+                    _logger.ErrorNoEx($"Validation failed for UpdateFloor: {uniqueNumberValidation.Message}");
+                    return OperationResult<ModifyFloorDto>.Failure(uniqueNumberValidation.Message);
+                }
+                //Fin Caso de Uso
+
+                var operationResult = await _floorRepository.UpdateAsync(modifyFloorDto);
 
                 if (!operationResult.IsSuccess)
                 {
@@ -159,8 +177,7 @@ namespace SGRH.Application.Services.Hotel
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error during UpdateFloor");
-                operationResult = OperationResult<ModifyFloorDto>.Failure($"Error trying to update a floor: {ex.Message}");
-                return operationResult;
+                return OperationResult<ModifyFloorDto>.Failure($"Error trying to update a floor: {ex.Message}");
             }
         }
     }

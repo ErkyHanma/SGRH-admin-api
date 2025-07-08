@@ -4,6 +4,7 @@ using SGRH.Application.Dtos.Hotel.RoomCategory;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Domain.Base;
+using SGRH.Application.UseCases.Hotel.RoomCategory;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,29 +15,44 @@ namespace SGRH.Application.Services.Hotel
     {
         private readonly IRoomCategoryRepository _roomCategoryRepository;
         private readonly IAppLogger<RoomCategoryService> _logger;
-        private readonly IConfiguration _configuration; // Although not used in RoomService logic, it's injected. Keeping for consistency.
+        private readonly IConfiguration _configuration;
+        private readonly RoomCategoryNameMustBeUnique _roomCategoryNameMustBeUnique; 
+        private readonly RoomCategoryMustNotHaveAssociatedRooms _roomCategoryMustNotHaveAssociatedRooms;
 
-        public RoomCategoryService(IRoomCategoryRepository roomCategoryRepository, IAppLogger<RoomCategoryService> logger, IConfiguration configuration)
+        public RoomCategoryService(
+            IRoomCategoryRepository roomCategoryRepository,
+            IAppLogger<RoomCategoryService> logger,
+            IConfiguration configuration,
+            RoomCategoryNameMustBeUnique roomCategoryNameMustBeUnique, 
+            RoomCategoryMustNotHaveAssociatedRooms roomCategoryMustNotHaveAssociatedRooms 
+        )
         {
             _roomCategoryRepository = roomCategoryRepository;
             _logger = logger;
             _configuration = configuration;
+            _roomCategoryNameMustBeUnique = roomCategoryNameMustBeUnique;
+            _roomCategoryMustNotHaveAssociatedRooms = roomCategoryMustNotHaveAssociatedRooms;
         }
 
         public async Task<OperationResult<CreateRoomCategoryDto>> CreateRoomCategory(CreateRoomCategoryDto createRoomCategoryDto)
         {
-            OperationResult<CreateRoomCategoryDto> operationResult = new OperationResult<CreateRoomCategoryDto>();
             try
             {
                 _logger.Info("Creating room category", createRoomCategoryDto);
 
                 if (createRoomCategoryDto is null)
-                {
-                    operationResult = OperationResult<CreateRoomCategoryDto>.Failure("Object CreateRoomCategoryDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<CreateRoomCategoryDto>.Failure("CreateRoomCategoryDto is required.");
 
-                operationResult = await _roomCategoryRepository.AddAsync(createRoomCategoryDto);
+                //Caso de Uso: RoomCategoryNameMustBeUnique (para creación)
+                var uniqueNameValidation = await _roomCategoryNameMustBeUnique.ValidateCreate(createRoomCategoryDto.Name);
+                if (!uniqueNameValidation.IsSuccess)
+                {
+                    _logger.ErrorNoEx($"Validation failed for CreateRoomCategory: {uniqueNameValidation.Message}");
+                    return OperationResult<CreateRoomCategoryDto>.Failure(uniqueNameValidation.Message);
+                }
+                //Fin Caso de Uso
+
+                var operationResult = await _roomCategoryRepository.AddAsync(createRoomCategoryDto);
 
                 if (!operationResult.IsSuccess)
                 {
@@ -50,25 +66,29 @@ namespace SGRH.Application.Services.Hotel
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error creating a room category");
-                operationResult = OperationResult<CreateRoomCategoryDto>.Failure($"Error creating a room category: {ex.Message}");
-                return operationResult;
+                return OperationResult<CreateRoomCategoryDto>.Failure($"Error creating a room category: {ex.Message}");
             }
         }
 
         public async Task<OperationResult<DisableRoomCategoryDto>> DeleteRoomCategory(DisableRoomCategoryDto disableRoomCategoryDto)
         {
-            OperationResult<DisableRoomCategoryDto> operationResult = new OperationResult<DisableRoomCategoryDto>();
             try
             {
                 _logger.Info("Disabling room category ID {CategoryId}", disableRoomCategoryDto.CategoryId);
 
                 if (disableRoomCategoryDto is null)
-                {
-                    operationResult = OperationResult<DisableRoomCategoryDto>.Failure("Object DisableRoomCategoryDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<DisableRoomCategoryDto>.Failure("DisableRoomCategoryDto is required.");
 
-                operationResult = await _roomCategoryRepository.DeleteAsync(disableRoomCategoryDto);
+                //Caso de Uso: RoomCategoryMustNotHaveAssociatedRooms
+                var associatedRoomsValidation = await _roomCategoryMustNotHaveAssociatedRooms.Validate(disableRoomCategoryDto.CategoryId);
+                if (!associatedRoomsValidation.IsSuccess)
+                {
+                    _logger.ErrorNoEx($"Validation failed for DeleteRoomCategory: {associatedRoomsValidation.Message}");
+                    return OperationResult<DisableRoomCategoryDto>.Failure(associatedRoomsValidation.Message);
+                }
+                //Fin Caso de Uso
+
+                var operationResult = await _roomCategoryRepository.DeleteAsync(disableRoomCategoryDto);
 
                 if (!operationResult.IsSuccess)
                 {
@@ -82,70 +102,67 @@ namespace SGRH.Application.Services.Hotel
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error disabling a room category");
-                operationResult = OperationResult<DisableRoomCategoryDto>.Failure($"Error trying to disable a room category: {ex.Message}");
-                return operationResult;
+                return OperationResult<DisableRoomCategoryDto>.Failure($"Error trying to disable a room category: {ex.Message}");
             }
         }
 
         public async Task<OperationResult<IEnumerable<RoomCategoryDto>>> GetRoomCategories()
         {
-            OperationResult<IEnumerable<RoomCategoryDto>> operationResult = new OperationResult<IEnumerable<RoomCategoryDto>>();
             try
             {
                 _logger.Info("Retrieving all room categories");
-                operationResult = await _roomCategoryRepository.GetAllAsync();
+                var operationResult = await _roomCategoryRepository.GetAllAsync();
 
                 if (!operationResult.IsSuccess)
-                {
                     _logger.ErrorNoEx($"An error has occurred on _roomCategoryRepository.GetAllAsync() while retrieving room categories: {operationResult.Message}");
-                }
 
                 return operationResult;
             }
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error retrieving room categories");
-                operationResult = OperationResult<IEnumerable<RoomCategoryDto>>.Failure($"Error retrieving room categories: {ex.Message}");
-                return operationResult;
+                return OperationResult<IEnumerable<RoomCategoryDto>>.Failure($"Error retrieving room categories: {ex.Message}");
             }
         }
 
         public async Task<OperationResult<RoomCategoryDto>> GetRoomCategoryById(int categoryId)
         {
-            OperationResult<RoomCategoryDto> operationResult = new OperationResult<RoomCategoryDto>();
             try
             {
                 _logger.Info("Retrieving room category by ID {CategoryId}", categoryId);
-                operationResult = await _roomCategoryRepository.GetByIdAsync(categoryId);
+                var operationResult = await _roomCategoryRepository.GetByIdAsync(categoryId);
 
                 if (!operationResult.IsSuccess)
-                {
                     _logger.ErrorNoEx($"An error has occurred on _roomCategoryRepository.GetByIdAsync({categoryId}) while retrieving a room category: {operationResult.Message}");
-                }
+
                 return operationResult;
             }
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error retrieving a room category by ID");
-                operationResult = OperationResult<RoomCategoryDto>.Failure($"Error retrieving a room category: {ex.Message}");
-                return operationResult;
+                return OperationResult<RoomCategoryDto>.Failure($"Error retrieving a room category: {ex.Message}");
             }
         }
 
         public async Task<OperationResult<ModifyRoomCategoryDto>> UpdateRoomCategory(ModifyRoomCategoryDto modifyRoomCategoryDto)
         {
-            OperationResult<ModifyRoomCategoryDto> operationResult = new OperationResult<ModifyRoomCategoryDto>();
             try
             {
                 _logger.Info("Updating room category ID {CategoryId}", modifyRoomCategoryDto.CategoryId);
 
                 if (modifyRoomCategoryDto is null)
-                {
-                    operationResult = OperationResult<ModifyRoomCategoryDto>.Failure("Object ModifyRoomCategoryDto is required.");
-                    return operationResult;
-                }
+                    return OperationResult<ModifyRoomCategoryDto>.Failure("ModifyRoomCategoryDto is required.");
 
-                operationResult = await _roomCategoryRepository.UpdateAsync(modifyRoomCategoryDto);
+                //Caso de Uso: RoomCategoryNameMustBeUnique (para modificación)
+                var uniqueNameValidation = await _roomCategoryNameMustBeUnique.ValidateModify(modifyRoomCategoryDto.CategoryId, modifyRoomCategoryDto.Name);
+                if (!uniqueNameValidation.IsSuccess)
+                {
+                    _logger.ErrorNoEx($"Validation failed for UpdateRoomCategory: {uniqueNameValidation.Message}");
+                    return OperationResult<ModifyRoomCategoryDto>.Failure(uniqueNameValidation.Message);
+                }
+                //Fin Caso de Uso
+
+                var operationResult = await _roomCategoryRepository.UpdateAsync(modifyRoomCategoryDto);
 
                 if (!operationResult.IsSuccess)
                 {
@@ -159,8 +176,7 @@ namespace SGRH.Application.Services.Hotel
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error during UpdateRoomCategory");
-                operationResult = OperationResult<ModifyRoomCategoryDto>.Failure($"Error trying to update a room category: {ex.Message}");
-                return operationResult;
+                return OperationResult<ModifyRoomCategoryDto>.Failure($"Error trying to update a room category: {ex.Message}");
             }
         }
     }
