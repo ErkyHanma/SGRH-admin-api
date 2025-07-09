@@ -5,9 +5,9 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public int UpdatedBy { get; set; }
-        public int? DeletedBy { get; set; } // Added '?' to make it nullable.
-        public DateTime? DeleteAt { get; set; } // <----- there's a typo
+        public int? UpdatedBy { get; set; } 
+        public int? DeletedBy { get; set; }  
+        public DateTime? DeletedAt { get; set; } 
         public bool IsDeleted { get; set; }
         public bool IsActive { get; set; } = true;
     }

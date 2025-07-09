@@ -13,9 +13,9 @@ namespace SGRH.Application.Dtos.Hotel.Room.Validators
         public ModifyRoomValidator() // Implementan necesidades especificas 
         {
             RuleFor(x => x.RoomId) 
-                .GreaterThan(0).WithMessage("CreatedBy must be greater than zero.");
+                .GreaterThan(0).WithMessage("RoomId must be greater than zero.");
             RuleFor(x => x.UpdatedBy)
-                .GreaterThan(0).WithMessage("CreatedBy must be greater than zero.");
+                .GreaterThan(0).WithMessage("UpdatedBy must be greater than zero.");
         }
 
         // Sobreescriben sus metodos de la clase BaseRoomValidator.

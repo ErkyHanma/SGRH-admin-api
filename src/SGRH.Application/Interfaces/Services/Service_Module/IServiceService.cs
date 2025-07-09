@@ -9,7 +9,7 @@ namespace SGRH.Application.Interfaces.Services.Service_Module
         Task<OperationResult<ServiceDto>> GetServiceByIdAsync(int id);
         Task<OperationResult<CreateServiceDto>> CreateServicesAsync(CreateServiceDto createServiceDto);
         Task<OperationResult<ServiceDto>> UpdateServicesAsync(ServiceDto serviceDto);
-        Task<OperationResult<ServiceDto>> DeleteServicesAsync(ServiceDto serviceDto);
+        Task<OperationResult<DeleteServiceDto>> DeleteServicesAsync(DeleteServiceDto deleteServiceDto);
 
     }
 }
