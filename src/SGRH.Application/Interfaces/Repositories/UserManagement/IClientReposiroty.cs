@@ -1,4 +1,5 @@
 ﻿using SGRH.Domain.Entities.UserManagement;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Core.Application.Interfaces.Repositories.UserManagement
@@ -9,5 +10,6 @@ namespace Core.Application.Interfaces.Repositories.UserManagement
         Task<Client?> GetClientByIdAsync(int clientId);
         Task<string> UpdateClientAsync(Client client);
         Task<string> DisableClientAsync(int clientId, int updatedBy);
+        Task<IEnumerable<Client>> GetAllClientsAsync();
     }
 }

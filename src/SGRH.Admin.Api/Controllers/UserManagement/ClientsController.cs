@@ -20,12 +20,17 @@ namespace SGRH.Api.Controllers.UserManagement
         
         [HttpGet]
         public async Task<IActionResult> GetAll()
-        {
-           
-            throw new NotImplementedException("El método GetAllAsync no está definido en IClientRepository o su contraparte.");
-
+        {           
+            var clients = await _clientRepository.GetAllClientsAsync();
+            
+            if (clients == null || !clients.Any())
+            {
+                return NotFound("No se encontraron clientes.");
+            }
+            return Ok(clients);
+            
         }
-              
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
