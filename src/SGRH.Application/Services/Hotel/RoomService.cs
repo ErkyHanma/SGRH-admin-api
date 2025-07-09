@@ -187,7 +187,7 @@ namespace SGRH.Application.Services.Hotel
             }
         }
 
-        // Métodos auxiliares
+        // Metodos auxiliares
 
         private async Task<bool> CategoryExists(int categoryId)
         {
