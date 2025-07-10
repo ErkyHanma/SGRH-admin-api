@@ -89,6 +89,7 @@ namespace SGRH.Application.Services.ServiceModule
                     return validationResult;
                 }
 
+                // Check if service with the same name already exists
                 if (await _serviceRepository.ExistsAsync(nt => nt.Name == createServiceDto.Name))
                 {
                     return OperationResult<CreateServiceDto>.Failure($"Service with name {createServiceDto.Name} already exists.");
@@ -134,6 +135,12 @@ namespace SGRH.Application.Services.ServiceModule
                     return validationResult;
                 }
 
+                // Check if service exists
+                if (!await _serviceRepository.ExistsAsync(nt => nt.ServiceId == serviceDto.ServiceId))
+                {
+                    return OperationResult<ServiceDto>.Failure($"Service with ID: {serviceDto.ServiceId} does not exists.");
+                }
+
                 var result = await _serviceRepository.UpdateAsync(_mapper.ToDomainEntity(serviceDto));
 
 
@@ -166,13 +173,19 @@ namespace SGRH.Application.Services.ServiceModule
             {
                 _logger.Info($"Deleting service with Id: {deleteServiceDto.ServiceId}");
 
+                // Check if service exists
+                if (!await _serviceRepository.ExistsAsync(nt => nt.ServiceId == deleteServiceDto.ServiceId))
+                {
+                    return OperationResult<DeleteServiceDto>.Failure($"Service with ID: {deleteServiceDto.ServiceId} does not exists.");
+                }
+
 
                 var result = await _serviceRepository.DeleteAsync(_mapper.ToDomainEntityDelete(deleteServiceDto));
 
                 if (!result.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while deleting Service: {result.Message}.");
-                    return OperationResult<DeleteServiceDto>.Failure($"Error while trying to delete Service with ID: {deleteServiceDto.ServiceId}");
+                    return OperationResult<DeleteServiceDto>.Failure(result.Message);
                 }
 
                 if (result.Data is null)

@@ -11,5 +11,6 @@ namespace SGRH.Application.Interfaces.Repositories.ReservationModule
         Task<OperationResult<UpdateReservationDto>> UpdateAsync(UpdateReservationDto updateReservationDto);
         Task<OperationResult<DisableReservationDto>> DeleteAsync(DisableReservationDto disableReservationDto);
         Task<OperationResult<CheckRoomAvailabilityResultDto>> CheckAvailability(int RoomId, DateTime StartDate, DateTime EndDate);
+        Task<OperationResult<bool>> ExistsAsync(int reservationID);
     }
 }

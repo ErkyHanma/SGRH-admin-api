@@ -94,5 +94,60 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             }
 
         }
+
+        public async Task<OperationResult<bool>> IsServiceAdded(int reservationID, int serviceId)
+        {
+            if (reservationID <= 0)
+            {
+                _logger.ErrorNoEx($"Invalid reservation ID: {reservationID}");
+                return OperationResult<bool>.Failure("Invalid reservation ID: it must be greater than zero.");
+            }
+
+            if (serviceId <= 0)
+            {
+                _logger.ErrorNoEx($"Invalid service ID: {serviceId}");
+                return OperationResult<bool>.Failure("Invalid service ID: it must be greater than zero.");
+            }
+
+            try
+            {
+                _logger.Info($"Checking if service {serviceId} is added to reservation {reservationID}");
+
+                var result = await FunctionReaderEx.CallFunctionAsync(
+                    _connectionString,
+                    """
+                    SELECT 1 AS is_present
+                    FROM reservationModule.reservation_service
+                    WHERE reservation_id = @p_reservation_id
+                      AND service_id = @p_service_id
+                      AND is_deleted = FALSE
+                    """,
+                    reader => reader.GetInt32(reader.GetOrdinal("is_present")),
+                    new Dictionary<string, object>
+                    {
+                { "@p_reservation_id", reservationID },
+                { "@p_service_id", serviceId }
+                    }
+                );
+
+                bool exists = result.Any();
+
+
+                if (!exists)
+                {
+                    return OperationResult<bool>.Success("Service is not added to reservation.", false);
+                }
+
+                return OperationResult<bool>.Success("Service is already added to reservation.", true);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorEx(ex, $"Error checking if service {serviceId} is added to reservation {reservationID}");
+                return OperationResult<bool>.Failure("An error occurred while checking if the service is added.");
+            }
+        }
+
     }
 }
+
+

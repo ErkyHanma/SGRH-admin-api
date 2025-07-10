@@ -3,6 +3,7 @@ using SGRH.Application.Dtos.ReservationModule.Reservation;
 using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.ReservationModule;
+using SGRH.Application.UseCases.ReservationModule;
 using SGRH.Domain.Base;
 
 namespace SGRH.Application.Services.ReservationModule
@@ -12,11 +13,20 @@ namespace SGRH.Application.Services.ReservationModule
 
         private readonly IReservationRepository _reservationRepository;
         private readonly IAppLogger<ReservationService> _logger;
+        private readonly CreateReservationUseCase _createReservationUseCase;
+        private readonly UpdateReservationUseCase _updateReservationUseCase;
 
-        public ReservationService(IReservationRepository reservationRepository, IAppLogger<ReservationService> logger)
+        public ReservationService(
+            IReservationRepository reservationRepository,
+            IAppLogger<ReservationService> logger,
+            CreateReservationUseCase createReservationUseCase,
+            UpdateReservationUseCase updateReservationUseCase
+           )
         {
             _reservationRepository = reservationRepository;
             _logger = logger;
+            _createReservationUseCase = createReservationUseCase;
+            _updateReservationUseCase = updateReservationUseCase;
         }
 
         public async Task<OperationResult<IEnumerable<ReservationDto>>> GetAllReservationAsync()
@@ -83,20 +93,12 @@ namespace SGRH.Application.Services.ReservationModule
                     return validationResult;
                 }
 
-                var creationResult = await _reservationRepository.AddAsync(createReservationDto);
+                var result = await _createReservationUseCase.CreateReservation(createReservationDto);
 
-                if (!creationResult.IsSuccess)
-                {
-                    _logger.ErrorNoEx($"An error has occured while creating Reservation: {creationResult.Message}.");
-                    return OperationResult<CreateReservationDto>.Failure($"Error trying to create a Reservation {creationResult.Message}");
-                }
+                if (!result.IsSuccess)
+                    _logger.ErrorNoEx($"Error: {result.Message}");
 
-                if (creationResult.Data is null)
-                {
-                    return OperationResult<CreateReservationDto>.Failure("No Reservation found.");
-                }
-
-                return OperationResult<CreateReservationDto>.Success(creationResult.Message, creationResult.Data);
+                return result;
 
             }
             catch (Exception ex)
@@ -119,7 +121,7 @@ namespace SGRH.Application.Services.ReservationModule
                     return validationResult;
                 }
 
-                var result = await _reservationRepository.UpdateAsync(updateReservationDto);
+                var result = await _updateReservationUseCase.UpdateReservation(updateReservationDto);
 
                 if (!result.IsSuccess)
                 {
@@ -152,6 +154,13 @@ namespace SGRH.Application.Services.ReservationModule
                 if (!validationResult.IsSuccess)
                 {
                     return validationResult;
+                }
+
+                var reservationExits = await _reservationRepository.GetByIdAsync(disableReservationDto.ReservationId);
+
+                if (!reservationExits.IsSuccess)
+                {
+                    return OperationResult<DisableReservationDto>.Failure($"The reservation with ID {disableReservationDto.ReservationId} does not exists");
                 }
 
                 var result = await _reservationRepository.DeleteAsync(disableReservationDto);
