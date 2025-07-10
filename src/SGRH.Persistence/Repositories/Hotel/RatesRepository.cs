@@ -17,9 +17,9 @@ namespace SGRH.Persistence.Repositories.Hotel
     public class RatesRepository : IRatesRepository
     {
         private readonly SGRHContext _context;
-        private readonly IAppLogger<RoomRepository> _logger;
+        private readonly IAppLogger<RatesRepository> _logger;
 
-        public RatesRepository(SGRHContext context, IAppLogger<RoomRepository> logger)
+        public RatesRepository(SGRHContext context, IAppLogger<RatesRepository> logger)
         {
             _context = context;
             _logger = logger;
@@ -29,14 +29,12 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                _logger.Info("Adding new rate entity"); 
+                _logger.Info("Adding new rate entity");
 
                 // Validaciones 
 
-                /**
-                var validation = ValidateRateEntity(entity, isUpdate: false);
-                if (!validation.IsSuccess)
-                    return validation; **/
+                if (entity == null)
+                    return OperationResult<Rate>.Failure("Rate is null.");
 
                 entity.CreatedAt = DateTime.Now.Date;
                 entity.IsActive = true;
@@ -58,6 +56,9 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
+                if (entity == null)
+                    return OperationResult<Rate>.Failure("Rate is null.");
+
                 var existing = await _context.Rate
                     .FirstOrDefaultAsync(r => r.RateId == entity.RateId && !r.IsDeleted && r.IsActive);
 
@@ -79,13 +80,10 @@ namespace SGRH.Persistence.Repositories.Hotel
                 return OperationResult<Rate>.Failure("Error occurred while deleting rate.");
             }
         }
-
-
         public async Task<bool> ExistsAsync(Expression<Func<Rate, bool>> filter)
         {
             return await _context.Rate.AnyAsync(filter);
         }
-
         public async Task<OperationResult<IEnumerable<Rate>>> GetAllAsync() 
         {
             try
@@ -102,7 +100,6 @@ namespace SGRH.Persistence.Repositories.Hotel
                 return OperationResult<IEnumerable<Rate>>.Failure("Error fetching rates.");
             }
         }
-
         public async Task<OperationResult<IEnumerable<Rate>>> GetAllAsync(Expression<Func<Rate, bool>> filter)
         {
             try
@@ -120,11 +117,11 @@ namespace SGRH.Persistence.Repositories.Hotel
                 return OperationResult<IEnumerable<Rate>>.Failure("Error fetching filtered rates.");
             }
         }
-
         public async Task<OperationResult<Rate>> GetByIdAsync(int id)
         {
             try
             {
+
                 var rate = await _context.Rate
                     .Where(r => r.RateId == id && !r.IsDeleted)  // Obtener por ID, si no está eliminada
                     .FirstOrDefaultAsync();
@@ -140,7 +137,6 @@ namespace SGRH.Persistence.Repositories.Hotel
                 return OperationResult<Rate>.Failure("Error fetching rate.");
             }
         }
-
         public async Task<OperationResult<IEnumerable<Rate>>> GetRatesByCategoryAsync(int categoryId)
         {
             try
@@ -157,11 +153,13 @@ namespace SGRH.Persistence.Repositories.Hotel
                 return OperationResult<IEnumerable<Rate>>.Failure("Error fetching category rates.");
             }
         }
-
         public async Task<OperationResult<Rate>> UpdateAsync(Rate entity)
         {
             try
             {
+                if (entity == null)
+                    return OperationResult<Rate>.Failure("Rate is null.");
+
                 var existing = await _context.Rate.FindAsync(entity.RateId);
 
                 // Validaciones 
@@ -169,14 +167,10 @@ namespace SGRH.Persistence.Repositories.Hotel
                 if (existing == null || existing.IsDeleted)
                     return OperationResult<Rate>.Failure("Rate not found or already deleted.");
 
-                /** var validation = ValidateRateEntity(entity, isUpdate: true);
-                if (!validation.IsSuccess)
-                    return validation; **/
-
                 existing.CategoryId = entity.CategoryId;
                 existing.SeasonId = entity.SeasonId;
                 existing.NightPrice = entity.NightPrice;
-                existing.UpdatedAt = DateTime.Now.Date; // aquiiiiiiiiii
+                existing.UpdatedAt = DateTime.Now.Date; 
                 existing.UpdatedBy = entity.UpdatedBy;
 
                 _context.Rate.Update(existing);
@@ -190,31 +184,5 @@ namespace SGRH.Persistence.Repositories.Hotel
                 return OperationResult<Rate>.Failure("Error occurred while updating rate.");
             }
         }
-        /**
-        private OperationResult<Rate> ValidateRateEntity(Rate entity, bool isUpdate)
-        {
-            if (entity == null)
-                return OperationResult<Rate>.Failure("Rate entity cannot be null.");
-
-            if (isUpdate && entity.RateId <= 0)
-                return OperationResult<Rate>.Failure("Invalid Rate ID.");
-
-            if (entity.CategoryId <= 0)
-                return OperationResult<Rate>.Failure("Invalid Category ID.");
-
-            if (entity.SeasonId <= 0)
-                return OperationResult<Rate>.Failure("Invalid Season ID.");
-
-            if (entity.NightPrice <= 0)
-                return OperationResult<Rate>.Failure("Night price must be greater than 0.");
-
-            if (!isUpdate && entity.CreatedBy <= 0)
-                return OperationResult<Rate>.Failure("CreatedBy is required.");
-
-            if (isUpdate && entity.UpdatedBy <= 0)
-                return OperationResult<Rate>.Failure("UpdatedBy is required.");
-
-            return OperationResult<Rate>.Success("Validation passed.");
-        } **/
     }
 }

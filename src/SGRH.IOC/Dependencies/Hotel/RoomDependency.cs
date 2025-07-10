@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SGRH.Application.Dtos.Hotel.Room.Validators;
 using SGRH.Application.Dtos.Hotel.Room;
+using SGRH.Application.UseCases.Hotel.Room;
 
 namespace SGRH.IOC.Dependencies.Hotel
 {
@@ -23,11 +24,16 @@ namespace SGRH.IOC.Dependencies.Hotel
             service.AddScoped<IRoomRepository, RoomRepository>();
             service.AddTransient<IRoomService, RoomService>();
 
+            //Use cases
+
+            service.AddScoped<RoomMustNotBeOccupied>();
+
             //Fluent validation
 
             service.AddScoped<IValidator<CreateRoomDto>, CreateRoomValidator>();
             service.AddScoped<IValidator<ModifyRoomDto>, ModifyRoomValidator>();
             service.AddScoped<IValidator<DisableRoomDto>, DisableRoomValidator>();
+           
         }
     }
 }

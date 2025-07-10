@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SGRH.Application.UseCases.Hotel.Rate;
 
 namespace SGRH.IOC.Dependencies.Hotel
 {
@@ -22,6 +23,10 @@ namespace SGRH.IOC.Dependencies.Hotel
             service.AddScoped<IRatesRepository, RatesRepository>();
             service.AddTransient<IRatesService, RatesService>();
             service.AddScoped<IRateMapper, RateMapper>();
+
+            //Use cases
+
+            service.AddScoped<RatesMustNotBeOverlapping>();
 
             //Fluent Validation
 

@@ -5,6 +5,7 @@ using SGRH.Application.Dtos.Report;
 using SGRH.Application.Dtos.Report.InputDtos;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Report;
+using SGRH.Application.UseCases.Report;
 using SGRH.Domain.Base;
 using System;
 using System.Collections.Generic;
@@ -19,19 +20,24 @@ namespace SGRH.Application.Services.Report
         private readonly IReportRepository _reportRepository;
         private readonly IAppLogger<ReportService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly ReportDateMustBeCorrect _reportDateMustBeCorrect;
 
-        public ReportService(IReportRepository reportRepository, IAppLogger<ReportService> logger, IConfiguration configuration)
+        public ReportService(IReportRepository reportRepository,
+                             IAppLogger<ReportService> logger,
+                             IConfiguration configuration,
+                             ReportDateMustBeCorrect reportDateMustBeCorrect)
         {
             _reportRepository = reportRepository;
             _logger = logger;
             _configuration = configuration;
+            _reportDateMustBeCorrect = reportDateMustBeCorrect;
         }
 
         public async Task<OperationResult<IEnumerable<OcuppancyReportDto>>> GetOcuppancyReport(ReportDateRangeRequestDto request)
         {
             try
             {
-                var validation = ValidateDateRange(request);
+                var validation = _reportDateMustBeCorrect.Validate(request);
                 if (!validation.IsSuccess)
                 {
                     return OperationResult<IEnumerable<OcuppancyReportDto>>.Failure(validation.Message);
@@ -61,7 +67,7 @@ namespace SGRH.Application.Services.Report
         {
             try
             {
-                var validation = ValidateDateRange(request);
+                var validation = _reportDateMustBeCorrect.Validate(request);
                 if (!validation.IsSuccess)
                 {
                     return OperationResult<IEnumerable<RatesReportDto>>.Failure(validation.Message);
@@ -89,7 +95,7 @@ namespace SGRH.Application.Services.Report
         {
             try
             {
-                var validation = ValidateDateRange(request);
+                var validation = _reportDateMustBeCorrect.Validate(request);
                 if (!validation.IsSuccess)
                 {
                     return OperationResult<IEnumerable<RevenueReportDto>>.Failure(validation.Message);
@@ -145,19 +151,6 @@ namespace SGRH.Application.Services.Report
             }
         }
 
-        // Validaciones
-        private OperationResult<string> ValidateDateRange(ReportDateRangeRequestDto request)
-        {
-            if (request == null)
-                return OperationResult<string>.Failure("Request cannot be null.");
-
-            if (request.StartDate > request.EndDate)
-                return OperationResult<string>.Failure("Start date cannot be after end date.");
-
-            if (request.StartDate > DateTime.Now || request.EndDate > DateTime.Now)
-                return OperationResult<string>.Failure("Dates cannot be in the future.");
-
-            return OperationResult<string>.Success("Date range is valid.");
-        }
+      
     }
 }

@@ -6,6 +6,8 @@ using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Domain.Base;
 using SGRH.Application.Interfaces.Mappers.Hotel;
 using FluentValidation;
+using SGRH.Application.UseCases.Hotel.Rate;
+using SGRH.Application.Dtos.Hotel.Room;
 
 namespace SGRH.Application.Services.Hotel
 {
@@ -18,6 +20,8 @@ namespace SGRH.Application.Services.Hotel
         private readonly IValidator<CreateRateDto> _createRateValidator;
         private readonly IValidator<UpdateRateDto> _updateRateValidator;
         private readonly IValidator<DeleteRateDto> _deleteRateValidator;
+        private readonly RatesMustNotBeOverlapping _ratesMustNotBeOverlapping;
+        private readonly IRoomCategoryRepository _roomCategoryRepository;
 
         public RatesService(
             IRatesRepository ratesRepository,
@@ -26,7 +30,9 @@ namespace SGRH.Application.Services.Hotel
             IConfiguration configuration,
             IValidator<CreateRateDto> createRateValidator,
             IValidator<UpdateRateDto> updateRateValidator,
-            IValidator<DeleteRateDto> deleteRateValidator)
+            IValidator<DeleteRateDto> deleteRateValidator,
+            RatesMustNotBeOverlapping ratesMustNotBeOverlapping,
+            IRoomCategoryRepository roomCategoryRepository)
         {
             _ratesRepository = ratesRepository;
             _logger = logger;
@@ -35,8 +41,9 @@ namespace SGRH.Application.Services.Hotel
             _createRateValidator = createRateValidator;
             _updateRateValidator = updateRateValidator;
             _deleteRateValidator = deleteRateValidator;
+            _ratesMustNotBeOverlapping = ratesMustNotBeOverlapping;
+            _roomCategoryRepository = roomCategoryRepository;
         }
-
 
         public async Task<OperationResult<CreateRateDto>> CreateRatesAsync(CreateRateDto createRateDto)
         {
@@ -47,6 +54,9 @@ namespace SGRH.Application.Services.Hotel
                 if (createRateDto == null)
                     return OperationResult<CreateRateDto>.Failure("Input data is required.");
 
+                if (!await CategoryExists(createRateDto.CategoryId))
+                    return OperationResult<CreateRateDto>.Failure($"CategoryId {createRateDto.CategoryId} does not exist.");
+
                 var validation = _createRateValidator.Validate(createRateDto);
                 if (!validation.IsValid)
                 {
@@ -55,15 +65,10 @@ namespace SGRH.Application.Services.Hotel
 
                 // Regla: No puede haber dos tarifas para la misma categoría y temporada
 
-                var overlappingRates = await _ratesRepository.GetAllAsync(r =>
-                    r.CategoryId == createRateDto.CategoryId &&
-                    r.SeasonId == createRateDto.SeasonId &&
-                    !r.IsDeleted);
+                var overlapValidation = await _ratesMustNotBeOverlapping.Validate(createRateDto.CategoryId, createRateDto.SeasonId);
 
-                if (overlappingRates.Data.Any())
-                {
-                    return OperationResult<CreateRateDto>.Failure("A rate already exists for this category and season.");
-                }
+                if (!overlapValidation.IsSuccess)
+                    return OperationResult<CreateRateDto>.Failure(overlapValidation.Message);
 
                 var entity = _mapper.MapFromDto(createRateDto);
                 var result = await _ratesRepository.AddAsync(entity);
@@ -178,6 +183,9 @@ namespace SGRH.Application.Services.Hotel
                 if (updateRateDto == null)
                     return OperationResult<RateDto>.Failure("Input data is required.");
 
+                if (!await CategoryExists(updateRateDto.CategoryId))
+                    return OperationResult<RateDto>.Failure($"CategoryId {updateRateDto.CategoryId} does not exist.");
+
                 var validation = _updateRateValidator.Validate(updateRateDto);
                 if (!validation.IsValid)
                 {
@@ -190,6 +198,13 @@ namespace SGRH.Application.Services.Hotel
                 {
                     return OperationResult<RateDto>.Failure("Rate not found.");
                 }
+
+                // Regla: No puede haber dos tarifas para la misma categoría y temporada
+
+                var overlapValidation = await _ratesMustNotBeOverlapping.Validate(updateRateDto.CategoryId, updateRateDto.SeasonId);
+
+                if (!overlapValidation.IsSuccess)
+                    return OperationResult<RateDto>.Failure(overlapValidation.Message);
 
                 _mapper.ApplyUpdateDto(existingRate.Data, updateRateDto);
 
@@ -209,5 +224,15 @@ namespace SGRH.Application.Services.Hotel
                 return OperationResult<RateDto>.Failure($"Unexpected error: {ex.Message}");
             }
         }
+
+        // Metodos auxiliares
+
+        private async Task<bool> CategoryExists(int categoryId)
+        {
+            var result = await _roomCategoryRepository.GetByIdAsync(categoryId);
+            return result.IsSuccess && result.Data != null;
+        }
     }
+
+
 }
