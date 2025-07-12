@@ -1,25 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SGRH.Domain.Entities.Hotel;
+using SGRH.Domain.Entities.ReservationModule;
 using SGRH.Domain.Entities.ServiceModule;
 using SGRH.Persistence.Context.EntityConfiguration;
-using SGRH.Persistence.Context.EntityConfigurations.Hotel;
 
-namespace SGRH.Persistence.Context
+namespace SGRH.Persistence.Test.Context
 {
-    public class SGRHContext : DbContext
+    public class SGRHContextInMemory : DbContext
     {
-        public SGRHContext(DbContextOptions<SGRHContext> options) : base(options) { }
+        public DbSet<Reservation> Reservation { get; set; }
         public DbSet<Service> Service { get; set; }
-        public DbSet<Rate> Rate { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseInMemoryDatabase("SGRHDB");
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Service
             ServiceConfiguration.OnServiceModelCreating(modelBuilder);
 
             // Rate
-            modelBuilder.ApplyConfiguration(new RateConfiguration());
+            //modelBuilder.ApplyConfiguration(new RateConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
+
+
+
     }
 }
