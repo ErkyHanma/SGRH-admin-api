@@ -11,8 +11,7 @@ namespace SGRH.Application.Dtos.ReservationModule.Reservation.Validators
             if (!result.IsSuccess)
                 return result;
 
-            if (dto.CreatedBy <= 0)
-                return OperationResult<CreateReservationDto>.Failure("CreatedBy must be greater than zero.");
+
 
             return OperationResult<CreateReservationDto>.Success("All field validated", dto);
         }

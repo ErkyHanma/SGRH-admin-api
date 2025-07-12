@@ -3,8 +3,6 @@
     public record class DisableReservationDto
     {
         public int ReservationId { get; set; }
-        public int UpdatedBy { get; set; }
-        public int DeleteBy { get; set; }
     }
 }
 

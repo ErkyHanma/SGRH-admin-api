@@ -14,9 +14,6 @@ namespace SGRH.Application.Dtos.ReservationModule.Reservation.Validators
             if (dto.ReservationId <= 0)
                 return OperationResult<UpdateReservationDto>.Failure("ReservationId must be greater than zero.");
 
-            if (dto.UpdatedBy <= 0)
-                return OperationResult<UpdateReservationDto>.Failure("UpdatedBy must be greater than zero.");
-
             return OperationResult<UpdateReservationDto>.Success("All fields validated! ", dto);
         }
 

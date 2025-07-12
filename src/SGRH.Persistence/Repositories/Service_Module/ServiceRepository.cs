@@ -95,6 +95,8 @@ namespace SGRH.Persistence.Repositories.Service_Module
                     return validationResult;
                 }
 
+
+                entity.CreatedBy = 1; // User session ID (For now Hardcode value)
                 await _context.Service.AddAsync(entity);
                 await _context.SaveChangesAsync();
 
@@ -139,9 +141,8 @@ namespace SGRH.Persistence.Repositories.Service_Module
                 ExistingService.Description = entity.Description;
                 ExistingService.Price = entity.Price;
                 ExistingService.IsActive = entity.IsActive;
-                ExistingService.UpdatedBy = entity.UpdatedBy;
+                ExistingService.UpdatedBy = 1; // User session ID (For now Hardcode value)
                 ExistingService.UpdatedAt = DateTime.Now;
-
 
                 _context.Service.Update(ExistingService);
                 await _context.SaveChangesAsync();
@@ -177,7 +178,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
                 ExistingService.IsDeleted = true;
                 ExistingService.IsActive = false;
                 ExistingService.DeleteAt = DateTime.Now;
-                ExistingService.DeletedBy = 1; // For now a hardcoded value
+                ExistingService.DeletedBy = 1; // User session ID (For now Hardcode value)
 
                 _context.Service.Update(ExistingService);
                 await _context.SaveChangesAsync();

@@ -17,7 +17,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         public ReservationRepository(IAppLogger<ReservationRepository> logger, IConfiguration configuration)
         {
             _configuration = configuration;
-            _connectionString = _configuration["ConnectionStrings:SGRHConnection"]; 
+            _connectionString = _configuration["ConnectionStrings:SGRHConnection"];
             _logger = logger;
         }
 
@@ -139,7 +139,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
                 { "p_status", createReservationDto.Status },
                 { "p_guest_count",createReservationDto.GuestCount },
                 { "p_payment_amount",createReservationDto.PaymentAmount },
-                { "p_created_by", createReservationDto.CreatedBy },
+                { "p_created_by", 1 }, // <--- User session ID (For now Hardcode value)
             };
 
 
@@ -184,7 +184,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
                 { "p_status", updateReservationDto.Status},
                 { "p_guest_count", updateReservationDto.GuestCount},
                 { "p_payment_amount", updateReservationDto.PaymentAmount},
-                { "p_updated_by", updateReservationDto.UpdatedBy},
+                { "p_updated_by", 1}, // <--- User session ID (For now Hardcode value)
             };
 
             var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync(
@@ -219,8 +219,8 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             var parameters = new Dictionary<string, object>()
             {
                 {"p_reservation_id", disableReservationDto.ReservationId},
-                {"p_updated_by", disableReservationDto.UpdatedBy},
-                {"p_deleted_by", disableReservationDto.DeleteBy},
+                {"p_updated_by", 1}, // <--- User session ID (For now Hardcode value)
+                {"p_deleted_by", 1}, // <--- User session ID (For now Hardcode value)
             };
 
             var StoredProcedureResult = await StoreProcedureEx.ExecuteAsync(

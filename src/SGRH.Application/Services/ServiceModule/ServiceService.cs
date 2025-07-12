@@ -97,7 +97,6 @@ namespace SGRH.Application.Services.ServiceModule
 
                 var creationResult = await _serviceRepository.AddAsync(_mapper.ToDomainEntityAdd(createServiceDto));
 
-
                 if (!creationResult.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while creating Service: {creationResult.Message}.");
