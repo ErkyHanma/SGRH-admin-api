@@ -14,26 +14,26 @@ namespace SGRH.Application.Services.Hotel
     public sealed class RoomService : IRoomService
     {
         private readonly IRoomRepository _roomRepository;
-        private readonly IRoomCategoryRepository _roomCategoryRepository;
-        private readonly IFloorRepository _floorRepository;
         private readonly IAppLogger<RoomService> _logger;
         private readonly IConfiguration _configuration;
         private readonly RoomMustNotBeOccupied _roomMustNotBeOccupied;
+        private readonly RoomCategoryMustExist _roomCategoryMustExist;
+        private readonly RoomFloorMustExist _roomFloorMustExist;
 
         public RoomService(
             IRoomRepository roomRepository,
-            IRoomCategoryRepository roomCategoryRepository,
-            IFloorRepository floorRepository,
             IAppLogger<RoomService> logger,
             IConfiguration configuration,
-            RoomMustNotBeOccupied roomMustNotBeOccupied)
+            RoomMustNotBeOccupied roomMustNotBeOccupied,
+            RoomCategoryMustExist roomCategoryMustExist,
+            RoomFloorMustExist roomFloorMustExist)
         {
             _roomRepository = roomRepository;
-            _roomCategoryRepository = roomCategoryRepository;
-            _floorRepository = floorRepository;
             _logger = logger;
             _configuration = configuration;
             _roomMustNotBeOccupied = roomMustNotBeOccupied;
+            _roomCategoryMustExist = roomCategoryMustExist;
+            _roomFloorMustExist = roomFloorMustExist;
         }
 
         public async Task<OperationResult<CreateRoomDto>> CreateRoom(CreateRoomDto createRoomDto)
@@ -47,11 +47,13 @@ namespace SGRH.Application.Services.Hotel
                 if (createRoomDto is null)
                     return OperationResult<CreateRoomDto>.Failure("CreateRoomDto is required.");
 
-                if (!await CategoryExists(createRoomDto.CategoryId))
-                    return OperationResult<CreateRoomDto>.Failure($"CategoryId {createRoomDto.CategoryId} does not exist.");
+                var categoryValidation = await _roomCategoryMustExist.Validate(createRoomDto.CategoryId);
+                if (!categoryValidation.IsSuccess)
+                    return OperationResult<CreateRoomDto>.Failure(categoryValidation.Message);
 
-                if (!await FloorExists(createRoomDto.FloorId))
-                    return OperationResult<CreateRoomDto>.Failure($"FloorId {createRoomDto.FloorId} does not exist.");
+                var floorValidation = await _roomFloorMustExist.Validate(createRoomDto.FloorId); 
+                if (!floorValidation.IsSuccess)
+                    return OperationResult<CreateRoomDto>.Failure(floorValidation.Message);
 
                 var operationResult = await _roomRepository.AddAsync(createRoomDto);
 
@@ -155,11 +157,13 @@ namespace SGRH.Application.Services.Hotel
                 if (modifyRoomDto is null)
                     return OperationResult<ModifyRoomDto>.Failure("ModifyRoomDto is required.");
 
-                if (!await CategoryExists(modifyRoomDto.CategoryId))
-                    return OperationResult<ModifyRoomDto>.Failure($"CategoryId {modifyRoomDto.CategoryId} does not exist.");
+                var categoryValidation = await _roomCategoryMustExist.Validate(modifyRoomDto.CategoryId);
+                if (!categoryValidation.IsSuccess)
+                    return OperationResult<ModifyRoomDto>.Failure(categoryValidation.Message);
 
-                if (!await FloorExists(modifyRoomDto.FloorId))
-                    return OperationResult<ModifyRoomDto>.Failure($"FloorId {modifyRoomDto.FloorId} does not exist.");
+                var floorValidation = await _roomFloorMustExist.Validate(modifyRoomDto.FloorId);
+                if (!floorValidation.IsSuccess)
+                    return OperationResult<ModifyRoomDto>.Failure(floorValidation.Message);
 
                 var roomResult = await _roomRepository.GetByIdAsync(modifyRoomDto.RoomId);
                 if (!roomResult.IsSuccess || roomResult.Data == null)
@@ -185,20 +189,6 @@ namespace SGRH.Application.Services.Hotel
                 _logger.ErrorEx(ex, "Error updating room");
                 return OperationResult<ModifyRoomDto>.Failure($"Error updating room: {ex.Message}");
             }
-        }
-
-        // Metodos auxiliares
-
-        private async Task<bool> CategoryExists(int categoryId)
-        {
-            var result = await _roomCategoryRepository.GetByIdAsync(categoryId);
-            return result.IsSuccess && result.Data != null;
-        }
-
-        private async Task<bool> FloorExists(int floorId)
-        {
-            var result = await _floorRepository.GetByIdAsync(floorId);
-            return result.IsSuccess && result.Data != null;
         }
     }
 }

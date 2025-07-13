@@ -27,6 +27,8 @@ namespace SGRH.IOC.Dependencies.Hotel
             //Use cases
 
             service.AddScoped<RoomMustNotBeOccupied>();
+            service.AddScoped<RoomCategoryMustExist>(); // <- Este mas tarde puede ser movido a una clase para dependencias compartidas (Lo usan Room y Rate)
+            service.AddScoped<RoomFloorMustExist>(); 
 
             //Fluent validation
 

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SGRH.Application.UseCases.Hotel.Rate;
+using SGRH.Application.UseCases.Hotel.Room;
 
 namespace SGRH.IOC.Dependencies.Hotel
 {
@@ -27,6 +28,8 @@ namespace SGRH.IOC.Dependencies.Hotel
             //Use cases
 
             service.AddScoped<RatesMustNotBeOverlapping>();
+            service.AddScoped<RoomCategoryMustExist>();
+
 
             //Fluent Validation
 

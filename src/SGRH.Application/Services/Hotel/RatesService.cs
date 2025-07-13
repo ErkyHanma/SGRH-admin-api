@@ -8,6 +8,7 @@ using SGRH.Application.Interfaces.Mappers.Hotel;
 using FluentValidation;
 using SGRH.Application.UseCases.Hotel.Rate;
 using SGRH.Application.Dtos.Hotel.Room;
+using SGRH.Application.UseCases.Hotel.Room;
 
 namespace SGRH.Application.Services.Hotel
 {
@@ -21,7 +22,7 @@ namespace SGRH.Application.Services.Hotel
         private readonly IValidator<UpdateRateDto> _updateRateValidator;
         private readonly IValidator<DeleteRateDto> _deleteRateValidator;
         private readonly RatesMustNotBeOverlapping _ratesMustNotBeOverlapping;
-        private readonly IRoomCategoryRepository _roomCategoryRepository;
+        private readonly RoomCategoryMustExist _roomCategoryMustExist;
 
         public RatesService(
             IRatesRepository ratesRepository,
@@ -32,7 +33,7 @@ namespace SGRH.Application.Services.Hotel
             IValidator<UpdateRateDto> updateRateValidator,
             IValidator<DeleteRateDto> deleteRateValidator,
             RatesMustNotBeOverlapping ratesMustNotBeOverlapping,
-            IRoomCategoryRepository roomCategoryRepository)
+            RoomCategoryMustExist roomCategoryMustExist)
         {
             _ratesRepository = ratesRepository;
             _logger = logger;
@@ -42,7 +43,7 @@ namespace SGRH.Application.Services.Hotel
             _updateRateValidator = updateRateValidator;
             _deleteRateValidator = deleteRateValidator;
             _ratesMustNotBeOverlapping = ratesMustNotBeOverlapping;
-            _roomCategoryRepository = roomCategoryRepository;
+            _roomCategoryMustExist = roomCategoryMustExist;
         }
 
         public async Task<OperationResult<CreateRateDto>> CreateRatesAsync(CreateRateDto createRateDto)
@@ -54,8 +55,9 @@ namespace SGRH.Application.Services.Hotel
                 if (createRateDto == null)
                     return OperationResult<CreateRateDto>.Failure("Input data is required.");
 
-                if (!await CategoryExists(createRateDto.CategoryId))
-                    return OperationResult<CreateRateDto>.Failure($"CategoryId {createRateDto.CategoryId} does not exist.");
+                var categoryValidation = await _roomCategoryMustExist.Validate(createRateDto.CategoryId);
+                if (!categoryValidation.IsSuccess)
+                    return OperationResult<CreateRateDto>.Failure(categoryValidation.Message);
 
                 var validation = _createRateValidator.Validate(createRateDto);
                 if (!validation.IsValid)
@@ -183,8 +185,9 @@ namespace SGRH.Application.Services.Hotel
                 if (updateRateDto == null)
                     return OperationResult<RateDto>.Failure("Input data is required.");
 
-                if (!await CategoryExists(updateRateDto.CategoryId))
-                    return OperationResult<RateDto>.Failure($"CategoryId {updateRateDto.CategoryId} does not exist.");
+                var categoryValidation = await _roomCategoryMustExist.Validate(updateRateDto.CategoryId);
+                if (!categoryValidation.IsSuccess)
+                    return OperationResult<RateDto>.Failure(categoryValidation.Message);
 
                 var validation = _updateRateValidator.Validate(updateRateDto);
                 if (!validation.IsValid)
@@ -225,14 +228,5 @@ namespace SGRH.Application.Services.Hotel
             }
         }
 
-        // Metodos auxiliares
-
-        private async Task<bool> CategoryExists(int categoryId)
-        {
-            var result = await _roomCategoryRepository.GetByIdAsync(categoryId);
-            return result.IsSuccess && result.Data != null;
-        }
     }
-
-
 }
