@@ -27,12 +27,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service entity cannot be null.";
+                var expectedMessage = "Service entity cannot be null.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -47,12 +47,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service name is required.";
+                var expectedMessage = "Service name is required.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -67,12 +67,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service description is required.";
+                var expectedMessage = "Service description is required.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -87,12 +87,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service price cannot be negative.";
+                var expectedMessage = "Service price cannot be negative.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -105,12 +105,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service entity added successfully.";
+                var expectedMessage = "Service entity added successfully.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.True(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
         }
@@ -125,12 +125,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.UpdateAsync(entity);
-                var message = "Service entity cannot be null.";
+                var expectedMessage = "Service entity cannot be null.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -145,12 +145,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.UpdateAsync(entity);
-                var message = "Service name is required.";
+                var expectedMessage = "Service name is required.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -165,12 +165,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.UpdateAsync(entity);
-                var message = "Service description is required.";
+                var expectedMessage = "Service description is required.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -186,12 +186,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.UpdateAsync(entity);
-                var message = "Service price cannot be negative.";
+                var expectedMessage = "Service price cannot be negative.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -206,12 +206,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.UpdateAsync(entity);
-                var message = "Service entity not found";
+                var expectedMessage = "Service entity not found";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -225,12 +225,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
                 await _dbContext.SaveChangesAsync();
                 // Act
                 var result = await _serviceRepository.UpdateAsync(entity);
-                var message = "Service Entity update successfully";
+                var expectedMessage = "Service Entity update successfully";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.True(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -246,12 +246,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service entity cannot be null.";
+                var expectedMessage = "Service entity cannot be null.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -266,12 +266,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service name is required.";
+                var expectedMessage = "Service name is required.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -286,12 +286,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service description is required.";
+                var expectedMessage = "Service description is required.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -307,12 +307,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
-                var message = "Service price cannot be negative.";
+                var expectedMessage = "Service price cannot be negative.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -327,12 +327,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.DeleteAsync(entity);
-                var message = "Service entity not found";
+                var expectedMessage = "Service entity not found";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -346,12 +346,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
                 await _dbContext.SaveChangesAsync();
                 // Act
                 var result = await _serviceRepository.DeleteAsync(entity);
-                var message = $"Service {entity.Name} deleted successfully";
+                var expectedMessage = $"Service {entity.Name} deleted successfully";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.True(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
 
             }
 
@@ -368,12 +368,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.GetByIdAsync(id);
-                var message = "Invalid service ID";
+                var expectedMessage = "Invalid service ID";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
             }
 
             [Fact]
@@ -384,12 +384,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.GetByIdAsync(id);
-                var message = $"Service was not found with the given ID";
+                var expectedMessage = $"Service was not found with the given ID";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.False(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
             }
 
             [Fact]
@@ -402,12 +402,12 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
                 // Act
                 var result = await _serviceRepository.GetByIdAsync(id);
-                var message = $"Service with the ID: {id} found";
+                var expectedMessage = $"Service with the ID: {id} found";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
                 Assert.True(result.IsSuccess);
-                Assert.Equal(message, result.Message);
+                Assert.Equal(expectedMessage, result.Message);
             }
         }
 

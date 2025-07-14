@@ -11,8 +11,6 @@ namespace SGRH.Application.Dtos.ReservationModule.Reservation.Validators
             if (!result.IsSuccess)
                 return result;
 
-
-
             return OperationResult<CreateReservationDto>.Success("All field validated", dto);
         }
     }

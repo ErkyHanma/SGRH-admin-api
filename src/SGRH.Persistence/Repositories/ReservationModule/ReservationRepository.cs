@@ -126,7 +126,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
             if (!validationResult.IsSuccess)
             {
-                _logger.ErrorNoEx($"Validation failed for CreateReservationDto");
+                _logger.ErrorNoEx($"Validation failed for CreateReservationDto. ${validationResult.Message}");
                 return validationResult;
             }
 
@@ -170,7 +170,7 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
             if (!validationResult.IsSuccess)
             {
-                _logger.ErrorNoEx($"Validation failed for UpdateReservationDto");
+                _logger.ErrorNoEx($"Validation failed for UpdateReservationDto. ${validationResult.Message}");
                 return validationResult;
             }
 
@@ -203,16 +203,17 @@ namespace SGRH.Persistence.Repositories.ReservationModule
                 return OperationResult<UpdateReservationDto>.Failure(StoredProcedureResult.Message);
             }
         }
-        public async Task<OperationResult<DisableReservationDto>> DeleteAsync(DisableReservationDto disableReservationDto)
+        public async Task<OperationResult<DeleteReservationDto>> DeleteAsync(DeleteReservationDto disableReservationDto)
         {
             _logger.Info($"Disable reservation {disableReservationDto.ReservationId}");
 
             // Validation
-            var validationResult = DisableReservationDtoValidator.Validate(disableReservationDto);
+            var deleteReservationDtoValidator = new DeleteReservationDtoValidator();
+            var validationResult = deleteReservationDtoValidator.Validate(disableReservationDto);
 
             if (!validationResult.IsSuccess)
             {
-                _logger.ErrorNoEx($"Validation failed for DisableReservationDto");
+                _logger.ErrorNoEx($"Validation failed for DisableReservationDto. ${validationResult.Message}");
                 return validationResult;
             }
 
@@ -230,12 +231,12 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
             if (StoredProcedureResult.IsSuccess)
             {
-                return OperationResult<DisableReservationDto>.Success(StoredProcedureResult.Message, disableReservationDto);
+                return OperationResult<DeleteReservationDto>.Success(StoredProcedureResult.Message, disableReservationDto);
 
             }
             else
             {
-                return OperationResult<DisableReservationDto>.Failure(StoredProcedureResult.Message);
+                return OperationResult<DeleteReservationDto>.Failure(StoredProcedureResult.Message);
             }
 
 
