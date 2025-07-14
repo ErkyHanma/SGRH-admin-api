@@ -3,10 +3,10 @@ using SGRH.Application.Dtos.ReservationModule.Reservation;
 using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
-using SGRH.Persistence.Test.Test.ReservationModule.EntityBuilder;
+using SGRH.Persistence.Test.Test.ReservationModule.Reservation.EntityBuilder;
 
 
-namespace SGRH.Persistence.Test.Test.ReservationModule
+namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
 {
     public class ReservationRepositoryTest
     {
@@ -17,7 +17,6 @@ namespace SGRH.Persistence.Test.Test.ReservationModule
 
         public ReservationRepositoryTest()
         {
-
             _reservationRepository = A.Fake<IReservationRepository>();
         }
 

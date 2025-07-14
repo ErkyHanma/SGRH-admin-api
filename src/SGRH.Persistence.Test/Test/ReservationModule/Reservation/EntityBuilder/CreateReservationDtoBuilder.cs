@@ -1,5 +1,5 @@
 ﻿using SGRH.Application.Dtos.ReservationModule.Reservation;
-using SGRH.Persistence.Test.Test.ReservationModule.EntityBuilder;
+using SGRH.Persistence.Test.Test.ReservationModule.Reservation.EntityBuilder;
 
 public class CreateReservationDtoBuilder : BaseReservationDtoBuilder<CreateReservationDto>
 {

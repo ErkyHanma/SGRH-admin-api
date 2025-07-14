@@ -1,6 +1,6 @@
 ﻿using SGRH.Application.Dtos.ReservationModule.Reservation;
 
-namespace SGRH.Persistence.Test.Test.ReservationModule.EntityBuilder
+namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation.EntityBuilder
 {
     public class DeleteReservationDtoBuilder
     {
