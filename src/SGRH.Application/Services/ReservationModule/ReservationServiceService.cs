@@ -3,7 +3,7 @@ using SGRH.Application.Dtos.ReservationModule.ReservationService;
 using SGRH.Application.Dtos.ReservationModule.ReservationService.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.ReservationModule;
-using SGRH.Application.UseCases.ReservationModule;
+using SGRH.Application.UseCases.ReservationModule.ReservationService;
 using SGRH.Domain.Base;
 
 namespace SGRH.Application.Services.ReservationModule

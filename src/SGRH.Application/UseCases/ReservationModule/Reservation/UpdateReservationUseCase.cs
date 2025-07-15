@@ -3,7 +3,7 @@ using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
 
 
-namespace SGRH.Application.UseCases.ReservationModule
+namespace SGRH.Application.UseCases.ReservationModule.Reservation
 {
     public class UpdateReservationUseCase
     {
@@ -25,13 +25,6 @@ namespace SGRH.Application.UseCases.ReservationModule
                 {
                     return OperationResult<UpdateReservationDto>.Failure("Reservation cannot be in the past");
                 }
-
-
-                if (updateReservationDto.StartDate >= updateReservationDto.EndDate)
-                {
-                    return OperationResult<UpdateReservationDto>.Failure("Start date must be before end date.");
-                }
-
 
                 var reservationExits = await _reservationRepository.ExistsAsync(updateReservationDto.ReservationId);
 
