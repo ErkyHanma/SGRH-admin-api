@@ -24,6 +24,13 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
         public async Task<OperationResult<CreateReservationServiceDto>> AddAsync(CreateReservationServiceDto createReservationServiceDto)
         {
+
+            if (createReservationServiceDto == null)
+            {
+                _logger.ErrorNoEx("Error adding reservation service. Dto Null");
+                return OperationResult<CreateReservationServiceDto>.Failure("Dto cannot be null.");
+            }
+
             _logger.Info("Adding Reservation service", createReservationServiceDto);
 
             var parameters = new Dictionary<string, object>()
@@ -51,6 +58,14 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
         public async Task<OperationResult<DeleteReservationServiceDto>> DeleteAsync(DeleteReservationServiceDto deleteReservationServiceDto)
         {
+
+            if (deleteReservationServiceDto == null)
+            {
+                _logger.ErrorNoEx("Error removing reservation service. Dto Null");
+                return OperationResult<DeleteReservationServiceDto>.Failure("Dto cannot be null.");
+            }
+
+
             _logger.Info("Remove service for a reservation");
 
             var parameters = new Dictionary<string, object>()

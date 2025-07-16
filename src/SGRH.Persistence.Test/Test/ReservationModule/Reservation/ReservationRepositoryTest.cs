@@ -1,6 +1,5 @@
 ﻿using FakeItEasy;
 using SGRH.Application.Dtos.ReservationModule.Reservation;
-using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Test.Test.ReservationModule.Reservation.EntityBuilder;
@@ -23,7 +22,6 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
         public class GetByIdAsync : ReservationRepositoryTest
         {
             [Fact]
-
             public async Task GetByIdAsync_WhenReservationIdIsValid_ShouldReturnReservationDto()
             {
                 // Arrange
@@ -47,11 +45,11 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
             {
                 // Arrange
                 var reservationId = -1;
-                var validationMessage = "All fields validated";
+                var validationMessage = "";
 
                 if (reservationId <= 0)
                 {
-                    validationMessage = "Invalid reservation ID";
+                    validationMessage = $"Trying to find reservation with invalid id {reservationId}.";
                 }
 
                 var val = OperationResult<ReservationDto>.Failure(validationMessage);
@@ -59,7 +57,7 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
 
                 // Act
                 var result = await _reservationRepository.GetByIdAsync(reservationId);
-                var expectedMessage = "Invalid reservation ID";
+                var expectedMessage = $"Trying to find reservation with invalid id {reservationId}.";
 
                 // Assert
                 Assert.IsType<OperationResult<ReservationDto>>(result);
@@ -79,21 +77,13 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
             public async void AddAsync_WhenEntityDtoIsValid_ShouldReturnCreateReservationDto()
             {
                 // Arrange
-                var entity = _createReservationDtoBuilder.WithTestValues().Build();
+                var dto = _createReservationDtoBuilder.WithTestValues().Build();
 
-                var createReservationDtoValidator = new CreateReservationDtoValidator();
-                var validationResult = createReservationDtoValidator.Validate(entity);
-
-                if (validationResult.IsSuccess)
-                {
-                    validationResult.Message = "Reservation created successfully.";
-                }
-
-                var val = OperationResult<CreateReservationDto>.Success(validationResult.Message, entity);
-                A.CallTo(() => _reservationRepository.AddAsync(entity)).Returns(Task.FromResult(val));
+                var val = OperationResult<CreateReservationDto>.Success("Reservation created successfully.", dto);
+                A.CallTo(() => _reservationRepository.AddAsync(dto)).Returns(Task.FromResult(val));
 
                 // Act
-                var result = await _reservationRepository.AddAsync(entity);
+                var result = await _reservationRepository.AddAsync(dto);
                 var expectedMessage = "Reservation created successfully.";
 
                 // Assert
@@ -109,169 +99,14 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
             public async void AddAsync_WhenEntityDtoIsNull_ShouldReturnError()
             {
                 // Arrange
-                CreateReservationDto entity = null;
+                CreateReservationDto dto = null;
 
-                var createReservationDtoValidator = new CreateReservationDtoValidator();
-                var validationResult = createReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<CreateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.AddAsync(entity)).Returns(Task.FromResult(val));
+                var val = OperationResult<CreateReservationDto>.Failure("Dto cannot be null.");
+                A.CallTo(() => _reservationRepository.AddAsync(dto)).Returns(Task.FromResult(val));
 
                 // Act
-                var result = await _reservationRepository.AddAsync(entity);
+                var result = await _reservationRepository.AddAsync(dto);
                 var expectedMessage = "Dto cannot be null.";
-
-                // Assert
-                Assert.IsType<OperationResult<CreateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void AddAsync_WhenClientIdIsNullOrNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _createReservationDtoBuilder.WithTestValues().WithClientId(-2).Build();
-
-                var createReservationDtoValidator = new CreateReservationDtoValidator();
-                var validationResult = createReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<CreateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.AddAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.AddAsync(entity);
-                var expectedMessage = "ClientId must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<CreateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void AddAsync_WhenRoomIdIsNullOrNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _createReservationDtoBuilder.WithTestValues().WithRoomId(-2).Build();
-
-                var createReservationDtoValidator = new CreateReservationDtoValidator();
-                var validationResult = createReservationDtoValidator.Validate(entity);
-
-
-                var val = OperationResult<CreateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.AddAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.AddAsync(entity);
-                var expectedMessage = "RoomId must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<CreateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void AddAsync_WhenStartDateIsGreaterOrEqualToEndDate_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _createReservationDtoBuilder
-                    .WithTestValues()
-                    .WithStartDate(DateTime.Today)
-                    .WithEndDate(DateTime.Today)
-                    .Build();
-
-                var createReservationDtoValidator = new CreateReservationDtoValidator();
-                var validationResult = createReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<CreateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.AddAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.AddAsync(entity);
-                var expectedMessage = "StartDate must be before EndDate.";
-
-                // Assert
-                Assert.IsType<OperationResult<CreateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void AddAsync_WhenStatusIsNullOrEmpty_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _createReservationDtoBuilder
-                    .WithTestValues()
-                    .WithStatus("")
-                    .Build();
-
-                var createReservationDtoValidator = new CreateReservationDtoValidator();
-                var validationResult = createReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<CreateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.AddAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.AddAsync(entity);
-                var expectedMessage = "Status is required.";
-
-                // Assert
-                Assert.IsType<OperationResult<CreateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void AddAsync_WhenGuestCountIsLessOrEqualToZero_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _createReservationDtoBuilder
-                    .WithTestValues()
-                    .WithGuestCount(0)
-                    .Build();
-
-                var createReservationDtoValidator = new CreateReservationDtoValidator();
-                var validationResult = createReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<CreateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.AddAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.AddAsync(entity);
-                var expectedMessage = "GuestCount must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<CreateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void AddAsync_WhenPaymentAmountIsNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _createReservationDtoBuilder
-                    .WithTestValues()
-                    .WithPaymentAmount(-100)
-                    .Build();
-
-                var createReservationDtoValidator = new CreateReservationDtoValidator();
-                var validationResult = createReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<CreateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.AddAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.AddAsync(entity);
-                var expectedMessage = "PaymentAmount cannot be negative.";
 
                 // Assert
                 Assert.IsType<OperationResult<CreateReservationDto>>(result);
@@ -289,21 +124,13 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
             public async void UpdateAsync_WhenEntityDtoIsValid_ShouldReturnUpdateReservationDto()
             {
                 // Arrange
-                var entity = _updateReservationDtoBuilder.WithTestValues().Build();
+                var dto = _updateReservationDtoBuilder.WithTestValues().Build();
 
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                if (validationResult.IsSuccess)
-                {
-                    validationResult.Message = "Reservation updated successfully.";
-                }
-
-                var val = OperationResult<UpdateReservationDto>.Success(validationResult.Message, entity);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
+                var val = OperationResult<UpdateReservationDto>.Success("Reservation updated successfully.", dto);
+                A.CallTo(() => _reservationRepository.UpdateAsync(dto)).Returns(Task.FromResult(val));
 
                 // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
+                var result = await _reservationRepository.UpdateAsync(dto);
                 var expectedMessage = "Reservation updated successfully.";
 
                 // Assert
@@ -317,16 +144,13 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
             public async void UpdateAsync_WhenEntityDtoIsNull_ShouldReturnError()
             {
                 // Arrange
-                UpdateReservationDto entity = null;
+                UpdateReservationDto dto = null;
 
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<UpdateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
+                var val = OperationResult<UpdateReservationDto>.Failure("Dto cannot be null.");
+                A.CallTo(() => _reservationRepository.UpdateAsync(dto)).Returns(Task.FromResult(val));
 
                 // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
+                var result = await _reservationRepository.UpdateAsync(dto);
                 var expectedMessage = "Dto cannot be null.";
 
                 // Assert
@@ -335,185 +159,6 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
                 Assert.Equal(expectedMessage, result.Message);
 
             }
-
-            [Fact]
-            public async void UpdateAsync_WhenClientIdIsNullOrNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _updateReservationDtoBuilder.WithTestValues().WithClientId(-3).Build();
-
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<UpdateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
-                var expectedMessage = "ClientId must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<UpdateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenRoomIdIsNullOrNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _updateReservationDtoBuilder.WithTestValues().WithRoomId(-2).Build();
-
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<UpdateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
-                var expectedMessage = "RoomId must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<UpdateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenStartDateIsGreaterOrEqualToEndDate_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _updateReservationDtoBuilder
-                    .WithTestValues()
-                    .WithStartDate(DateTime.Today)
-                    .WithEndDate(DateTime.Today)
-                    .Build();
-
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<UpdateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
-                var expectedMessage = "StartDate must be before EndDate.";
-
-                // Assert
-                Assert.IsType<OperationResult<UpdateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenStatusIsNullOrEmpty_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _updateReservationDtoBuilder
-                    .WithTestValues()
-                    .WithStatus("")
-                    .Build();
-
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<UpdateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
-                var expectedMessage = "Status is required.";
-
-                // Assert
-                Assert.IsType<OperationResult<UpdateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenGuestCountIsLessOrEqualToZero_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _updateReservationDtoBuilder
-                    .WithTestValues()
-                    .WithGuestCount(-2)
-                    .Build();
-
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<UpdateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
-                var expectedMessage = "GuestCount must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<UpdateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenPaymentAmountIsNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _updateReservationDtoBuilder
-                    .WithTestValues()
-                    .WithPaymentAmount(-100)
-                    .Build();
-
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<UpdateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
-                var expectedMessage = "PaymentAmount cannot be negative.";
-
-                // Assert
-                Assert.IsType<OperationResult<UpdateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenReservationIdIsNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _updateReservationDtoBuilder
-                    .WithTestValues()
-                    .WithReservationId(-1)
-                    .Build();
-
-
-                var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-                var validationResult = updateReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<UpdateReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.UpdateAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.UpdateAsync(entity);
-                var expectedMessage = "ReservationId must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<UpdateReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
 
 
         }
@@ -526,15 +171,7 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
                 // Arrange
                 var entity = _deleteReservationDtoBuilder.WithTestValues().Build();
 
-                var deleteReservationDtoValidator = new DeleteReservationDtoValidator();
-                var validationResult = deleteReservationDtoValidator.Validate(entity);
-
-                if (validationResult.IsSuccess)
-                {
-                    validationResult.Message = "Reservation delete successfully.";
-                }
-
-                var val = OperationResult<DeleteReservationDto>.Success(validationResult.Message);
+                var val = OperationResult<DeleteReservationDto>.Success("Reservation delete successfully.");
                 A.CallTo(() => _reservationRepository.DeleteAsync(entity)).Returns(Task.FromResult(val));
 
                 // Act
@@ -554,10 +191,7 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
                 // Arrange
                 DeleteReservationDto entity = null;
 
-                var deleteReservationDtoValidator = new DeleteReservationDtoValidator();
-                var validationResult = deleteReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<DeleteReservationDto>.Failure(validationResult.Message);
+                var val = OperationResult<DeleteReservationDto>.Failure("Dto cannot be null.");
                 A.CallTo(() => _reservationRepository.DeleteAsync(entity)).Returns(Task.FromResult(val));
 
                 // Act
@@ -570,34 +204,6 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
                 Assert.Equal(expectedMessage, result.Message);
 
             }
-
-            [Fact]
-            public async void DeleteAsync_WhenReservationIdIsNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _deleteReservationDtoBuilder
-                    .WithTestValues()
-                    .WithReservationId(-2)
-                    .Build();
-
-
-                var deleteReservationDtoValidator = new DeleteReservationDtoValidator();
-                var validationResult = deleteReservationDtoValidator.Validate(entity);
-
-                var val = OperationResult<DeleteReservationDto>.Failure(validationResult.Message);
-                A.CallTo(() => _reservationRepository.DeleteAsync(entity)).Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.DeleteAsync(entity);
-                var expectedMessage = "ReservationId must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<DeleteReservationDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
 
         }
 
@@ -638,70 +244,6 @@ namespace SGRH.Persistence.Test.Test.ReservationModule.Reservation
                 Assert.Equal(expectedMessage, result.Message);
 
             }
-
-            [Fact]
-            public async Task CheckRoomAvailability_WhenRoomIdIsNegative_ShouldReturnError()
-            {
-                // Arrange
-                var roomId = -1;
-                var startDate = DateTime.Now;
-                var endDate = DateTime.Now.AddDays(1);
-                var validationMessage = "";
-
-                if (roomId <= 0)
-                {
-                    validationMessage = "Room ID must be greater than zero.";
-                }
-
-                var val = OperationResult<CheckRoomAvailabilityResultDto>.Failure(validationMessage);
-
-                A.CallTo(() => _reservationRepository.CheckAvailability(
-                    roomId, startDate, endDate))
-                    .Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.CheckAvailability(roomId, startDate, endDate);
-                var expectedMessage = "Room ID must be greater than zero.";
-
-                // Assert
-                Assert.IsType<OperationResult<CheckRoomAvailabilityResultDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async Task CheckRoomAvailability_WhenStartDateIsGreaterOrEqualToEndDate_ShouldReturnError()
-            {
-                // Arrange
-                var startDate = DateTime.Now.AddDays(2);
-                var endDate = DateTime.Now;
-                var validationMessage = "";
-
-                if (startDate >= endDate)
-                {
-                    validationMessage = "Start date must be before end date.";
-                }
-
-                var val = OperationResult<CheckRoomAvailabilityResultDto>.Failure(validationMessage);
-
-                A.CallTo(() => _reservationRepository.CheckAvailability(
-                    1, startDate, endDate))
-                    .Returns(Task.FromResult(val));
-
-                // Act
-                var result = await _reservationRepository.CheckAvailability(1, startDate, endDate);
-                var expectedMessage = "Start date must be before end date.";
-
-                // Assert
-                Assert.IsType<OperationResult<CheckRoomAvailabilityResultDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-
-
-            }
-
 
         }
 

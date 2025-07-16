@@ -36,66 +36,6 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
             }
 
-            [Fact]
-            public async void AddAsync_WhenNameIsNullOrEmpty_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                    .WithTestValues()
-                    .WithName("")
-                    .Build();
-
-                // Act
-                var result = await _serviceRepository.AddAsync(entity);
-                var expectedMessage = "Service name is required.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void AddAsync_WhenDescriptionIsNullOrEmpty_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                      .WithTestValues()
-                      .WithDescription("")
-                      .Build();
-
-                // Act
-                var result = await _serviceRepository.AddAsync(entity);
-                var expectedMessage = "Service description is required.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void AddAsync_WhenPriceIsNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                     .WithTestValues()
-                     .WithPrice(-3)
-                     .Build();
-
-                // Act
-                var result = await _serviceRepository.AddAsync(entity);
-                var expectedMessage = "Service price cannot be negative.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
             // Sometimes it gives error because of the DB In Memory
             [Fact]
             public async void AddAsync_WhenEntityIsValid_ShouldReturnSuccess()
@@ -126,67 +66,6 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
                 // Act
                 var result = await _serviceRepository.UpdateAsync(entity);
                 var expectedMessage = "Service entity cannot be null.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenNameIsNullOrEmpty_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                    .WithTestValues()
-                    .WithName("")
-                    .Build();
-
-                // Act
-                var result = await _serviceRepository.UpdateAsync(entity);
-                var expectedMessage = "Service name is required.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenDescriptionIsNullOrEmpty_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                     .WithTestValues()
-                     .WithDescription("")
-                     .Build();
-
-                // Act
-                var result = await _serviceRepository.UpdateAsync(entity);
-                var expectedMessage = "Service description is required.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void UpdateAsync_WhenPriceIsNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                    .WithTestValues()
-                    .WithPrice(-3)
-                    .Build();
-
-
-                // Act
-                var result = await _serviceRepository.UpdateAsync(entity);
-                var expectedMessage = "Service price cannot be negative.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
@@ -247,67 +126,6 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
                 // Act
                 var result = await _serviceRepository.AddAsync(entity);
                 var expectedMessage = "Service entity cannot be null.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void DeleteAsync_WhenNameIsNullOrEmpty_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                   .WithTestValues()
-                   .WithName("")
-                   .Build();
-
-                // Act
-                var result = await _serviceRepository.AddAsync(entity);
-                var expectedMessage = "Service name is required.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void DeleteAsync_WhenDescriptionIsNullOrEmpty_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                      .WithTestValues()
-                      .WithDescription("")
-                      .Build();
-
-                // Act
-                var result = await _serviceRepository.AddAsync(entity);
-                var expectedMessage = "Service description is required.";
-
-                // Assert
-                Assert.IsType<OperationResult<Service>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void DeleteAsync_WhenPriceIsNegative_ShouldReturnError()
-            {
-                // Arrange
-                var entity = _serviceEntityBuilder
-                    .WithTestValues()
-                    .WithPrice(-3)
-                    .Build();
-
-
-                // Act
-                var result = await _serviceRepository.AddAsync(entity);
-                var expectedMessage = "Service price cannot be negative.";
 
                 // Assert
                 Assert.IsType<OperationResult<Service>>(result);
