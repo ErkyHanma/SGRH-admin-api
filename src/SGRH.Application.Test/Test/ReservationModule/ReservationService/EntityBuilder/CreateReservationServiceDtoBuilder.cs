@@ -7,12 +7,12 @@ namespace SGRH.Application.Test.Test.ReservationModule.ReservationService.Entity
     {
         public CreateReservationServiceDtoBuilder()
         {
-            _entity = new CreateReservationServiceDto();
+            _dto = new CreateReservationServiceDto();
         }
 
         public override CreateReservationServiceDto Build()
         {
-            return _entity;
+            return _dto;
         }
 
 

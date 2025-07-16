@@ -7,31 +7,31 @@ namespace SGRH.Application.Test.Test.ReservationModule.Reservation.EntityBuilder
 
         public UpdateReservationDtoBuilder()
         {
-            _entity = new UpdateReservationDto();
+            _dto = new UpdateReservationDto();
         }
 
         public UpdateReservationDtoBuilder WithReservationId(int reservationId)
         {
-            _entity.ReservationId = reservationId;
+            _dto.ReservationId = reservationId;
             return this;
         }
 
         public override UpdateReservationDto Build()
         {
-            return _entity;
+            return _dto;
         }
 
 
         public override UpdateReservationDtoBuilder WithTestValues()
         {
-            _entity.ReservationId = 1;
-            _entity.ClientId = 3;
-            _entity.RoomId = 3;
-            _entity.StartDate = new DateTime(2055, 7, 10);
-            _entity.EndDate = new DateTime(2055, 7, 11);
-            _entity.Status = "Pending";
-            _entity.GuestCount = 2;
-            _entity.PaymentAmount = 100;
+            _dto.ReservationId = 1;
+            _dto.ClientId = 3;
+            _dto.RoomId = 3;
+            _dto.StartDate = new DateTime(2055, 7, 10);
+            _dto.EndDate = new DateTime(2055, 7, 11);
+            _dto.Status = "Pending";
+            _dto.GuestCount = 2;
+            _dto.PaymentAmount = 100;
 
             return this;
         }

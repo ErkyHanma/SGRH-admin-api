@@ -53,6 +53,11 @@ namespace SGRH.Application.Services.ServiceModule
         {
             try
             {
+                if (id <= 0)
+                {
+                    return OperationResult<ServiceDto>.Failure("Invalid service ID");
+                }
+
                 var result = await _serviceRepository.GetByIdAsync(id);
 
                 if (!result.IsSuccess)
@@ -89,8 +94,9 @@ namespace SGRH.Application.Services.ServiceModule
                     return validationResult;
                 }
 
+                var serviceExits = await _serviceRepository.ExistsAsync(nt => nt.Name == createServiceDto.Name);
                 // Check if service with the same name already exists
-                if (await _serviceRepository.ExistsAsync(nt => nt.Name == createServiceDto.Name))
+                if (serviceExits)
                 {
                     return OperationResult<CreateServiceDto>.Failure($"Service with name {createServiceDto.Name} already exists.");
                 }
@@ -101,11 +107,6 @@ namespace SGRH.Application.Services.ServiceModule
                 {
                     _logger.ErrorNoEx($"An error has occured while creating Service: {creationResult.Message}.");
                     return OperationResult<CreateServiceDto>.Failure($"Error trying to create a Service {creationResult.Message}");
-                }
-
-                if (creationResult.Data is null)
-                {
-                    return OperationResult<CreateServiceDto>.Failure("No services found.");
                 }
 
                 return OperationResult<CreateServiceDto>.Success(creationResult.Message, _mapper.ToCreateDto(creationResult.Data));
@@ -124,8 +125,6 @@ namespace SGRH.Application.Services.ServiceModule
         {
             try
             {
-                _logger.Info($"Updating {serviceDto.Name}");
-
                 var serviceDtoValidator = new ServiceDtoValidator();
                 var validationResult = serviceDtoValidator.Validate(serviceDto);
 
@@ -134,11 +133,7 @@ namespace SGRH.Application.Services.ServiceModule
                     return validationResult;
                 }
 
-                // Check if service exists
-                if (!await _serviceRepository.ExistsAsync(nt => nt.ServiceId == serviceDto.ServiceId))
-                {
-                    return OperationResult<ServiceDto>.Failure($"Service with ID: {serviceDto.ServiceId} does not exists.");
-                }
+                _logger.Info($"Updating {serviceDto.Name}");
 
                 var result = await _serviceRepository.UpdateAsync(_mapper.ToDomainEntity(serviceDto));
 
@@ -154,8 +149,6 @@ namespace SGRH.Application.Services.ServiceModule
                     return OperationResult<ServiceDto>.Failure($"No services found. {result.Message}");
                 }
 
-
-
                 return OperationResult<ServiceDto>.Success(result.Message, _mapper.ToDto(result.Data));
 
 
@@ -170,14 +163,14 @@ namespace SGRH.Application.Services.ServiceModule
         {
             try
             {
-                _logger.Info($"Deleting service with Id: {deleteServiceDto.ServiceId}");
 
-                // Check if service exists
-                if (!await _serviceRepository.ExistsAsync(nt => nt.ServiceId == deleteServiceDto.ServiceId))
+                if (deleteServiceDto == null)
                 {
-                    return OperationResult<DeleteServiceDto>.Failure($"Service with ID: {deleteServiceDto.ServiceId} does not exists.");
+                    return OperationResult<DeleteServiceDto>.Failure("Service dto cannot be null.");
                 }
 
+
+                _logger.Info($"Deleting service with Id: {deleteServiceDto.ServiceId}");
 
                 var result = await _serviceRepository.DeleteAsync(_mapper.ToDomainEntityDelete(deleteServiceDto));
 

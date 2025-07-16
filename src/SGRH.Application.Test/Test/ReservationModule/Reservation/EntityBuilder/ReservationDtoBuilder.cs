@@ -6,37 +6,37 @@ namespace SGRH.Application.Test.Test.ReservationModule.Reservation.EntityBuilder
     {
         public ReservationDtoBuilder()
         {
-            _entity = new ReservationDto();
+            _dto = new ReservationDto();
         }
 
         public ReservationDtoBuilder WithReservationId(int reservationId)
         {
-            _entity.ReservationId = reservationId;
+            _dto.ReservationId = reservationId;
             return this;
         }
 
         public override ReservationDto Build()
         {
-            return _entity;
+            return _dto;
         }
 
 
         public override ReservationDtoBuilder WithTestValues()
         {
-            _entity.ReservationId = 1;
-            _entity.ClientId = 3;
-            _entity.RoomId = 3;
-            _entity.StartDate = new DateTime(2026, 7, 10);
-            _entity.EndDate = new DateTime(2026, 7, 11);
-            _entity.Status = "Pending";
-            _entity.GuestCount = 2;
-            _entity.PaymentAmount = 100;
-            _entity.ReservationDate = DateTime.Now;
-            _entity.ServicesCount = 3;
-            _entity.TotalServicesCost = 100;
-            _entity.ServiceNames = "Spa, Limpiar, Extra Bed";
-            _entity.CreatedAt = new DateTime(2025, 7, 13);
-            _entity.UpdatedAt = new DateTime(2025, 7, 14);
+            _dto.ReservationId = 1;
+            _dto.ClientId = 3;
+            _dto.RoomId = 3;
+            _dto.StartDate = new DateTime(2026, 7, 10);
+            _dto.EndDate = new DateTime(2026, 7, 11);
+            _dto.Status = "Pending";
+            _dto.GuestCount = 2;
+            _dto.PaymentAmount = 100;
+            _dto.ReservationDate = DateTime.Now;
+            _dto.ServicesCount = 3;
+            _dto.TotalServicesCost = 100;
+            _dto.ServiceNames = "Spa, Limpiar, Extra Bed";
+            _dto.CreatedAt = new DateTime(2025, 7, 13);
+            _dto.UpdatedAt = new DateTime(2025, 7, 14);
 
             return this;
         }

@@ -2,7 +2,7 @@
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.ReservationModule;
 using SGRH.Application.Services.ReservationModule;
-using SGRH.Application.UseCases.ReservationModule;
+using SGRH.Application.UseCases.ReservationModule.Reservation;
 using SGRH.Persistence.Repositories.ReservationModule;
 
 namespace SGRH.IOC.Dependencies.ReservationModule

@@ -5,17 +5,17 @@ namespace SGRH.Application.Test.Test.ReservationModule.ReservationService.Entity
     public abstract class BaseReservationServiceDtoBuilder<T> where T : BaseReservationServiceDto
     {
 
-        public T _entity;
+        public T _dto;
 
         public BaseReservationServiceDtoBuilder<T> WithReservationId(int reservationId)
         {
-            _entity.ReservationId = reservationId;
+            _dto.ReservationId = reservationId;
             return this;
         }
 
         public BaseReservationServiceDtoBuilder<T> WithServiceId(int serviceId)
         {
-            _entity.ServiceId = serviceId;
+            _dto.ServiceId = serviceId;
             return this;
         }
 
@@ -24,8 +24,8 @@ namespace SGRH.Application.Test.Test.ReservationModule.ReservationService.Entity
         public virtual BaseReservationServiceDtoBuilder<T> WithTestValues()
         {
             {
-                _entity.ReservationId = 1;
-                _entity.ServiceId = 1;
+                _dto.ReservationId = 1;
+                _dto.ServiceId = 1;
 
                 return this;
             }

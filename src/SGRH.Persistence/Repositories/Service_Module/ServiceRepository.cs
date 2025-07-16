@@ -165,7 +165,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
                     return OperationResult<Service>.Failure("Service entity cannot be null.");
                 }
 
-                _logger.Info($"Deleting Service entity with Name: {entity.Name}");
+                _logger.Info($"Deleting Service entity");
 
                 var ExistingService = await _context.Service
                                             .FirstOrDefaultAsync(s => s.ServiceId == entity.ServiceId && !s.IsDeleted && s.IsActive);
