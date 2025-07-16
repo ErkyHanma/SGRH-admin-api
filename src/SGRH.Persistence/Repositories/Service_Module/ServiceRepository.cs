@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SGRH.Application.Common.Logging;
-using SGRH.Application.Dtos.ServiceModule.Validator;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.ServiceModule;
@@ -88,14 +87,6 @@ namespace SGRH.Persistence.Repositories.Service_Module
 
                 _logger.Info($"Adding Service entity with Name: {entity.Name}");
 
-                var validationResult = ServiceValidator.Validate(entity);
-
-                if (!validationResult.IsSuccess)
-                {
-                    return validationResult;
-                }
-
-
                 entity.CreatedBy = 1; // User session ID (For now Hardcode value)
                 await _context.Service.AddAsync(entity);
                 await _context.SaveChangesAsync();
@@ -113,20 +104,8 @@ namespace SGRH.Persistence.Repositories.Service_Module
         {
             try
             {
-                if (entity == null)
-                {
-                    _logger.ErrorNoEx("Tried to add null Service entity.");
-                    return OperationResult<Service>.Failure("Service entity cannot be null.");
-                }
-
                 _logger.Info($"Updating Service entity with Name: {entity.Name}");
 
-                var validationResult = ServiceValidator.Validate(entity);
-
-                if (!validationResult.IsSuccess)
-                {
-                    return validationResult;
-                }
 
                 var ExistingService = await _context.Service
                                             .FirstOrDefaultAsync(s => s.ServiceId == entity.ServiceId && !s.IsDeleted && s.IsActive);

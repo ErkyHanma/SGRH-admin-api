@@ -82,9 +82,6 @@ namespace SGRH.Application.Services.ReservationModule
         {
             try
             {
-                _logger.Info("Creating reservation", createReservationDto);
-
-
                 var createReservationDtoValidator = new CreateReservationDtoValidator();
                 var validationResult = createReservationDtoValidator.Validate(createReservationDto);
 
@@ -111,7 +108,6 @@ namespace SGRH.Application.Services.ReservationModule
         {
             try
             {
-                _logger.Info("Updating reservation", updateReservationDto);
 
                 var updateReservationDtoValidator = new UpdateReservationDtoValidator();
                 var validationResult = updateReservationDtoValidator.Validate(updateReservationDto);
@@ -147,7 +143,6 @@ namespace SGRH.Application.Services.ReservationModule
         {
             try
             {
-                _logger.Info("Deleting reservation", disableReservationDto);
 
                 var deleteReservationDtoValidator = new DeleteReservationDtoValidator();
                 var validationResult = deleteReservationDtoValidator.Validate(disableReservationDto);
@@ -202,7 +197,7 @@ namespace SGRH.Application.Services.ReservationModule
 
             try
             {
-                _logger.Info($"Checking availability for room {roomId} from {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}");
+
 
                 var result = await _reservationRepository.CheckAvailability(roomId, startDate, endDate);
 

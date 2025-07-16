@@ -1,7 +1,6 @@
 ﻿using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.ReservationModule.ReservationService;
 using SGRH.Application.Dtos.ReservationModule.ReservationService.Validators;
-using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.ReservationModule;
 using SGRH.Application.UseCases.ReservationModule.ReservationService;
 using SGRH.Domain.Base;
@@ -10,19 +9,16 @@ namespace SGRH.Application.Services.ReservationModule
 {
     public class ReservationServiceService : IReservationServiceService
     {
-        private readonly IReservationServiceRepository _reservationServiceRepository;
         private readonly IAppLogger<ReservationServiceService> _logger;
         private readonly AddReservationServiceUseCase _addReservationServiceUseCase;
         private readonly DeleteReservationServiceUseCase _deleteReservationServiceUseCase;
 
         public ReservationServiceService(
-            IReservationServiceRepository reservationServiceRepository,
             IAppLogger<ReservationServiceService> logger,
             AddReservationServiceUseCase addReservationServiceUseCase,
             DeleteReservationServiceUseCase deleteReservationServiceUseCase
             )
         {
-            _reservationServiceRepository = reservationServiceRepository;
             _logger = logger;
             _addReservationServiceUseCase = addReservationServiceUseCase;
             _deleteReservationServiceUseCase = deleteReservationServiceUseCase;
@@ -32,8 +28,6 @@ namespace SGRH.Application.Services.ReservationModule
         {
             try
             {
-                _logger.Info("Creating Reservation service", createReservationServiceDto);
-
 
                 var createReservationServiceDtoValidator = new CreateReservationServiceDtoValidator();
                 var validationResult = createReservationServiceDtoValidator.Validate(createReservationServiceDto);
@@ -70,7 +64,6 @@ namespace SGRH.Application.Services.ReservationModule
         {
             try
             {
-                _logger.Info("Attempting to delete reservation service", deleteReservationServiceDto);
 
                 var deleteReservationServiceDtoValidator = new DeleteReservationServiceDtoValidator();
                 var validationResult = deleteReservationServiceDtoValidator.Validate(deleteReservationServiceDto);

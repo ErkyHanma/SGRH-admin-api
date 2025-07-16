@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.ReservationModule.Reservation;
-using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Helpers;
@@ -118,16 +117,13 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         public async Task<OperationResult<CreateReservationDto>> AddAsync(CreateReservationDto createReservationDto)
         {
 
-            _logger.Info($"Creating Reservation for client {createReservationDto.ClientId}");
+            _logger.Info("Creating reservation", createReservationDto);
 
-            // Validation
-            var createReservationDtoValidator = new CreateReservationDtoValidator();
-            var validationResult = createReservationDtoValidator.Validate(createReservationDto);
-
-            if (!validationResult.IsSuccess)
+            if (createReservationDto == null)
             {
-                _logger.ErrorNoEx($"Validation failed for CreateReservationDto. ${validationResult.Message}");
-                return validationResult;
+                _logger.ErrorNoEx("Failed to create reservation: input DTO is null.");
+                return OperationResult<CreateReservationDto>.Failure("Dto cannot be null.");
+
             }
 
             var parameters = new Dictionary<string, object>
@@ -156,23 +152,20 @@ namespace SGRH.Persistence.Repositories.ReservationModule
             }
             else
             {
-                Console.WriteLine("Fake");
                 return OperationResult<CreateReservationDto>.Failure(StoredProcedureResult.Message);
             }
         }
         public async Task<OperationResult<UpdateReservationDto>> UpdateAsync(UpdateReservationDto updateReservationDto)
         {
-            _logger.Info($"Update reservation {updateReservationDto.ReservationId}");
 
-            // Validation
-            var updateReservationDtoValidator = new UpdateReservationDtoValidator();
-            var validationResult = updateReservationDtoValidator.Validate(updateReservationDto);
-
-            if (!validationResult.IsSuccess)
+            if (updateReservationDto == null)
             {
-                _logger.ErrorNoEx($"Validation failed for UpdateReservationDto. ${validationResult.Message}");
-                return validationResult;
+                _logger.ErrorNoEx("Failed to update reservation: input DTO is null.");
+                return OperationResult<UpdateReservationDto>.Failure("Dto cannot be null.");
             }
+
+            _logger.Info("Updating reservation", updateReservationDto);
+
 
             var parameters = new Dictionary<string, object>()
             {
@@ -205,17 +198,13 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         }
         public async Task<OperationResult<DeleteReservationDto>> DeleteAsync(DeleteReservationDto disableReservationDto)
         {
-            _logger.Info($"Disable reservation {disableReservationDto.ReservationId}");
-
-            // Validation
-            var deleteReservationDtoValidator = new DeleteReservationDtoValidator();
-            var validationResult = deleteReservationDtoValidator.Validate(disableReservationDto);
-
-            if (!validationResult.IsSuccess)
+            if (disableReservationDto == null)
             {
-                _logger.ErrorNoEx($"Validation failed for DisableReservationDto. ${validationResult.Message}");
-                return validationResult;
+                _logger.ErrorNoEx("Failed to delete reservation: input DTO is null.");
+                return OperationResult<DeleteReservationDto>.Failure("Dto cannot be null.");
             }
+
+            _logger.Info("Deleting reservation", disableReservationDto);
 
             var parameters = new Dictionary<string, object>()
             {
@@ -243,22 +232,9 @@ namespace SGRH.Persistence.Repositories.ReservationModule
         }
         public async Task<OperationResult<CheckRoomAvailabilityResultDto>> CheckAvailability(int roomId, DateTime startDate, DateTime endDate)
         {
-
-            if (roomId <= 0)
-            {
-                _logger.ErrorNoEx($"Invalid room ID: {roomId}");
-                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("Room ID must be greater than zero.");
-            }
-
-            if (startDate >= endDate)
-            {
-                _logger.ErrorNoEx($"Invalid date range: startDate={startDate}, endDate={endDate}");
-                return OperationResult<CheckRoomAvailabilityResultDto>.Failure("Start date must be before end date.");
-            }
-
             try
             {
-                _logger.Info($"Checking availability for room {roomId} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd}");
+                _logger.Info($"Checking availability for room {roomId} from {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}");
 
                 var result = await FunctionReaderEx.CallFunctionAsync(
                     _connectionString,

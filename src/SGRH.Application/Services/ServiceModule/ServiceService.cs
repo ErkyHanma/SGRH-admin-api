@@ -84,8 +84,6 @@ namespace SGRH.Application.Services.ServiceModule
 
             try
             {
-                _logger.Info("Creating service", createServiceDto);
-
                 var createDtoValidator = new CreateServiceDtoValidator();
                 var validationResult = createDtoValidator.Validate(createServiceDto);
 
@@ -168,9 +166,6 @@ namespace SGRH.Application.Services.ServiceModule
                 {
                     return OperationResult<DeleteServiceDto>.Failure("Service dto cannot be null.");
                 }
-
-
-                _logger.Info($"Deleting service with Id: {deleteServiceDto.ServiceId}");
 
                 var result = await _serviceRepository.DeleteAsync(_mapper.ToDomainEntityDelete(deleteServiceDto));
 
