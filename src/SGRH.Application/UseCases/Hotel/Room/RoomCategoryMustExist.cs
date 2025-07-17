@@ -1,4 +1,5 @@
 ﻿using SGRH.Application.Interfaces.Repositories.Hotel;
+using SGRH.Application.Interfaces.UseCases;
 using SGRH.Domain.Base;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SGRH.Application.UseCases.Hotel.Room
 {
-    public class RoomCategoryMustExist
+    public class RoomCategoryMustExist : IMustExistValidator<int>
     {
         private readonly IRoomCategoryRepository _roomCategoryRepository;
 

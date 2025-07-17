@@ -1,9 +1,10 @@
 ﻿using SGRH.Application.Dtos.Report.InputDtos;
+using SGRH.Application.Interfaces.UseCases;
 using SGRH.Domain.Base;
 
 namespace SGRH.Application.UseCases.Report
 {
-    public class ReportDateMustBeCorrect
+    public class ReportDateMustBeCorrect : IReportDateMustBeCorrect<ReportDateRangeRequestDto>
     {
         public OperationResult<string> Validate(ReportDateRangeRequestDto request)
         {

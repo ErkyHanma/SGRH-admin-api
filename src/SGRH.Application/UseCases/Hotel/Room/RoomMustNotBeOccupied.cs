@@ -1,4 +1,5 @@
 ﻿using SGRH.Application.Dtos.Hotel.Room;
+using SGRH.Application.Interfaces.UseCases;
 using SGRH.Domain.Base;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SGRH.Application.UseCases.Hotel.Room
 {
-    public class RoomMustNotBeOccupied
+    public class RoomMustNotBeOccupied : IMustNotBeOccupied<RoomDto>
     {
         public OperationResult<string> Validate(RoomDto room)
         {
