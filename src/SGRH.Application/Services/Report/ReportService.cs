@@ -5,6 +5,7 @@ using SGRH.Application.Dtos.Report;
 using SGRH.Application.Dtos.Report.InputDtos;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Report;
+using SGRH.Application.Interfaces.UseCases;
 using SGRH.Application.UseCases.Report;
 using SGRH.Domain.Base;
 using System;
@@ -20,24 +21,24 @@ namespace SGRH.Application.Services.Report
         private readonly IReportRepository _reportRepository;
         private readonly IAppLogger<ReportService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly ReportDateMustBeCorrect _reportDateMustBeCorrect;
+        private readonly IReportDateMustBeCorrect<ReportDateRangeRequestDto> _dateValidator;
 
         public ReportService(IReportRepository reportRepository,
                              IAppLogger<ReportService> logger,
                              IConfiguration configuration,
-                             ReportDateMustBeCorrect reportDateMustBeCorrect)
+                             IReportDateMustBeCorrect<ReportDateRangeRequestDto> dateValidator)
         {
             _reportRepository = reportRepository;
             _logger = logger;
             _configuration = configuration;
-            _reportDateMustBeCorrect = reportDateMustBeCorrect;
+            _dateValidator = dateValidator;
         }
 
         public async Task<OperationResult<IEnumerable<OcuppancyReportDto>>> GetOcuppancyReport(ReportDateRangeRequestDto request)
         {
             try
             {
-                var validation = _reportDateMustBeCorrect.Validate(request);
+                var validation = _dateValidator.Validate(request);
                 if (!validation.IsSuccess)
                 {
                     return OperationResult<IEnumerable<OcuppancyReportDto>>.Failure(validation.Message);
@@ -67,7 +68,7 @@ namespace SGRH.Application.Services.Report
         {
             try
             {
-                var validation = _reportDateMustBeCorrect.Validate(request);
+                var validation = _dateValidator.Validate(request);
                 if (!validation.IsSuccess)
                 {
                     return OperationResult<IEnumerable<RatesReportDto>>.Failure(validation.Message);
@@ -95,7 +96,7 @@ namespace SGRH.Application.Services.Report
         {
             try
             {
-                var validation = _reportDateMustBeCorrect.Validate(request);
+                var validation = _dateValidator.Validate(request);
                 if (!validation.IsSuccess)
                 {
                     return OperationResult<IEnumerable<RevenueReportDto>>.Failure(validation.Message);

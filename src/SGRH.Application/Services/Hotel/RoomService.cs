@@ -3,6 +3,7 @@ using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
+using SGRH.Application.Interfaces.UseCases;
 using SGRH.Application.UseCases.Hotel.Room;
 using SGRH.Domain.Base;
 using System;
@@ -16,17 +17,17 @@ namespace SGRH.Application.Services.Hotel
         private readonly IRoomRepository _roomRepository;
         private readonly IAppLogger<RoomService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly RoomMustNotBeOccupied _roomMustNotBeOccupied;
-        private readonly RoomCategoryMustExist _roomCategoryMustExist;
-        private readonly RoomFloorMustExist _roomFloorMustExist;
+        private readonly IMustNotBeOccupied<RoomDto> _roomMustNotBeOccupied;
+        private readonly IMustExistValidator<int> _roomCategoryMustExist;
+        private readonly IMustExistValidator<int> _roomFloorMustExist;
 
         public RoomService(
             IRoomRepository roomRepository,
             IAppLogger<RoomService> logger,
             IConfiguration configuration,
-            RoomMustNotBeOccupied roomMustNotBeOccupied,
-            RoomCategoryMustExist roomCategoryMustExist,
-            RoomFloorMustExist roomFloorMustExist)
+            IMustNotBeOccupied<RoomDto> roomMustNotBeOccupied,
+            IMustExistValidator<int> roomCategoryMustExist,
+            IMustExistValidator<int> roomFloorMustExist)
         {
             _roomRepository = roomRepository;
             _logger = logger;
