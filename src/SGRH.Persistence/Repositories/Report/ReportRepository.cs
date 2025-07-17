@@ -140,7 +140,6 @@ namespace SGRH.Persistence.Repositories.Report
                 return OperationResult<IEnumerable<ServiceRevenueReportDto>>.Failure("Error getting the report.");
             }
         }
-
         
     }
 }
