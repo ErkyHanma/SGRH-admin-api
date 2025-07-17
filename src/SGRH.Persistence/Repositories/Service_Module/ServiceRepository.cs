@@ -38,7 +38,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
                     return OperationResult<IEnumerable<Service>>.Success("No services were found.", services);
                 }
 
-                return OperationResult<IEnumerable<Service>>.Success($"Found {services.Count} service(s) matching the filter.", services);
+                return OperationResult<IEnumerable<Service>>.Success($"Services retrieve successfully", services);
             }
             catch (Exception ex)
             {
