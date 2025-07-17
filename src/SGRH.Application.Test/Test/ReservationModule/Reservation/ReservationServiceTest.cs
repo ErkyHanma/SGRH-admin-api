@@ -20,6 +20,46 @@ namespace SGRH.Application.Test.Test.ReservationModule.Reservation
             _reservationService = A.Fake<IReservationService>();
         }
 
+        public class GetAllReservationAsync : ReservationServiceTest
+        {
+            [Fact]
+            public async Task GetAllReservationAsync_WhenSuccess_ShouldReturnReservationDtos()
+            {
+                // Arrange
+
+                var val = OperationResult<IEnumerable<ReservationDto>>.Success("Reservations retrieved successfully.");
+                A.CallTo(() => _reservationService.GetAllReservationAsync()).Returns(Task.FromResult(val));
+
+                // Act
+                var result = await _reservationService.GetAllReservationAsync();
+                var expectedMessage = "Reservations retrieved successfully.";
+
+                // Assert
+                Assert.IsType<OperationResult<IEnumerable<ReservationDto>>>(result);
+                Assert.True(result.IsSuccess);
+                Assert.Equal(expectedMessage, result.Message);
+            }
+
+            [Fact]
+            public async Task GetAllReservationAsync_WhenReservationsNotFound_ShouldReturnError()
+            {
+                // Arrange
+
+                var val = OperationResult<IEnumerable<ReservationDto>>.Failure("No reservations found");
+                A.CallTo(() => _reservationService.GetAllReservationAsync()).Returns(Task.FromResult(val));
+
+                // Act
+                var result = await _reservationService.GetAllReservationAsync();
+                var expectedMessage = "No reservations found";
+
+                // Assert
+                Assert.IsType<OperationResult<IEnumerable<ReservationDto>>>(result);
+                Assert.False(result.IsSuccess);
+                Assert.Equal(expectedMessage, result.Message);
+            }
+        }
+
+
         public class GetByIdAsync : ReservationServiceTest
         {
             [Fact]

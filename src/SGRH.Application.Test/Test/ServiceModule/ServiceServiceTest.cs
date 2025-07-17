@@ -29,6 +29,102 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
             _serviceService = new ServiceService(_fakeServiceRepository, _fakeLogger, _fakeMapper);
         }
 
+
+
+        public class GetAllServicesAsync : ServiceServiceTest
+        {
+
+            [Fact]
+            public async void GetAllServicesAsync_WhenServicesFound_ShouldReturnDtos()
+            {
+                // Arrange
+                var mockServices = new List<Service>
+                {
+                    new Service { ServiceId = 2, Name = "Limpiar", Description = "Se limpia el ITLA", Price = 20 },
+                    new Service { ServiceId = 3, Name = "Limpiar2", Description = "Se limpia el ITLA", Price = 20 }
+
+                };
+
+
+                var val = OperationResult<IEnumerable<Service>>.Success($"Found {mockServices.Count()} service(s) matching the filter.", mockServices);
+                A.CallTo(() => _fakeServiceRepository.GetAllAsync()).Returns(Task.FromResult(val));
+
+
+                // Act
+                var result = await _serviceService.GetAllServicesAsync();
+                var expectedMessage = $"Found {mockServices.Count()} service(s) matching the filter.";
+
+                // Assert
+                Assert.IsType<OperationResult<IEnumerable<ServiceDto>>>(result);
+                Assert.True(result.IsSuccess);
+                Assert.Equal(expectedMessage, result.Message);
+
+            }
+        }
+        public class GetServiceByIdAsync : ServiceServiceTest
+        {
+
+            [Fact]
+            public async void GetServiceByIdAsync_WhenIdIsInvalid_ShouldReturnError()
+            {
+                // Arrange
+                int id = -2;
+
+                // Act
+                var result = await _serviceService.GetServiceByIdAsync(id);
+                var expectedMessage = "Invalid service ID";
+
+                // Assert
+                Assert.IsType<OperationResult<ServiceDto>>(result);
+                Assert.False(result.IsSuccess);
+                Assert.Equal(expectedMessage, result.Message);
+            }
+
+            [Fact]
+            public async void GetServiceByIdAsync_WhenServiceIsNotFound_ShouldReturnDto()
+            {
+                // Arrange
+                var id = 2;
+
+                var val = OperationResult<Service>.Failure("Service was not found with the given ID");
+                A.CallTo(() => _fakeServiceRepository.GetByIdAsync(id)).Returns(Task.FromResult(val));
+
+
+                // Act
+                var result = await _serviceService.GetServiceByIdAsync(id);
+                var expectedMessage = "Service was not found with the given ID";
+
+                // Assert
+                Assert.IsType<OperationResult<ServiceDto>>(result);
+                Assert.False(result.IsSuccess);
+                Assert.Equal(expectedMessage, result.Message);
+
+            }
+
+            [Fact]
+            public async void GetServiceByIdAsync_WhenServiceFound_ShouldReturnDto()
+            {
+                // Arrange
+                var id = 2;
+
+                // Result Mock
+                var existingService = new Service { ServiceId = 2, Name = "Limpiar", Description = "Se limpia el ITLA", Price = 20 };
+
+                var val = OperationResult<Service>.Success($"Service with the ID: {id} found", existingService);
+                A.CallTo(() => _fakeServiceRepository.GetByIdAsync(id)).Returns(Task.FromResult(val));
+
+
+                // Act
+                var result = await _serviceService.GetServiceByIdAsync(id);
+                var expectedMessage = $"Service with the ID: {id} found";
+
+                // Assert
+                Assert.IsType<OperationResult<ServiceDto>>(result);
+                Assert.True(result.IsSuccess);
+                Assert.Equal(expectedMessage, result.Message);
+
+            }
+        }
         public class CreateServicesAsync : ServiceServiceTest
         {
             [Fact]
@@ -157,7 +253,6 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
             }
         }
-
         public class UpdateServicesAsync : ServiceServiceTest
         {
             [Fact]
@@ -267,7 +362,6 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
             }
 
         }
-
         public class DeleteServicesAsync : ServiceServiceTest
         {
             [Fact]
@@ -313,70 +407,7 @@ namespace SGRH.Persistence.Test.Test.ServiceModule
 
         }
 
-        public class GetServiceByIdAsync : ServiceServiceTest
-        {
 
-            [Fact]
-            public async void GetServiceByIdAsync_WhenIdIsInvalid_ShouldReturnError()
-            {
-                // Arrange
-                int id = -2;
-
-                // Act
-                var result = await _serviceService.GetServiceByIdAsync(id);
-                var expectedMessage = "Invalid service ID";
-
-                // Assert
-                Assert.IsType<OperationResult<ServiceDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-            }
-
-            [Fact]
-            public async void GetServiceByIdAsync_WhenServiceIsNotFound_ShouldReturnDto()
-            {
-                // Arrange
-                var id = 2;
-
-                var val = OperationResult<Service>.Failure("Service was not found with the given ID");
-                A.CallTo(() => _fakeServiceRepository.GetByIdAsync(id)).Returns(Task.FromResult(val));
-
-
-                // Act
-                var result = await _serviceService.GetServiceByIdAsync(id);
-                var expectedMessage = "Service was not found with the given ID";
-
-                // Assert
-                Assert.IsType<OperationResult<ServiceDto>>(result);
-                Assert.False(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-
-            [Fact]
-            public async void GetServiceByIdAsync_WhenServiceFound_ShouldReturnDto()
-            {
-                // Arrange
-                var id = 2;
-
-                // Result Mock
-                var existingService = new Service { ServiceId = 2, Name = "Limpiar", Description = "Se limpia el ITLA", Price = 20 };
-
-                var val = OperationResult<Service>.Success($"Service with the ID: {id} found", existingService);
-                A.CallTo(() => _fakeServiceRepository.GetByIdAsync(id)).Returns(Task.FromResult(val));
-
-
-                // Act
-                var result = await _serviceService.GetServiceByIdAsync(id);
-                var expectedMessage = $"Service with the ID: {id} found";
-
-                // Assert
-                Assert.IsType<OperationResult<ServiceDto>>(result);
-                Assert.True(result.IsSuccess);
-                Assert.Equal(expectedMessage, result.Message);
-
-            }
-        }
     }
 
 }
