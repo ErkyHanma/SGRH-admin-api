@@ -4,7 +4,7 @@ using SGRH.Application.Dtos.Hotel.Floor;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Domain.Base;
-using SGRH.Application.UseCases.Hotel.Floor;
+using SGRH.Application.Interfaces.UseCases;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,15 +16,16 @@ namespace SGRH.Application.Services.Hotel
         private readonly IFloorRepository _floorRepository;
         private readonly IAppLogger<FloorService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly FloorNumberMustBeUnique _floorNumberMustBeUnique; 
-        private readonly FloorMustNotHaveActiveReservations _floorMustNotHaveActiveReservations; 
+        private readonly IMustBeUniqueValidator<int> _floorNumberMustBeUnique;
+        private readonly IMustNotHaveAssociationsValidator<int> _floorMustNotHaveActiveReservations;
+
 
         public FloorService(
             IFloorRepository floorRepository,
             IAppLogger<FloorService> logger,
             IConfiguration configuration,
-            FloorNumberMustBeUnique floorNumberMustBeUnique, 
-            FloorMustNotHaveActiveReservations floorMustNotHaveActiveReservations 
+            IMustBeUniqueValidator<int> floorNumberMustBeUnique, 
+            IMustNotHaveAssociationsValidator<int> floorMustNotHaveActiveReservations 
         )
         {
             _floorRepository = floorRepository;
@@ -43,14 +44,12 @@ namespace SGRH.Application.Services.Hotel
                 if (createFloorDto is null)
                     return OperationResult<CreateFloorDto>.Failure("CreateFloorDto is required.");
 
-                //Caso de Uso: FloorNumberMustBeUnique (para creación)
                 var uniqueNumberValidation = await _floorNumberMustBeUnique.ValidateCreate(createFloorDto.FloorNumber);
                 if (!uniqueNumberValidation.IsSuccess)
                 {
                     _logger.ErrorNoEx($"Validation failed for CreateFloor: {uniqueNumberValidation.Message}");
                     return OperationResult<CreateFloorDto>.Failure(uniqueNumberValidation.Message);
                 }
-                //Fin Caso de Uso
 
                 var operationResult = await _floorRepository.AddAsync(createFloorDto);
 
@@ -79,14 +78,12 @@ namespace SGRH.Application.Services.Hotel
                 if (disableFloorDto is null)
                     return OperationResult<DisableFloorDto>.Failure("DisableFloorDto is required.");
 
-                //Caso de Uso: FloorMustNotHaveActiveReservations
                 var activeReservationsValidation = await _floorMustNotHaveActiveReservations.Validate(disableFloorDto.FloorId);
                 if (!activeReservationsValidation.IsSuccess)
                 {
                     _logger.ErrorNoEx($"Validation failed for DeleteFloor: {activeReservationsValidation.Message}");
                     return OperationResult<DisableFloorDto>.Failure(activeReservationsValidation.Message);
                 }
-                //Fin Caso de Uso
 
                 var operationResult = await _floorRepository.DeleteAsync(disableFloorDto);
 
@@ -106,7 +103,6 @@ namespace SGRH.Application.Services.Hotel
             }
         }
 
-        //(GetFloors y GetFloorsById solo lectura)
         public async Task<OperationResult<IEnumerable<FloorDto>>> GetFloors()
         {
             try
@@ -154,14 +150,12 @@ namespace SGRH.Application.Services.Hotel
                 if (modifyFloorDto is null)
                     return OperationResult<ModifyFloorDto>.Failure("ModifyFloorDto is required.");
 
-                //Caso de Uso: FloorNumberMustBeUnique (para modificación)
                 var uniqueNumberValidation = await _floorNumberMustBeUnique.ValidateModify(modifyFloorDto.FloorId, modifyFloorDto.FloorNumber);
                 if (!uniqueNumberValidation.IsSuccess)
                 {
                     _logger.ErrorNoEx($"Validation failed for UpdateFloor: {uniqueNumberValidation.Message}");
                     return OperationResult<ModifyFloorDto>.Failure(uniqueNumberValidation.Message);
                 }
-                //Fin Caso de Uso
 
                 var operationResult = await _floorRepository.UpdateAsync(modifyFloorDto);
 

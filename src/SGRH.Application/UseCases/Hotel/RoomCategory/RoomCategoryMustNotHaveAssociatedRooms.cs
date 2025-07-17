@@ -7,8 +7,8 @@ namespace SGRH.Application.UseCases.Hotel.RoomCategory
 {
     public class RoomCategoryMustNotHaveAssociatedRooms
     {
-        private readonly IRoomRepository _roomRepository; // Inyectar el repositorio de Habitaciones
-        private readonly IRoomCategoryRepository _roomCategoryRepository; // Para verificar si la categoría existe
+        private readonly IRoomRepository _roomRepository; 
+        private readonly IRoomCategoryRepository _roomCategoryRepository; 
 
         public RoomCategoryMustNotHaveAssociatedRooms(IRoomRepository roomRepository, IRoomCategoryRepository roomCategoryRepository)
         {

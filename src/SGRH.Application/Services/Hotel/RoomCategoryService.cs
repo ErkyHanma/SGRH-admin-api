@@ -4,7 +4,7 @@ using SGRH.Application.Dtos.Hotel.RoomCategory;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Domain.Base;
-using SGRH.Application.UseCases.Hotel.RoomCategory;
+using SGRH.Application.Interfaces.UseCases; 
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,15 +16,16 @@ namespace SGRH.Application.Services.Hotel
         private readonly IRoomCategoryRepository _roomCategoryRepository;
         private readonly IAppLogger<RoomCategoryService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly RoomCategoryNameMustBeUnique _roomCategoryNameMustBeUnique; 
-        private readonly RoomCategoryMustNotHaveAssociatedRooms _roomCategoryMustNotHaveAssociatedRooms;
+        private readonly IMustBeUniqueValidator<string> _roomCategoryNameMustBeUnique; 
+        private readonly IMustNotHaveAssociationsValidator<int> _roomCategoryMustNotHaveAssociatedRooms; 
+
 
         public RoomCategoryService(
             IRoomCategoryRepository roomCategoryRepository,
             IAppLogger<RoomCategoryService> logger,
             IConfiguration configuration,
-            RoomCategoryNameMustBeUnique roomCategoryNameMustBeUnique, 
-            RoomCategoryMustNotHaveAssociatedRooms roomCategoryMustNotHaveAssociatedRooms 
+            IMustBeUniqueValidator<string> roomCategoryNameMustBeUnique,
+            IMustNotHaveAssociationsValidator<int> roomCategoryMustNotHaveAssociatedRooms 
         )
         {
             _roomCategoryRepository = roomCategoryRepository;
@@ -32,6 +33,7 @@ namespace SGRH.Application.Services.Hotel
             _configuration = configuration;
             _roomCategoryNameMustBeUnique = roomCategoryNameMustBeUnique;
             _roomCategoryMustNotHaveAssociatedRooms = roomCategoryMustNotHaveAssociatedRooms;
+            // _roomRepository = roomRepository; // Asignar si se descomenta arriba
         }
 
         public async Task<OperationResult<CreateRoomCategoryDto>> CreateRoomCategory(CreateRoomCategoryDto createRoomCategoryDto)
@@ -43,14 +45,12 @@ namespace SGRH.Application.Services.Hotel
                 if (createRoomCategoryDto is null)
                     return OperationResult<CreateRoomCategoryDto>.Failure("CreateRoomCategoryDto is required.");
 
-                //Caso de Uso: RoomCategoryNameMustBeUnique (para creación)
                 var uniqueNameValidation = await _roomCategoryNameMustBeUnique.ValidateCreate(createRoomCategoryDto.Name);
                 if (!uniqueNameValidation.IsSuccess)
                 {
                     _logger.ErrorNoEx($"Validation failed for CreateRoomCategory: {uniqueNameValidation.Message}");
                     return OperationResult<CreateRoomCategoryDto>.Failure(uniqueNameValidation.Message);
                 }
-                //Fin Caso de Uso
 
                 var operationResult = await _roomCategoryRepository.AddAsync(createRoomCategoryDto);
 
@@ -79,14 +79,12 @@ namespace SGRH.Application.Services.Hotel
                 if (disableRoomCategoryDto is null)
                     return OperationResult<DisableRoomCategoryDto>.Failure("DisableRoomCategoryDto is required.");
 
-                //Caso de Uso: RoomCategoryMustNotHaveAssociatedRooms
                 var associatedRoomsValidation = await _roomCategoryMustNotHaveAssociatedRooms.Validate(disableRoomCategoryDto.CategoryId);
                 if (!associatedRoomsValidation.IsSuccess)
                 {
                     _logger.ErrorNoEx($"Validation failed for DeleteRoomCategory: {associatedRoomsValidation.Message}");
                     return OperationResult<DisableRoomCategoryDto>.Failure(associatedRoomsValidation.Message);
                 }
-                //Fin Caso de Uso
 
                 var operationResult = await _roomCategoryRepository.DeleteAsync(disableRoomCategoryDto);
 
@@ -153,14 +151,12 @@ namespace SGRH.Application.Services.Hotel
                 if (modifyRoomCategoryDto is null)
                     return OperationResult<ModifyRoomCategoryDto>.Failure("ModifyRoomCategoryDto is required.");
 
-                //Caso de Uso: RoomCategoryNameMustBeUnique (para modificación)
                 var uniqueNameValidation = await _roomCategoryNameMustBeUnique.ValidateModify(modifyRoomCategoryDto.CategoryId, modifyRoomCategoryDto.Name);
                 if (!uniqueNameValidation.IsSuccess)
                 {
                     _logger.ErrorNoEx($"Validation failed for UpdateRoomCategory: {uniqueNameValidation.Message}");
                     return OperationResult<ModifyRoomCategoryDto>.Failure(uniqueNameValidation.Message);
                 }
-                //Fin Caso de Uso
 
                 var operationResult = await _roomCategoryRepository.UpdateAsync(modifyRoomCategoryDto);
 

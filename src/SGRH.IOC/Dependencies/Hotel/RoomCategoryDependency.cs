@@ -26,6 +26,7 @@ namespace SGRH.IOC.Dependencies.Hotel
             // Casos de Uso
             service.AddTransient<RoomCategoryNameMustBeUnique>();
             service.AddTransient<RoomCategoryMustNotHaveAssociatedRooms>();
+
         }
     }
 }
