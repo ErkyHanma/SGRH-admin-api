@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SGRH.Application.Dtos.Report.InputDtos;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Report;
+using SGRH.Application.Interfaces.UseCases;
 using SGRH.Application.Services.Report;
 using SGRH.Application.UseCases.Report;
 using SGRH.Domain.Entities.ServiceModule;
@@ -22,7 +24,7 @@ namespace SGRH.IOC.Dependencies.Report
 
            //Use cases
 
-           service.AddScoped<ReportDateMustBeCorrect>();
+           service.AddScoped<IReportDateMustBeCorrect<ReportDateRangeRequestDto>, ReportDateMustBeCorrect>();
 
         }
     }

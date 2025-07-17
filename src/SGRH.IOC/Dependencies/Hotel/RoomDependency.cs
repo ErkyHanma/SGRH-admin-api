@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using SGRH.Application.Dtos.Hotel.Room.Validators;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.UseCases.Hotel.Room;
+using SGRH.Application.Interfaces.UseCases;
 
 namespace SGRH.IOC.Dependencies.Hotel
 {
@@ -26,9 +27,10 @@ namespace SGRH.IOC.Dependencies.Hotel
 
             //Use cases
 
-            service.AddScoped<RoomMustNotBeOccupied>();
-            service.AddScoped<RoomCategoryMustExist>(); // <- Este mas tarde puede ser movido a una clase para dependencias compartidas (Lo usan Room y Rate)
-            service.AddScoped<RoomFloorMustExist>(); 
+            service.AddScoped<IMustNotBeOccupied<RoomDto>, RoomMustNotBeOccupied>();
+            service.AddScoped<IMustExistValidator<int>, RoomCategoryMustExist>(); // <- Este mas tarde puede ser movido a una clase para dependencias compartidas (Lo usan Room y Rate)
+            service.AddScoped<IMustExistValidator<int>, RoomFloorMustExist>();
+
 
             //Fluent validation
 
