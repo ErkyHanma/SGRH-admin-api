@@ -1,63 +1,58 @@
-﻿using SGRH.Application.Common.Base; // Required for IBaseService inheritance
+﻿using Core.Application.Interfaces.Repositories.UserManagement;
 using SGRH.Application.Common.Logging; // Necessary for the logger (IAppLogger)
-using SGRH.Application.Dtos.UserManagement.Client; // Required for all Client DTOs (ClientDto, CreateClientDto, UpdateClientDto, RemoveClientDto)
-using SGRH.Application.Dtos.UserManagement.Client.SGRH.Application.Dtos.UserManagement.Client;
 using SGRH.Application.Interfaces.UserManagement; // Required for IClientService inheritance
-using System; // For basic types like Exception (good practice)
+using SGRH.Domain.Entities.UserManagement;
 using System.Collections.Generic; // For IEnumerable<T>
-using System.Linq; // For Enumerable.Empty<T>()
 using System.Threading.Tasks; // For Task
+
+
 
 namespace SGRH.Application.Services.UserManagement
 {
     public class ClientService : IClientService
     {
-        private readonly IAppLogger<ClientService> _logger; // Logger instance for service operations.
+        private readonly IClientRepository _clientRepository;
+        private readonly IAppLogger<ClientService> _logger;
 
-        // Constructor for ClientService.
-        public ClientService(IAppLogger<ClientService> logger)
+       
+        public ClientService(IClientRepository clientRepository, IAppLogger<ClientService> logger)
         {
+            _clientRepository = clientRepository;
             _logger = logger;
         }
 
-        // Retrieves all clients.
-        public Task<IEnumerable<ClientDto>> GetAll()
+       
+        public async Task<string> CreateClientAsync(Client client)
         {
-            _logger.Info("Getting all clients."); // Log information.
-            // Placeholder implementation: returns an empty collection.
-            return Task.FromResult(Enumerable.Empty<ClientDto>());
+            _logger.Info($"Creating client: {client.FirstName} {client.LastName}.");
+            
+            var result = await _clientRepository.CreateClientAsync(client);
+            return result;
         }
 
-        // Retrieves a client by their ID.
-        public Task<ClientDto> GetById(int id)
+        public async Task<Client> GetClientByIdAsync(int clientId)
         {
-            _logger.Info($"Getting client with Id: {id}."); // Log information.
-            // Placeholder implementation: returns null.
-            return Task.FromResult<ClientDto>(null);
+            _logger.Info($"Getting client with Id: {clientId}.");
+            
+            var result = await _clientRepository.GetClientByIdAsync(clientId);
+            return result;
         }
 
-        // Creates a new client.
-        public Task<int> Create(CreateClientDto dto)
+        public async Task<string> UpdateClientAsync(Client client)
         {
-            _logger.Info($"Creating client: {dto.Name}."); // Log information.
-            // Placeholder implementation: returns 0.
-            return Task.FromResult(0);
+            _logger.Info($"Updating client with Id: {client.UserId}.");
+            
+            var result = await _clientRepository.UpdateClientAsync(client);
+            return result;
         }
 
-        // Updates an existing client.
-        public Task<bool> Update(UpdateClientDto dto)
+        public async Task<string> DisableClientAsync(int clientId)
         {
-            _logger.Info($"Updating client with Id: {dto.Id}."); // Log information.
-            // Placeholder implementation: returns false.
-            return Task.FromResult(false);
+            _logger.Info($"Disabling client with Id: {clientId}.");
+            var result = await _clientRepository.DisableClientAsync(clientId, 1); 
+            return result;
         }
 
-        // Removes a client.
-        public Task<bool> Remove(RemoveClientDto dto)
-        {
-            _logger.Info($"Removing client with Id: {dto.Id}."); // Log information.
-            // Placeholder implementation: returns false.
-            return Task.FromResult(false);
-        }
+        
     }
 }

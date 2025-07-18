@@ -1,16 +1,16 @@
-﻿using SGRH.Application.Common.Base;
-using SGRH.Application.Dtos.UserManagement.Client;
-using SGRH.Application.Dtos.UserManagement.Client.SGRH.Application.Dtos.UserManagement.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
+using SGRH.Domain.Entities.UserManagement; 
 using System.Threading.Tasks;
+
+
 
 namespace SGRH.Application.Interfaces.UserManagement
 {
-    public interface IClientService : IBaseService<ClientDto, CreateClientDto, UpdateClientDto, RemoveClientDto>
+    public interface IClientService
     {
-        // Add specific methods for Client if any (e.g., GetClientsByEmail).
+        Task<string> CreateClientAsync(Client client);
+        Task<Client> GetClientByIdAsync(int clientId);
+        Task<string> UpdateClientAsync(Client client);
+        Task<string> DisableClientAsync(int clientId);
     }
 }
