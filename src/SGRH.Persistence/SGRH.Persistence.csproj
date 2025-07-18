@@ -19,4 +19,8 @@
     <ProjectReference Include="..\SGRH.Application\SGRH.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Loggers\" />
+  </ItemGroup>
+
 </Project>

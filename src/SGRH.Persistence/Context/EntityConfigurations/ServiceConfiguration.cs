@@ -36,7 +36,7 @@ namespace SGRH.Persistence.Context.EntityConfigurations
 
                 entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
 
-                entity.Property(e => e.DeleteAt)
+                entity.Property(e => e.DeletedAt)
                       .HasColumnName("deleted_at")
                       .HasColumnType("timestamp without time zone");
 

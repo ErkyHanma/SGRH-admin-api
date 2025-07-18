@@ -176,7 +176,7 @@ namespace SGRH.Persistence.Repositories.Service_Module
 
                 ExistingService.IsDeleted = true;
                 ExistingService.IsActive = false;
-                ExistingService.DeleteAt = DateTime.Now;
+                ExistingService.DeletedAt = DateTime.Now;
                 ExistingService.DeletedBy = 1; // For now a hardcoded value
 
                 _context.Service.Update(ExistingService);

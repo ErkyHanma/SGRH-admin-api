@@ -46,7 +46,7 @@ namespace SGRH.Persistence.Helpers
                 var affectedRows = await command.ExecuteNonQueryAsync();
 
                 // Crear variable y verificar si pResult y su Value no son nulos.
-                string message;
+                string message = string.Empty; ;
                 if (pResult?.Value != null && pResult.Value != DBNull.Value)
 
                 {

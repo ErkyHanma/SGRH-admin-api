@@ -32,6 +32,8 @@ using SGRH.Application.Services.ServiceModule;
 using SGRH.Persistence.Repositories.Service_Module;
 using SGRH.Persistence.Repositories.UserManagement;
 using SGRH.Application;
+using SGRH.Application.Interfaces.UserManagement;
+using SGRH.Application.Services.UserManagement;
 
 
 namespace SGRH.Api
@@ -100,6 +102,7 @@ namespace SGRH.Api
             builder.Services.AddScoped<IServiceMapper, ServiceMapper>();
 
             builder.Services.AddUserManagementRepositories(builder.Configuration);
+            builder.Services.AddScoped<IClientService, ClientService>();
 
             builder.Services.AddCors(options =>
             {

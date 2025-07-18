@@ -66,7 +66,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                 existing.IsActive = false;
                 existing.IsDeleted = true;
                 existing.DeletedBy = entity.DeletedBy;
-                existing.DeleteAt = DateTime.Now;
+                existing.DeletedAt = DateTime.Now;
 
                 await _context.SaveChangesAsync();
 
