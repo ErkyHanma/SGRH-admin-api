@@ -1,0 +1,33 @@
+﻿@model IEnumerable<SGRH.Application.Dtos.Report.ServiceRevenueReportDto>
+
+@{
+    ViewData["Title"] = "Service Revenue Report Results";
+}
+
+<h2>Service Revenue Report Results</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Service</th>
+            <th>Category</th>
+            <th>Count</th>
+            <th>Total Revenue</th>
+            <th>Average Revenue per Service</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ServiceName</td>
+                <td>@item.CategoryName</td>
+                <td>@item.ServiceCount</td>
+                <td>@item.TotalRevenue.ToString("C")</td>
+                <td>@item.AvgRevenuePerService.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index">Back</a>

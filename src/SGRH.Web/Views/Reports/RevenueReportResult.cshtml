@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SGRH.Application.Dtos.Report.RevenueReportDto>
+
+@{
+    ViewData["Title"] = "Revenue Report Results";
+}
+
+<h2>Revenue Report Results</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Report Date</th>
+            <th>Room Revenue</th>
+            <th>Service Revenue</th>
+            <th>Total Revenue</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var report in Model)
+        {
+            <tr>
+                <td>@report.ReportDate.ToString("yyyy-MM-dd")</td>
+                <td>@report.RoomRevenue.ToString("C")</td>
+                <td>@report.ServiceRevenue.ToString("C")</td>
+                <td>@report.TotalRevenue.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index">Back</a>

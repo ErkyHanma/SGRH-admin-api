@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SGRH.Application.Dtos.Report.OcuppancyReportDto>
+
+@{
+    ViewData["Title"] = "Occupancy Report Result";
+}
+
+<h2>Occupancy Report Results</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Total Rooms</th>
+            <th>Occupied Rooms</th>
+            <th>Occupancy Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var report in Model)
+        {
+            <tr>
+                <td>@report.ReportDate.ToString("yyyy-MM-dd")</td>
+                <td>@report.TotalRooms</td>
+                <td>@report.OccupiedRooms</td>
+                <td>@report.OccupancyRate.ToString("P")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index">Back</a>
