@@ -1,0 +1,52 @@
+﻿@model SGRH.Application.Dtos.Hotel.Rate.RateDto
+
+@{
+    ViewData["Title"] = "Rate Details";
+}
+
+<h2>Rate Details</h2>
+
+<table class="table">
+    <tr>
+        <th>Rate ID</th>
+        <td>@Model.RateId</td>
+    </tr>
+    <tr>
+        <th>Category ID</th>
+        <td>@Model.CategoryId</td>
+    </tr>
+    <tr>
+        <th>Season ID</th>
+        <td>@Model.SeasonId</td>
+    </tr>
+    <tr>
+        <th>Night Price</th>
+        <td>@Model.NightPrice.ToString("C")</td> <!-- Moneda -->
+    </tr>
+    <tr>
+        <th>Is Active?</th>
+        <td>@(Model.IsActive ? "Yes" : "No")</td>
+    </tr>
+    <tr>
+        <th>Is Deleted?</th>
+        <td>@(Model.IsDeleted ? "Yes" : "No")</td>
+    </tr>
+    <tr>
+        <th>Created By</th>
+        <td>@Model.CreatedBy</td>
+    </tr>
+    <tr>
+        <th>Created At</th>
+        <td>@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+    </tr>
+    <tr>
+        <th>Updated By</th>
+        <td>@Model.UpdatedBy</td>
+    </tr>
+    <tr>
+        <th>Updated At</th>
+        <td>@Model.UpdatedAt?.ToString("yyyy-MM-dd HH:mm")</td>
+    </tr>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>
