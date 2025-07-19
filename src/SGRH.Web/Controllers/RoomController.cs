@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Domain.Entities.Hotel;
@@ -9,21 +11,19 @@ namespace SGRH.Web.Controllers
     public class RoomController : Controller
     {
         public readonly IRoomService _roomService;
-        public RoomController(IRoomService roomService) 
+        public RoomController(IRoomService roomService)
         {
             _roomService = roomService; // break points aca 
         }
 
-        //
-
-        // GET: RoomController
+        // GET: RoomController 
         public async Task<IActionResult> Index()
         {
             var result = await _roomService.GetRooms(); // breakpoints en await
 
             if (result.IsSuccess)
             {
-                List<Room> roomList = (List<Room>)result.Data;
+                List<RoomDto> roomList = (List<RoomDto>)result.Data;
                 return View(roomList);
             }
             else
@@ -33,16 +33,23 @@ namespace SGRH.Web.Controllers
             }
         }
 
-        //
-
         // GET: RoomController/Details/5
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
+            var result = await _roomService.GetRoomsById(id);
+
+            if (!result.IsSuccess)
+            {
+                return NotFound();
+            }
+
+            var room = result.Data; // RoomDto
+
+            return View(room);
         }
 
         // GET: RoomController/Create
-        public ActionResult Create() 
+        public ActionResult Create()
         {
             return View();
         }
@@ -50,58 +57,107 @@ namespace SGRH.Web.Controllers
         // POST: RoomController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection) // ADD dto 
+        public async Task<IActionResult> Create(CreateRoomDto createRoomDto)
         {
-            try
+            if (!ModelState.IsValid)
+            {
+                return View(createRoomDto); // regresa el formulario con errores
+            }
+
+            var result = await _roomService.CreateRoom(createRoomDto);
+
+            if (result.IsSuccess)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            else
             {
-                return View();
+                ModelState.AddModelError(string.Empty, result.Message);
+                return View(createRoomDto);
             }
         }
 
         // GET: RoomController/Edit/5
-        public ActionResult Edit(int id) // se puede hacer copypaste al by id aqui (cuando lo tengamos)
+        public async Task<IActionResult> Edit(int id)
         {
-            return View();
+            var result = await _roomService.GetRoomsById(id);
+
+            if (!result.IsSuccess)
+            {
+                return NotFound();
+            }
+
+            var dto = new ModifyRoomDto
+            {
+                RoomId = result.Data.RoomId,
+                RoomNumber = result.Data.RoomNumber,
+                CategoryId = result.Data.CategoryId,
+                FloorId = result.Data.FloorId,
+                Status = result.Data.Status
+            };
+
+            return View(dto);
         }
 
         // POST: RoomController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection) //  MODIFY dto ??
+        public async Task<IActionResult> Edit(ModifyRoomDto modifyRoomDto)
         {
-            try
+            if (!ModelState.IsValid)
+            {
+                return View(modifyRoomDto);
+            }
+
+            var result = await _roomService.UpdateRoom(modifyRoomDto);
+
+            if (result.IsSuccess)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+
+            ModelState.AddModelError(string.Empty, result.Message);
+            return View(modifyRoomDto);
         }
 
         // GET: RoomController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return View();
+            var result = await _roomService.GetRoomsById(id);
+
+            if (!result.IsSuccess)
+            {
+                return NotFound();
+            }
+
+            var disableDto = new DisableRoomDto
+            {
+                RoomId = id
+                // UpdatedBy se completa en el formulario  
+            };
+
+            return View(disableDto);
         }
 
         // POST: RoomController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection) // disable dto
+        public async Task<IActionResult> Delete(DisableRoomDto disableRoomDto)
         {
-            try
+            if (!ModelState.IsValid)
+            {
+                return View(disableRoomDto);
+            }
+
+            var result = await _roomService.DeleteRoom(disableRoomDto);
+
+            if (result.IsSuccess)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+
+            ModelState.AddModelError(string.Empty, result.Message);
+            return View(disableRoomDto);
         }
     }
 }

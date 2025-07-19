@@ -1,0 +1,36 @@
+﻿@model SGRH.Application.Dtos.Hotel.Room.RoomDto
+
+@{
+    ViewData["Title"] = "Room Details";
+}
+
+<h2>Room Details</h2>
+
+<table class="table">
+    <tr>
+        <th>Room Number</th>
+        <td>@Model.RoomNumber</td>
+    </tr>
+    <tr>
+        <th>Category ID</th>
+        <td>@Model.CategoryId</td>
+    </tr>
+    <tr>
+        <th>Floor ID</th>
+        <td>@Model.FloorId</td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td>@Model.Status</td>
+    </tr>
+    <tr>
+        <th>Created By</th>
+        <td>@Model.CreatedBy</td>
+    </tr>
+    <tr>
+        <th>Created At</th>
+        <td>@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td> 
+    </tr>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>
