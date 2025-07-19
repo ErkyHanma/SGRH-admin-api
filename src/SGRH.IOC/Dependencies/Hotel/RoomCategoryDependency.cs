@@ -4,6 +4,7 @@ using SGRH.Application.Dtos.Hotel.RoomCategory;
 using SGRH.Application.Dtos.Hotel.RoomCategory.Validators;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
+using SGRH.Application.Interfaces.UseCases;
 using SGRH.Application.Services.Hotel;
 using SGRH.Application.UseCases.Hotel.RoomCategory;
 using SGRH.Persistence.Repositories.Hotel;
@@ -24,9 +25,8 @@ namespace SGRH.IOC.Dependencies.Hotel
             service.AddScoped<IValidator<DisableRoomCategoryDto>, DisableRoomCategoryValidator>();
 
             // Casos de Uso
-            service.AddTransient<RoomCategoryNameMustBeUnique>();
-            service.AddTransient<RoomCategoryMustNotHaveAssociatedRooms>();
-
+            service.AddTransient<IMustBeUniqueValidator<string>, RoomCategoryNameMustBeUnique>(); 
+            service.AddTransient<IMustNotHaveAssociationsValidator<int>, RoomCategoryMustNotHaveAssociatedRooms>();
         }
     }
 }

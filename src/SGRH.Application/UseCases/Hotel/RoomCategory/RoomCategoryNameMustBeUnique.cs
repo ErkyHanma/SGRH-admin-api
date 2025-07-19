@@ -1,11 +1,12 @@
 ﻿using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
 using System.Threading.Tasks;
-using System.Linq; 
+using System.Linq;
+using SGRH.Application.Interfaces.UseCases; 
 
 namespace SGRH.Application.UseCases.Hotel.RoomCategory
 {
-    public class RoomCategoryNameMustBeUnique
+    public class RoomCategoryNameMustBeUnique : IMustBeUniqueValidator<string>
     {
         private readonly IRoomCategoryRepository _roomCategoryRepository;
 
@@ -17,7 +18,7 @@ namespace SGRH.Application.UseCases.Hotel.RoomCategory
         // Método para validar la unicidad al crear una nueva categoría
         public async Task<OperationResult<string>> ValidateCreate(string categoryName)
         {
-            var existingCategoriesResult = await _roomCategoryRepository.GetAllAsync(); 
+            var existingCategoriesResult = await _roomCategoryRepository.GetAllAsync();
             if (existingCategoriesResult.IsSuccess && existingCategoriesResult.Data != null)
             {
                 if (existingCategoriesResult.Data.Any(rc => rc.Name != null && rc.Name.Equals(categoryName, StringComparison.OrdinalIgnoreCase)))
@@ -31,7 +32,7 @@ namespace SGRH.Application.UseCases.Hotel.RoomCategory
         // Método para validar la unicidad al modificar una categoría (excluyendo la propia categoría)
         public async Task<OperationResult<string>> ValidateModify(int categoryId, string categoryName)
         {
-            var existingCategoriesResult = await _roomCategoryRepository.GetAllAsync(); 
+            var existingCategoriesResult = await _roomCategoryRepository.GetAllAsync();
             if (existingCategoriesResult.IsSuccess && existingCategoriesResult.Data != null)
             {
                 if (existingCategoriesResult.Data.Any(rc => rc.Name != null && rc.Name.Equals(categoryName, StringComparison.OrdinalIgnoreCase) && rc.CategoryId != categoryId))

@@ -1,11 +1,12 @@
 ﻿using SGRH.Domain.Base;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
+using SGRH.Application.Interfaces.UseCases;
 using System.Threading.Tasks;
 
 namespace SGRH.Application.UseCases.Hotel.Floor
 {
-    public class FloorMustNotHaveActiveReservations
+    public class FloorMustNotHaveActiveReservations : IMustNotHaveAssociationsValidator<int>
     {
         private readonly IFloorRepository _floorRepository;
         private readonly IReservationRepository _reservationRepository;
@@ -21,7 +22,7 @@ namespace SGRH.Application.UseCases.Hotel.Floor
 
         public async Task<OperationResult<string>> Validate(int floorId)
         {
-            //Verificar si el piso existe
+            
             var floorResult = await _floorRepository.GetByIdAsync(floorId);
             if (!floorResult.IsSuccess || floorResult.Data == null)
             {

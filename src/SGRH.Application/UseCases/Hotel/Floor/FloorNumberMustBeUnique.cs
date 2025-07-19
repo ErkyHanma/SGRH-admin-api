@@ -1,10 +1,12 @@
 ﻿using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
 using System.Threading.Tasks;
+using System.Linq; 
+using SGRH.Application.Interfaces.UseCases; 
 
 namespace SGRH.Application.UseCases.Hotel.Floor
 {
-    public class FloorNumberMustBeUnique
+    public class FloorNumberMustBeUnique : IMustBeUniqueValidator<int>
     {
         private readonly IFloorRepository _floorRepository;
 
@@ -24,8 +26,6 @@ namespace SGRH.Application.UseCases.Hotel.Floor
                     return OperationResult<string>.Failure($"Floor number {floorNumber} already exists.");
                 }
             }
-            // Si hay un error al obtener los pisos, o si no hay datos, no lo consideramos un error de unicidad aquí
-            // Esto solo valida si el número de piso ya existe.
             return OperationResult<string>.Success("Floor number is unique.");
         }
 

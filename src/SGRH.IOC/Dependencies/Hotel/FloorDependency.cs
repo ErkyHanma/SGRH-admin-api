@@ -4,6 +4,7 @@ using SGRH.Application.Dtos.Hotel.Floor;
 using SGRH.Application.Dtos.Hotel.Floor.Validators;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
+using SGRH.Application.Interfaces.UseCases;
 using SGRH.Application.Services.Hotel;
 using SGRH.Application.UseCases.Hotel.Floor;
 using SGRH.Persistence.Repositories.Hotel;
@@ -24,8 +25,13 @@ namespace SGRH.IOC.Dependencies.Hotel
             service.AddScoped<IValidator<DisableFloorDto>, DisableFloorValidator>();
 
             // Casos de Uso
-            service.AddTransient<FloorNumberMustBeUnique>();
-            service.AddTransient<FloorMustNotHaveActiveReservations>();
+
+            service.AddTransient<IMustBeUniqueValidator<int>, FloorNumberMustBeUnique>(); 
+            service.AddTransient<IMustNotHaveAssociationsValidator<int>, FloorMustNotHaveActiveReservations>();
         }
     }
 }
+
+
+
+

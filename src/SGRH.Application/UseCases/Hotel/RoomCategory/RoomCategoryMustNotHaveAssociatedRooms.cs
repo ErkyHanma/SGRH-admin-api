@@ -1,14 +1,16 @@
 ﻿using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
 using System.Threading.Tasks;
-using System.Linq; // Necesario para .Any()
+using System.Linq;
+using SGRH.Application.Interfaces.UseCases; 
 
 namespace SGRH.Application.UseCases.Hotel.RoomCategory
 {
-    public class RoomCategoryMustNotHaveAssociatedRooms
+    
+    public class RoomCategoryMustNotHaveAssociatedRooms : IMustNotHaveAssociationsValidator<int>
     {
-        private readonly IRoomRepository _roomRepository; 
-        private readonly IRoomCategoryRepository _roomCategoryRepository; 
+        private readonly IRoomRepository _roomRepository;
+        private readonly IRoomCategoryRepository _roomCategoryRepository;
 
         public RoomCategoryMustNotHaveAssociatedRooms(IRoomRepository roomRepository, IRoomCategoryRepository roomCategoryRepository)
         {
@@ -30,12 +32,11 @@ namespace SGRH.Application.UseCases.Hotel.RoomCategory
             if (allRoomsResult.IsSuccess && allRoomsResult.Data != null)
             {
                 // Verifica si alguna habitación tiene el CategoryId especificado y está activa
-                if (allRoomsResult.Data.Any(r => r.CategoryId == categoryId && r.Status != "deleted" && r.Status != "inactive")) // Asumiendo que "deleted" e "inactive" son estados no asociados
+                if (allRoomsResult.Data.Any(r => r.CategoryId == categoryId && r.Status != "deleted" && r.Status != "inactive"))
                 {
                     return OperationResult<string>.Failure($"Room category ID {categoryId} cannot be deleted because it has associated active rooms.");
                 }
             }
-            // Si hay un error al obtener las habitaciones, o si no hay datos, no lo consideramos un error de asociación aquí.
             return OperationResult<string>.Success("Room category has no active associated rooms.");
         }
     }
