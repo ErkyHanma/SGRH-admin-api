@@ -22,11 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Context\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SGRH.Application\SGRH.Application.csproj" />
   </ItemGroup>
 
