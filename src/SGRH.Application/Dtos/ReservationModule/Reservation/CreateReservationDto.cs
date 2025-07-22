@@ -2,7 +2,6 @@
 {
     public class CreateReservationDto : BaseReservationDto
     {
-        public int CreatedBy { get; set; }
     }
 }
 

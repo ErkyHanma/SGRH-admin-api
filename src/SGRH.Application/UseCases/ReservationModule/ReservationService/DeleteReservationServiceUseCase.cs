@@ -3,7 +3,7 @@ using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Domain.Base;
 
-namespace SGRH.Application.UseCases.ReservationModule
+namespace SGRH.Application.UseCases.ReservationModule.ReservationService
 {
     public class DeleteReservationServiceUseCase
     {

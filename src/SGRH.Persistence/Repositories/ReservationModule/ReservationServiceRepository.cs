@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.ReservationModule.ReservationService;
-using SGRH.Application.Dtos.ReservationModule.ReservationService.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Helpers;
@@ -25,16 +24,14 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
         public async Task<OperationResult<CreateReservationServiceDto>> AddAsync(CreateReservationServiceDto createReservationServiceDto)
         {
-            _logger.Info("Add service for a reservation");
 
-            // Validation
-            var createReservationServiceDtoValidator = new CreateReservationServiceDtoValidator();
-            var validationResult = createReservationServiceDtoValidator.Validate(createReservationServiceDto);
-
-            if (!validationResult.IsSuccess)
+            if (createReservationServiceDto == null)
             {
-                return validationResult;
+                _logger.ErrorNoEx("Error adding reservation service. Dto Null");
+                return OperationResult<CreateReservationServiceDto>.Failure("Dto cannot be null.");
             }
+
+            _logger.Info("Adding Reservation service", createReservationServiceDto);
 
             var parameters = new Dictionary<string, object>()
             {
@@ -61,16 +58,15 @@ namespace SGRH.Persistence.Repositories.ReservationModule
 
         public async Task<OperationResult<DeleteReservationServiceDto>> DeleteAsync(DeleteReservationServiceDto deleteReservationServiceDto)
         {
-            _logger.Info("Remove service for a reservation");
 
-            // Validation
-            var deleteReservationServiceDtoValidator = new DeleteReservationServiceDtoValidator();
-            var validationResult = deleteReservationServiceDtoValidator.Validate(deleteReservationServiceDto);
-
-            if (!validationResult.IsSuccess)
+            if (deleteReservationServiceDto == null)
             {
-                return validationResult;
+                _logger.ErrorNoEx("Error removing reservation service. Dto Null");
+                return OperationResult<DeleteReservationServiceDto>.Failure("Dto cannot be null.");
             }
+
+
+            _logger.Info("Remove service for a reservation");
 
             var parameters = new Dictionary<string, object>()
             {

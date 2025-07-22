@@ -3,7 +3,7 @@ using SGRH.Application.Dtos.ReservationModule.Reservation;
 using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.ReservationModule;
-using SGRH.Application.UseCases.ReservationModule;
+using SGRH.Application.UseCases.ReservationModule.Reservation;
 using SGRH.Domain.Base;
 
 namespace SGRH.Application.Services.ReservationModule
@@ -82,9 +82,6 @@ namespace SGRH.Application.Services.ReservationModule
         {
             try
             {
-                _logger.Info("Creating reservation", createReservationDto);
-
-
                 var createReservationDtoValidator = new CreateReservationDtoValidator();
                 var validationResult = createReservationDtoValidator.Validate(createReservationDto);
 
@@ -111,7 +108,6 @@ namespace SGRH.Application.Services.ReservationModule
         {
             try
             {
-                _logger.Info("Updating reservation", updateReservationDto);
 
                 var updateReservationDtoValidator = new UpdateReservationDtoValidator();
                 var validationResult = updateReservationDtoValidator.Validate(updateReservationDto);
@@ -143,13 +139,13 @@ namespace SGRH.Application.Services.ReservationModule
                 return OperationResult<UpdateReservationDto>.Failure($"Error updating Reservation {ex.Message}");
             }
         }
-        public async Task<OperationResult<DisableReservationDto>> DeleteReservationAsync(DisableReservationDto disableReservationDto)
+        public async Task<OperationResult<DeleteReservationDto>> DeleteReservationAsync(DeleteReservationDto disableReservationDto)
         {
             try
             {
-                _logger.Info("Deleting reservation", disableReservationDto);
 
-                var validationResult = DisableReservationDtoValidator.Validate(disableReservationDto);
+                var deleteReservationDtoValidator = new DeleteReservationDtoValidator();
+                var validationResult = deleteReservationDtoValidator.Validate(disableReservationDto);
 
                 if (!validationResult.IsSuccess)
                 {
@@ -160,7 +156,7 @@ namespace SGRH.Application.Services.ReservationModule
 
                 if (!reservationExits.IsSuccess)
                 {
-                    return OperationResult<DisableReservationDto>.Failure($"The reservation with ID {disableReservationDto.ReservationId} does not exists");
+                    return OperationResult<DeleteReservationDto>.Failure($"The reservation with ID {disableReservationDto.ReservationId} does not exists");
                 }
 
                 var result = await _reservationRepository.DeleteAsync(disableReservationDto);
@@ -168,21 +164,21 @@ namespace SGRH.Application.Services.ReservationModule
                 if (!result.IsSuccess)
                 {
                     _logger.ErrorNoEx($"An error has occured while deleting Reservation: {result.Message}.");
-                    return OperationResult<DisableReservationDto>.Failure($"Error trying to delete a Reservation {result.Message}");
+                    return OperationResult<DeleteReservationDto>.Failure($"Error trying to delete a Reservation {result.Message}");
                 }
 
                 if (result.Data is null)
                 {
-                    return OperationResult<DisableReservationDto>.Failure("No Reservation found.");
+                    return OperationResult<DeleteReservationDto>.Failure("No Reservation found.");
                 }
 
-                return OperationResult<DisableReservationDto>.Success(result.Message, result.Data);
+                return OperationResult<DeleteReservationDto>.Success(result.Message, result.Data);
 
             }
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error");
-                return OperationResult<DisableReservationDto>.Failure($"Error deleting Reservation {ex.Message}");
+                return OperationResult<DeleteReservationDto>.Failure($"Error deleting Reservation {ex.Message}");
             }
         }
         public async Task<OperationResult<CheckRoomAvailabilityResultDto>> CheckAvailability(int roomId, DateTime startDate, DateTime endDate)
@@ -201,7 +197,7 @@ namespace SGRH.Application.Services.ReservationModule
 
             try
             {
-                _logger.Info($"Checking availability for room {roomId} from {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}");
+
 
                 var result = await _reservationRepository.CheckAvailability(roomId, startDate, endDate);
 

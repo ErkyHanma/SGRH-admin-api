@@ -13,7 +13,7 @@ namespace SGRH.Application.Dtos.ReservationModule.Reservation.Validators
                 return OperationResult<TDto>.Failure("ClientId must be greater than zero.");
 
             if (dto.RoomId <= 0)
-                return OperationResult<TDto>.Failure("RoomId must be greater than zero pene2.");
+                return OperationResult<TDto>.Failure("RoomId must be greater than zero.");
 
             if (dto.StartDate >= dto.EndDate)
                 return OperationResult<TDto>.Failure("StartDate must be before EndDate.");

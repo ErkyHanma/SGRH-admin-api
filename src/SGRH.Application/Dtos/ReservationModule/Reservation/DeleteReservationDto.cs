@@ -1,6 +1,6 @@
 ﻿namespace SGRH.Application.Dtos.ReservationModule.Reservation
 {
-    public class UpdateReservationDto : BaseReservationDto
+    public record class DeleteReservationDto
     {
         public int ReservationId { get; set; }
     }

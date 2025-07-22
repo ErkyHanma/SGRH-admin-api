@@ -3,7 +3,7 @@ using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
 
 
-namespace SGRH.Application.UseCases.ReservationModule
+namespace SGRH.Application.UseCases.ReservationModule.Reservation
 {
     public class CreateReservationUseCase
     {
@@ -23,11 +23,6 @@ namespace SGRH.Application.UseCases.ReservationModule
                 if (createReservationDto.StartDate <= DateTime.Now || createReservationDto.EndDate <= DateTime.Now)
                 {
                     return OperationResult<CreateReservationDto>.Failure("Reservation cannot be in the past");
-                }
-
-                if (createReservationDto.StartDate >= createReservationDto.EndDate)
-                {
-                    return OperationResult<CreateReservationDto>.Failure("Start date must be before end date.");
                 }
 
                 var reservationIsPossible = await _reservationRepository.CheckAvailability(createReservationDto.RoomId, createReservationDto.StartDate, createReservationDto.EndDate);
