@@ -30,7 +30,7 @@ namespace SGRH.Api.Controllers
         }
 
         // GET api/<RateController>/5
-        [HttpGet("{id}")]
+        [HttpGet("GetRateById")]
         public async Task<IActionResult> GetRateById(int id)
         {
             var result = await _rateService.GetRatesByIdAsync(id);
