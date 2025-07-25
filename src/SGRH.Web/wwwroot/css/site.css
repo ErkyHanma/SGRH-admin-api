@@ -20,3 +20,27 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.space {
+       
+   margin-top: 12px;
+   margin-bottom: 8px
+    
+}
+
+.link-edit {
+    color: orange;
+}
+
+.link-details {
+    color: teal;
+}
+
+.link-delete {
+    color: red;
+}
+
+.link-add-service {
+    color: blue;
+}
+

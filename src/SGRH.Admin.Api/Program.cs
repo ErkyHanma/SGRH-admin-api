@@ -29,8 +29,8 @@ namespace SGRH.Api
             // Load .env variables
             Env.Load();
 
-            //var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-            //builder.Configuration["ConnectionStrings:SGRHConnection"] = connectionString;
+            var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+            builder.Configuration["ConnectionStrings:SGRHConnection"] = connectionString;
 
             // Logger
             builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));

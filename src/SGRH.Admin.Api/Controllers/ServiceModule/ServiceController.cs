@@ -18,7 +18,7 @@ namespace SGRH.Api.Controllers.ServiceModule
 
 
 
-        [HttpGet]
+        [HttpGet()]
         public async Task<IActionResult> Get()
         {
             var result = await _serviceService.GetAllServicesAsync();
