@@ -66,7 +66,7 @@ namespace SGRH.Api.Controllers.ReservationModule
         }
 
         [HttpPost("DisableReservation")]
-        public async Task<IActionResult> Post([FromBody] DisableReservationDto disableReservationDto)
+        public async Task<IActionResult> Post([FromBody] DeleteReservationDto disableReservationDto)
         {
             var result = await _reservationService.DeleteReservationAsync(disableReservationDto);
 

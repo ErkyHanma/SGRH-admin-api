@@ -1,0 +1,108 @@
+﻿@model IEnumerable<SGRH.Web.Models.ReservationModule.ReservationModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Reservations List</h1>
+
+<p>
+    <a class="btn btn-primary btn-sm" asp-action="Create">Create Reservation</a>
+
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.reservationId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.reservationDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.totalServicesCost)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.serviceNames)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.createdAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.updatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.clientId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.roomId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.startDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.endDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.guestCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.paymentAmount)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.reservationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.reservationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.totalServicesCost)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.serviceNames)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.createdAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.updatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.clientId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.roomId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.startDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.endDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.guestCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.paymentAmount)
+            </td>
+            <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.reservationId }, new { @class = "btn btn-warning btn-sm" }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.reservationId }, new { @class = "btn btn-info btn-sm" }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.reservationId }, new { @class = "btn btn-danger btn-sm" })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
