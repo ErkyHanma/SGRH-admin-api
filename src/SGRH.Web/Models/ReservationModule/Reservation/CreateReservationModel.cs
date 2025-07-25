@@ -1,6 +1,6 @@
-﻿namespace SGRH.Web.Models.ReservationModule
+﻿namespace SGRH.Web.Models.ReservationModule.Reservation
 {
-    public abstract class BaseReservationModel
+    public class CreateReservationModel
     {
         public int clientId { get; set; }
         public int roomId { get; set; }
@@ -8,6 +8,6 @@
         public DateTime endDate { get; set; }
         public string status { get; set; }
         public int guestCount { get; set; }
-        public decimal paymentAmount { get; set; }
+        public int paymentAmount { get; set; }
     }
 }

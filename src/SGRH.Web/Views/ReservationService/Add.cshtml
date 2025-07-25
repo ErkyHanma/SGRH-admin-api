@@ -1,0 +1,39 @@
+﻿@model SGRH.Web.Models.ReservationModule.ReservationService.AddReservationServiceModel
+
+@{
+    ViewData["Title"] = "Add Service";
+    var services = ViewBag.Services as List<SGRH.Web.Models.ServiceModule.ServiceModel>;
+}
+
+<h1>Add Service to Reservation</h1>
+
+<form asp-action="Add" method="post">
+    <input type="hidden" asp-for="reservationId" />
+
+    <div class="form-group">
+        <label for="ServiceId">Choose a Service:</label>
+        <select asp-for="serviceId" class="form-control">
+            <option value="">-- Please choose a service --</option>
+            @if (services != null)
+            {
+                foreach (var service in services)
+                {
+                    <option value="@service.serviceId">@service.name</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="serviceId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary space">Add Service</button>
+</form>
+
+<div>
+    <a asp-action="Index" asp-controller="Reservation">Back to list</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

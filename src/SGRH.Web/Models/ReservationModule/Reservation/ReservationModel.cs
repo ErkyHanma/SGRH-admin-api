@@ -1,4 +1,4 @@
-﻿namespace SGRH.Web.Models.ReservationModule
+﻿namespace SGRH.Web.Models.ReservationModule.Reservation
 {
     public class ReservationModel : BaseReservationModel
     {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGRH.Web.Models.ReservationModule;
-using SGRH.Web.Models.ReservationModule.Response;
-
+using SGRH.Web.Models.ReservationModule.Reservation;
+using SGRH.Web.Models.ReservationModule.Reservation.Response;
 
 namespace SGRH.Web.Controllers.ReservationModule
 {

@@ -1,0 +1,39 @@
+﻿@model SGRH.Web.Models.ReservationModule.ReservationService.DeleteReservationServiceModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h4>Type Id for the service you want to delete</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Delete">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="space form-group">
+                <input type="hidden" asp-for="reservationId" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="serviceId" class="control-label"></label>
+                <input asp-for="serviceId" class="form-control" />
+                <span asp-validation-for="serviceId" class="text-danger"></span>
+            </div>
+            <div class="space form-group">
+                <input type="submit" value="Delete" class="btn btn-danger" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Reservation" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

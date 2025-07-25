@@ -1,4 +1,5 @@
-﻿@model IEnumerable<SGRH.Web.Models.ReservationModule.ReservationModel>
+﻿@using SGRH.Web.Models.ReservationModule.Reservation
+@model IEnumerable<ReservationModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -101,6 +102,8 @@
                     @Html.ActionLink("Edit", "Edit", new { id = item.reservationId }, new { @class = "btn btn-warning btn-sm" }) |
                     @Html.ActionLink("Details", "Details", new { id = item.reservationId }, new { @class = "btn btn-info btn-sm" }) |
                     @Html.ActionLink("Delete", "Delete", new { id = item.reservationId }, new { @class = "btn btn-danger btn-sm" })
+                    @Html.ActionLink("Add Service", "Add", "ReservationService", new { id = item.reservationId }, new { @class = "link-add-service" })
+                    @Html.ActionLink("Delete Service", "Delete", "ReservationService", new { id = item.reservationId }, new { @class = "link-delete-service" })
             </td>
         </tr>
 }
