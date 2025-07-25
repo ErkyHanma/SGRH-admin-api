@@ -28,19 +28,15 @@ body {
     
 }
 
-.link-edit {
-    color: orange;
+.btn-light-gray {
+    background-color: #e2e6ea;
+    color: #212529;
+    border: 1px solid #dae0e5;
 }
 
-.link-details {
-    color: teal;
-}
+    .btn-light-gray:hover {
+        background-color: #d6d8db;
+    }
 
-.link-delete {
-    color: red;
-}
 
-.link-add-service {
-    color: blue;
-}
 

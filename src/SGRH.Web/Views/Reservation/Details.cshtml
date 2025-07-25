@@ -5,10 +5,9 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>Reservation Details</h1>
 
 <div>
-    <h4>Reservation</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -92,6 +91,6 @@
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.reservationId }, new { @class = "btn btn-warning btn-sm" }) |
+    <a asp-action="Index" class="btn btn-light-gray btn-sm">Back to List</a>
 </div>
