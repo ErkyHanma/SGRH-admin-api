@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SGRH.Web.Models;
 using SGRH.Web.Models.ReservationModule.Reservation;
 using SGRH.Web.Models.ReservationModule.Reservation.Response;
+using SGRH.Web.Models.ServiceModule;
+using System.Text.Json;
 
 namespace SGRH.Web.Controllers.ReservationModule
 {
@@ -30,7 +33,7 @@ namespace SGRH.Web.Controllers.ReservationModule
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getAllReservationResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllReservationResponse>(responseString);
+                        getAllReservationResponse = JsonSerializer.Deserialize<GetAllReservationResponse>(responseString);
                     }
                     else
                     {
@@ -74,7 +77,7 @@ namespace SGRH.Web.Controllers.ReservationModule
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getReservationByIdResponse = System.Text.Json.JsonSerializer.Deserialize<GetReservationByIdResponse>(responseString);
+                        getReservationByIdResponse = JsonSerializer.Deserialize<GetReservationByIdResponse>(responseString);
                     }
                     else
                     {
@@ -121,16 +124,31 @@ namespace SGRH.Web.Controllers.ReservationModule
                     client.BaseAddress = new Uri(baseUrl ?? "");
                     var response = await client.PostAsJsonAsync("Reservation/CreateReservation", createReservationModel);
 
+                    var responseString = await response.Content.ReadAsStringAsync();
+
                     if (response.IsSuccessStatusCode)
                     {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        createReservationResponse = System.Text.Json.JsonSerializer.Deserialize<CreateReservationResponse>(responseString);
+                        createReservationResponse = JsonSerializer.Deserialize<CreateReservationResponse>(responseString);
 
 
                         if (createReservationResponse != null && createReservationResponse.isSuccess)
                         {
                             return RedirectToAction(nameof(Index));
                         }
+                    }
+                    else
+                    {
+                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
+
+                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
+                        {
+                            ModelState.AddModelError(string.Empty, errorResponse.message);
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                        }
+
                     }
 
                 }
@@ -160,7 +178,7 @@ namespace SGRH.Web.Controllers.ReservationModule
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        editReservationResponse = System.Text.Json.JsonSerializer.Deserialize<EditReservationResponse>(responseString);
+                        editReservationResponse = JsonSerializer.Deserialize<EditReservationResponse>(responseString);
                     }
                     else
                     {
@@ -202,16 +220,31 @@ namespace SGRH.Web.Controllers.ReservationModule
                     client.BaseAddress = new Uri(baseUrl ?? "");
                     var response = await client.PostAsJsonAsync("Reservation/UpdateReservation", editReservationModel);
 
+                    var responseString = await response.Content.ReadAsStringAsync();
+
                     if (response.IsSuccessStatusCode)
                     {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        editReservationResponse = System.Text.Json.JsonSerializer.Deserialize<EditReservationResponse>(responseString);
+                        editReservationResponse = JsonSerializer.Deserialize<EditReservationResponse>(responseString);
 
 
                         if (editReservationResponse != null && editReservationResponse.isSuccess)
                         {
                             return RedirectToAction(nameof(Index));
                         }
+                    }
+                    else
+                    {
+                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
+
+                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
+                        {
+                            ModelState.AddModelError(string.Empty, errorResponse.message);
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                        }
+
                     }
 
                 }
@@ -241,7 +274,7 @@ namespace SGRH.Web.Controllers.ReservationModule
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        deleteReservationResponse = System.Text.Json.JsonSerializer.Deserialize<DeleteReservationResponse>(responseString);
+                        deleteReservationResponse = JsonSerializer.Deserialize<DeleteReservationResponse>(responseString);
                     }
                     else
                     {
@@ -282,16 +315,31 @@ namespace SGRH.Web.Controllers.ReservationModule
                     client.BaseAddress = new Uri(baseUrl ?? "");
                     var response = await client.PostAsJsonAsync("Reservation/DisableReservation", deleteReservationModel);
 
+                    var responseString = await response.Content.ReadAsStringAsync();
+
                     if (response.IsSuccessStatusCode)
                     {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        deleteReservationResponse = System.Text.Json.JsonSerializer.Deserialize<DeleteReservationResponse>(responseString);
+                        deleteReservationResponse = JsonSerializer.Deserialize<DeleteReservationResponse>(responseString);
 
 
                         if (deleteReservationResponse != null && deleteReservationResponse.isSuccess)
                         {
                             return RedirectToAction(nameof(Index));
                         }
+                    }
+                    else
+                    {
+                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
+
+                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
+                        {
+                            ModelState.AddModelError(string.Empty, errorResponse.message);
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                        }
+
                     }
 
                 }

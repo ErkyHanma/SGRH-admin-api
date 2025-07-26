@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SGRH.Web.Models;
 using SGRH.Web.Models.ReservationModule.ReservationService;
 using SGRH.Web.Models.ReservationModule.ReservationService.Response;
 using SGRH.Web.Models.ServiceModule;
 using SGRH.Web.Models.ServiceModule.Response;
+using System.Text.Json;
 
 namespace SGRH.Web.Controllers.ReservationModule
 {
@@ -32,7 +34,7 @@ namespace SGRH.Web.Controllers.ReservationModule
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getAllServicesResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllServicesResponse>(responseString);
+                        getAllServicesResponse = JsonSerializer.Deserialize<GetAllServicesResponse>(responseString);
 
                         ViewBag.Services = getAllServicesResponse.data ?? new List<ServiceModel>();
 
@@ -80,10 +82,11 @@ namespace SGRH.Web.Controllers.ReservationModule
                     client.BaseAddress = new Uri(baseUrl ?? "");
                     var response = await client.PostAsJsonAsync("ReservationService/AddReservationService", addReservationServiceModel);
 
+                    var responseString = await response.Content.ReadAsStringAsync();
+
                     if (response.IsSuccessStatusCode)
                     {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        addReservationServiceResponse = System.Text.Json.JsonSerializer.Deserialize<AddReservationServiceResponse>(responseString);
+                        addReservationServiceResponse = JsonSerializer.Deserialize<AddReservationServiceResponse>(responseString);
 
 
                         if (addReservationServiceResponse != null && addReservationServiceResponse.isSuccess)
@@ -91,6 +94,20 @@ namespace SGRH.Web.Controllers.ReservationModule
                             return RedirectToAction("Index", "Reservation");
 
                         }
+                    }
+                    else
+                    {
+                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
+
+                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
+                        {
+                            ModelState.AddModelError(string.Empty, errorResponse.message);
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                        }
+
                     }
 
                 }
@@ -103,7 +120,6 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             return View(addReservationServiceResponse);
         }
-
 
 
         // GET: ReservationServiceController/Delete/5
@@ -132,10 +148,11 @@ namespace SGRH.Web.Controllers.ReservationModule
                     client.BaseAddress = new Uri(baseUrl ?? "");
                     var response = await client.PostAsJsonAsync("ReservationService/DeleteReservationService", deleteReservationServiceModel);
 
+                    var responseString = await response.Content.ReadAsStringAsync();
+
                     if (response.IsSuccessStatusCode)
                     {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        deleteReservationServiceResponse = System.Text.Json.JsonSerializer.Deserialize<DeleteReservationServiceResponse>(responseString);
+                        deleteReservationServiceResponse = JsonSerializer.Deserialize<DeleteReservationServiceResponse>(responseString);
 
 
                         if (deleteReservationServiceResponse != null && deleteReservationServiceResponse.isSuccess)
@@ -143,6 +160,20 @@ namespace SGRH.Web.Controllers.ReservationModule
                             return RedirectToAction("Index", "Reservation");
 
                         }
+                    }
+                    else
+                    {
+                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
+
+                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
+                        {
+                            ModelState.AddModelError(string.Empty, errorResponse.message);
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                        }
+
                     }
 
                 }
