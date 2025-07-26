@@ -10,4 +10,8 @@
     <ProjectReference Include="..\SGRH.Persistence\SGRH.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\User\" />
+  </ItemGroup>
+
 </Project>
