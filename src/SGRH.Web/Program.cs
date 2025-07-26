@@ -16,12 +16,23 @@ using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
 using SGRH.Persistence.Repositories.UserManagement;
+using SGRH.Web.Interfaces.HttpClients.ServiceModule;
+using SGRH.Web.Services.HttpClients.ServiceModule;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 builder.Configuration["ConnectionStrings:SGRHConnection"] = "Host=aws-0-us-east-2.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.vcnsurdtnpeycpifqzxl;Password=Erkyhanma002;SSL Mode=Require;Trust Server Certificate=true";
+
+builder.Services.AddTransient<IServiceHttpClient, ServiceHttpClient>();
+
+var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
+
+builder.Services.AddHttpClient<IServiceHttpClient, ServiceHttpClient>(client =>
+{
+    client.BaseAddress = new Uri(baseUrl);
+});
+
 
 // Logger
 builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));

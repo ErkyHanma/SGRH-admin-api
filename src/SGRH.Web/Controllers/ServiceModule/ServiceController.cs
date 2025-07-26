@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGRH.Web.Models;
+using SGRH.Web.Interfaces.HttpClients.ServiceModule;
 using SGRH.Web.Models.ServiceModule;
 using SGRH.Web.Models.ServiceModule.Response;
-using System.Text.Json;
 
 namespace SGRH.Web.Controllers.ServiceModule
 {
@@ -10,10 +9,12 @@ namespace SGRH.Web.Controllers.ServiceModule
     {
 
         private readonly IConfiguration _configuration;
+        private readonly IServiceHttpClient _serviceHttpClient;
 
-        public ServiceController(IConfiguration configuration)
+        public ServiceController(IConfiguration configuration, IServiceHttpClient serviceHttpClient)
         {
             _configuration = configuration;
+            _serviceHttpClient = serviceHttpClient;
         }
 
         // GET: ServiceController
@@ -23,27 +24,8 @@ namespace SGRH.Web.Controllers.ServiceModule
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
+                getAllServiceResponse = await _serviceHttpClient.GetAllServicesAsync();
 
-                    var response = await client.GetAsync("Service");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getAllServiceResponse = JsonSerializer.Deserialize<GetAllServicesResponse>(responseString);
-                    }
-                    else
-                    {
-                        getAllServiceResponse = new GetAllServicesResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -54,12 +36,8 @@ namespace SGRH.Web.Controllers.ServiceModule
                 };
             }
 
-
-            var services = getAllServiceResponse?.data ?? new List<ServiceModel>();
-
-            return View(services);
+            return View(getAllServiceResponse?.data ?? new List<ServiceModel>());
         }
-
 
         // GET: ServiceController/Details/5
         public async Task<IActionResult> Details(int id)
@@ -69,30 +47,7 @@ namespace SGRH.Web.Controllers.ServiceModule
 
             try
             {
-                using (var client = new HttpClient())
-                {
-
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.GetAsync($"Service/{id}");
-
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getServiceByIdResponse = JsonSerializer.Deserialize<GetServiceByIdResponse>(responseString);
-                    }
-                    else
-                    {
-                        getServiceByIdResponse = new GetServiceByIdResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
-
-
-                }
+                getServiceByIdResponse = await _serviceHttpClient.GetServiceByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -119,44 +74,27 @@ namespace SGRH.Web.Controllers.ServiceModule
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateServiceModel createServiceModel)
         {
-            BaseResponse<ServiceModel> ServiceResponse = null;
+            CreateServiceResponse createServiceResponse = null;
 
             try
             {
-                using (var client = new HttpClient())
+                createServiceResponse = await _serviceHttpClient.CreateServiceAsync(createServiceModel);
+
+                if (createServiceResponse != null && createServiceResponse.isSuccess)
                 {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
 
-                    var response = await client.PostAsJsonAsync("Service/CreateService", createServiceModel);
-
-                    var responseContent = await response.Content.ReadAsStringAsync();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        ServiceResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseContent);
-
-                        if (ServiceResponse != null && ServiceResponse.isSuccess)
-                        {
-                            TempData["SuccessMessage"] = "Service created successfully.";
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseContent);
-
-                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
-                        {
-                            ModelState.AddModelError(string.Empty, errorResponse.message);
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
-                        }
-
-                    }
+                    return RedirectToAction(nameof(Index));
                 }
+
+                if (createServiceResponse != null && !string.IsNullOrEmpty(createServiceResponse.message))
+                {
+                    ModelState.AddModelError(string.Empty, createServiceResponse.message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                }
+
             }
             catch (Exception ex)
             {
@@ -171,46 +109,23 @@ namespace SGRH.Web.Controllers.ServiceModule
         // GET: ServiceController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            GetServiceByIdResponse getServiceByIdResponse = null;
+            EditServiceResponse editServiceResponse = null;
 
             try
             {
-                using (var client = new HttpClient())
-                {
-
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.GetAsync($"Service/{id}");
-
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getServiceByIdResponse = JsonSerializer.Deserialize<GetServiceByIdResponse>(responseString);
-                    }
-                    else
-                    {
-                        getServiceByIdResponse = new GetServiceByIdResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
-
-
-                }
+                editServiceResponse = await _serviceHttpClient.GetEditServiceByIdAsync(id);
             }
             catch (Exception ex)
             {
-                getServiceByIdResponse = new GetServiceByIdResponse
+                editServiceResponse = new EditServiceResponse
                 {
                     isSuccess = false,
-                    message = "Error retrieving data."
+                    message = $"Error retrieving data. {ex.Message}"
                 };
 
             }
 
-            return View(getServiceByIdResponse?.data ?? new ServiceModel());
+            return View(editServiceResponse?.data ?? new ServiceModel());
         }
 
         // POST: ServiceController/Edit/5
@@ -222,38 +137,21 @@ namespace SGRH.Web.Controllers.ServiceModule
 
             try
             {
-                using (var client = new HttpClient())
+                editServiceResponse = await _serviceHttpClient.EditServiceAsync(serviceModel);
+
+                if (editServiceResponse != null && editServiceResponse.isSuccess)
                 {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.PostAsJsonAsync($"Service/UpdateService", serviceModel);
-
-                    var responseString = await response.Content.ReadAsStringAsync();
+                    return RedirectToAction(nameof(Index));
+                }
 
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        editServiceResponse = JsonSerializer.Deserialize<EditServiceResponse>(responseString);
-
-                        if (editServiceResponse != null && editServiceResponse.isSuccess)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
-
-                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
-                        {
-                            ModelState.AddModelError(string.Empty, errorResponse.message);
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
-                        }
-
-                    }
+                if (editServiceResponse != null && !editServiceResponse.isSuccess && !string.IsNullOrEmpty(editServiceResponse.message))
+                {
+                    ModelState.AddModelError(string.Empty, editServiceResponse.message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
                 }
             }
             catch (Exception ex)
@@ -268,34 +166,12 @@ namespace SGRH.Web.Controllers.ServiceModule
         // GET: ServiceController/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
+
             DeleteServiceResponse deleteServiceResponse = null;
 
             try
             {
-                using (var client = new HttpClient())
-                {
-
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.GetAsync($"Service/{id}");
-
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        deleteServiceResponse = JsonSerializer.Deserialize<DeleteServiceResponse>(responseString);
-                    }
-                    else
-                    {
-                        deleteServiceResponse = new DeleteServiceResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
-
-
-                }
+                deleteServiceResponse = await _serviceHttpClient.GetDeleteServiceByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -319,44 +195,22 @@ namespace SGRH.Web.Controllers.ServiceModule
 
             try
             {
+                deleteServiceResponse = await _serviceHttpClient.DeleteServiceAsync(deleteServiceModel);
 
-                using (var client = new HttpClient())
+                if (deleteServiceResponse != null && deleteServiceResponse.isSuccess)
                 {
-
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.PostAsJsonAsync($"Service/DisableService", deleteServiceModel);
-
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-
-                        deleteServiceResponse = JsonSerializer.Deserialize<DeleteServiceResponse>(responseString);
-
-                        if (deleteServiceResponse != null && deleteServiceResponse.isSuccess)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
-
-                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
-                        {
-                            ModelState.AddModelError(string.Empty, errorResponse.message);
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
-                        }
-
-                    }
-
-
+                    return RedirectToAction(nameof(Index));
                 }
 
+
+                if (deleteServiceResponse != null && !deleteServiceResponse.isSuccess && !string.IsNullOrEmpty(deleteServiceResponse.message))
+                {
+                    ModelState.AddModelError(string.Empty, deleteServiceResponse.message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                }
             }
             catch
             {
