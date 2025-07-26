@@ -34,7 +34,7 @@ namespace SGRH.Api.Controllers
         }
 
         // GET api/<RoomController>/5
-        [HttpGet("{id}")]
+        [HttpGet("GetRoomById")]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _roomService.GetRoomsById(id);
