@@ -1,45 +1,60 @@
-﻿@model SGRH.Application.Dtos.Hotel.Rate.UpdateRateDto
+﻿@model SGRH.Web.Models.Hotel.Rates.RateEditModel
 
 @{
-    ViewData["Title"] = "Edit Rate";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>Edit Rate</h1>
-<h4>Fill the info to edit!</h4>
+<h1>Edit a Rate</h1>
+<h4>Edit a rate here!</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <input asp-for="RateId" type="hidden" />
-
+            <input type="hidden" asp-for="rateId" />
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label">Category Id</label>
-                <input asp-for="CategoryId" class="form-control" />
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                <label asp-for="categoryId" class="control-label"></label>
+                <input asp-for="categoryId" class="form-control" />
+                <span asp-validation-for="categoryId" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label asp-for="SeasonId" class="control-label">Season Id</label>
-                <input asp-for="SeasonId" class="form-control" />
-                <span asp-validation-for="SeasonId" class="text-danger"></span>
+                <label asp-for="seasonId" class="control-label"></label>
+                <input asp-for="seasonId" class="form-control" />
+                <span asp-validation-for="seasonId" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label asp-for="NightPrice" class="control-label">Night Price</label>
-                <input asp-for="NightPrice" class="form-control" />
-                <span asp-validation-for="NightPrice" class="text-danger"></span>
+                <label asp-for="nightPrice" class="control-label"></label>
+                <input asp-for="nightPrice" class="form-control" />
+                <span asp-validation-for="nightPrice" class="text-danger"></span>
             </div>
-
-            <div class="form-group">
-                <label asp-for="UpdatedBy" class="control-label">Updated By</label>
-                <input asp-for="UpdatedBy" class="form-control" />
-                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
+                </label>
             </div>
-
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="isDeleted" /> @Html.DisplayNameFor(model => model.isDeleted)
+                </label>
+            </div>
             <div class="form-group">
-                <input type="submit" value="Save Changes" class="btn btn-primary" />
+                <label asp-for="createdAt" class="control-label"></label>
+                <input asp-for="createdAt" class="form-control" />
+                <span asp-validation-for="createdAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="createdBy" class="control-label"></label>
+                <input asp-for="createdBy" class="form-control" />
+                <span asp-validation-for="createdBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="updatedBy" class="control-label"></label>
+                <input asp-for="updatedBy" class="form-control" />
+                <span asp-validation-for="updatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>

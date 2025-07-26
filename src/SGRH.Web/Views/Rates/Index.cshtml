@@ -1,10 +1,10 @@
-﻿@model IEnumerable<RateModel>
+﻿@model IEnumerable<SGRH.Web.Models.Hotel.Rates.RateModel>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>List of All Active Rates</h1>
 
 <p>
     <a asp-action="Create">Create New Rate</a>
@@ -46,43 +46,45 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.rateId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.categoryId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.seasonId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.nightPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.isActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.isDeleted)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.createdAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.createdBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.updatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.updatedAt)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.rateId }) |
-                @Html.ActionLink("Details", "Details", new {  id=item.rateId  }) |
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.rateId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.categoryId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.seasonId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.nightPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.isActive)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.isDeleted)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.createdAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.createdBy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.updatedBy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.updatedAt)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.rateId }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.rateId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.rateId })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
