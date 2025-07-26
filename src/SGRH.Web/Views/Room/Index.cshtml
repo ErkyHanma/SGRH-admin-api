@@ -1,10 +1,11 @@
-﻿@model IEnumerable<SGRH.Application.Dtos.Hotel.Room.RoomDto>
+﻿@model IEnumerable<SGRH.Web.Models.Hotel.Room.RoomModel>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>List of Active Rooms</h1>
+<h1>List of All Active Rooms</h1>
+
 <p>
     <a asp-action="Create">Create New Room</a>
 </p>
@@ -12,31 +13,31 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.RoomId)
+                @Html.DisplayNameFor(model => model.roomId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RoomNumber)
+                @Html.DisplayNameFor(model => model.roomNumber)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryId)
+                @Html.DisplayNameFor(model => model.categoryId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FloorId)
+                @Html.DisplayNameFor(model => model.floorId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RoomImgUrl)
+                @Html.DisplayNameFor(model => model.roomImgUrl)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Status)
+                @Html.DisplayNameFor(model => model.status)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
+                @Html.DisplayNameFor(model => model.createdAt)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
+                @Html.DisplayNameFor(model => model.createdBy)
             </th>
             <th></th>
         </tr>
@@ -45,36 +46,36 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.RoomId)
+                @Html.DisplayFor(modelItem => item.roomId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RoomNumber)
+                @Html.DisplayFor(modelItem => item.roomNumber)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CategoryId)
+                @Html.DisplayFor(modelItem => item.categoryId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FloorId)
+                @Html.DisplayFor(modelItem => item.floorId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Description)
+                @Html.DisplayFor(modelItem => item.description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RoomImgUrl)
+                @Html.DisplayFor(modelItem => item.roomImgUrl)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Status)
+                @Html.DisplayFor(modelItem => item.status)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
+                @Html.DisplayFor(modelItem => item.createdAt)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
+                @Html.DisplayFor(modelItem => item.createdBy)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new {  id = item.RoomId  }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.RoomId }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.RoomId })
+                @Html.ActionLink("Edit", "Edit", new { id=item.roomId  }) |
+                @Html.ActionLink("Details", "Details", new { id=item.roomId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.roomId }) |
             </td>
         </tr>
 }

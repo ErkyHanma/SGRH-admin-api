@@ -1,51 +1,51 @@
-﻿@model SGRH.Application.Dtos.Hotel.Room.CreateRoomDto
+﻿@model SGRH.Web.Models.Hotel.Room.CreateRoomModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Room";
 }
 
-<h1>Create Room</h1>
 
-<h4>Create a room here!</h4>
+
+<h4>Create a new Room!</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="CreatedBy" class="control-label">Created By</label>
-                <input asp-for="CreatedBy" class="form-control" />
-                <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                <label asp-for="roomNumber" class="control-label"></label>
+                <input asp-for="roomNumber" class="form-control" />
+                <span asp-validation-for="roomNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="RoomNumber" class="control-label">Room Number</label>
-                <input asp-for="RoomNumber" class="form-control" />
-                <span asp-validation-for="RoomNumber" class="text-danger"></span>
+                <label asp-for="categoryId" class="control-label"></label>
+                <input asp-for="categoryId" class="form-control" />
+                <span asp-validation-for="categoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label">Category Id</label>
-                <input asp-for="CategoryId" class="form-control" />
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                <label asp-for="floorId" class="control-label"></label>
+                <input asp-for="floorId" class="form-control" />
+                <span asp-validation-for="floorId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FloorId" class="control-label">Floor Id</label>
-                <input asp-for="FloorId" class="form-control" />
-                <span asp-validation-for="FloorId" class="text-danger"></span>
+                <label asp-for="description" class="control-label"></label>
+                <input asp-for="description" class="form-control" />
+                <span asp-validation-for="description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label">Description</label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label asp-for="roomImgUrl" class="control-label"></label>
+                <input asp-for="roomImgUrl" class="form-control" />
+                <span asp-validation-for="roomImgUrl" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="RoomImgUrl" class="control-label">Img URL</label>
-                <input asp-for="RoomImgUrl" class="form-control" />
-                <span asp-validation-for="RoomImgUrl" class="text-danger"></span>
+                <label asp-for="status" class="control-label"></label>
+                <input asp-for="status" class="form-control" />
+                <span asp-validation-for="status" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Status" class="control-label">Status</label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
+                <label asp-for="createdBy" class="control-label"></label>
+                <input asp-for="createdBy" class="form-control" />
+                <span asp-validation-for="createdBy" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

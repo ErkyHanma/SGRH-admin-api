@@ -1,64 +1,55 @@
-﻿@model SGRH.Application.Dtos.Hotel.Room.ModifyRoomDto
+﻿@model SGRH.Web.Models.Hotel.Room.EditRoomModel
 
 @{
-    ViewData["Title"] = "Edit Room";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Edit Room</h1>
 
-<h4>Fill the info to edit!</h4>
+<h4>Edit a room here!</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <input asp-for="RoomId" type="hidden" />
-
+            <input type ="hidden" asp-for="roomId" />
             <div class="form-group">
-                <label asp-for="RoomNumber" class="control-label">Room Number</label>
-                <input asp-for="RoomNumber" class="form-control" />
-                <span asp-validation-for="RoomNumber" class="text-danger"></span>
+                <label asp-for="roomNumber" class="control-label"></label>
+                <input asp-for="roomNumber" class="form-control" />
+                <span asp-validation-for="roomNumber" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label">Category Id</label>
-                <input asp-for="CategoryId" class="form-control" />
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                <label asp-for="categoryId" class="control-label"></label>
+                <input asp-for="categoryId" class="form-control" />
+                <span asp-validation-for="categoryId" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label asp-for="FloorId" class="control-label">Floor Id</label>
-                <input asp-for="FloorId" class="form-control" />
-                <span asp-validation-for="FloorId" class="text-danger"></span>
+                <label asp-for="floorId" class="control-label"></label>
+                <input asp-for="floorId" class="form-control" />
+                <span asp-validation-for="floorId" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label asp-for="Description" class="control-label">Description</label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label asp-for="description" class="control-label"></label>
+                <input asp-for="description" class="form-control" />
+                <span asp-validation-for="description" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label asp-for="RoomImgUrl" class="control-label">Img URL</label>
-                <input asp-for="RoomImgUrl" class="form-control" />
-                <span asp-validation-for="RoomImgUrl" class="text-danger"></span>
+                <label asp-for="roomImgUrl" class="control-label"></label>
+                <input asp-for="roomImgUrl" class="form-control" />
+                <span asp-validation-for="roomImgUrl" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label asp-for="Status" class="control-label">Status</label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
+                <label asp-for="status" class="control-label"></label>
+                <input asp-for="status" class="form-control" />
+                <span asp-validation-for="status" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label asp-for="UpdatedBy" class="control-label">Updated By</label>
-                <input asp-for="UpdatedBy" class="form-control" />
-                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
+                <label asp-for="updatedBy" class="control-label"></label>
+                <input asp-for="updatedBy" class="form-control" />
+                <span asp-validation-for="updatedBy" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <input type="submit" value="Save Changes" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -69,7 +60,5 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
