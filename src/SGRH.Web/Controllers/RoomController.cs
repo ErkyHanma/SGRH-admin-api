@@ -1,55 +1,95 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SGRH.Application.Dtos.Hotel.Room;
-using SGRH.Application.Interfaces.Repositories.Hotel;
-using SGRH.Application.Interfaces.Services.Hotel;
-using SGRH.Domain.Entities.Hotel;
+using SGRH.Web.Models.Hotel.Room.Responses;
+using SGRH.Web.Models.Hotel.Room;
+using SGRH.Web.Models.Hotel.Rates.Responses;
+using SGRH.Web.Models.Hotel.Rates;
 
 namespace SGRH.Web.Controllers
 {
     public class RoomController : Controller
     {
-        public readonly IRoomService _roomService;
-        public RoomController(IRoomService roomService)
-        {
-            _roomService = roomService; // break points aca 
-        }
-
-        // GET: RoomController 
+        // GET: RoomController
         public async Task<IActionResult> Index()
         {
-            var result = await _roomService.GetRooms(); // breakpoints en await
+            GetAllRoomsResponse getAllRoomsResponse = null;
 
-            if (result.IsSuccess)
+            try
             {
-                List<RoomDto> roomList = (List<RoomDto>)result.Data;
-                return View(roomList);
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:5171/api/");
+
+                    var response = await client.GetAsync("Room/GetRooms");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        getAllRoomsResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllRoomsResponse>(responseString);
+                    }
+                    else
+                    {
+                        getAllRoomsResponse = new GetAllRoomsResponse
+                        {
+                            isSuccess = false,
+                            message = "Error retrieving rooms."
+                        };
+                    }
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, result.Message);
-                return View(new Room());
+                getAllRoomsResponse = new GetAllRoomsResponse
+                {
+                    isSuccess = false,
+                    message = $"Error retrieving rooms {ex.Message}."
+                };
             }
+
+            return View(getAllRoomsResponse.data);
         }
 
         // GET: RoomController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var result = await _roomService.GetRoomsById(id);
-
-            if (!result.IsSuccess)
+            GetRoomResponse getRoomResponse = null;
+            try
             {
-                return NotFound();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:5171/api/");
+
+                    var response = await client.GetAsync($"Room/GetRoomById?id={id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        getRoomResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomResponse>(responseString);
+                    }
+                    else
+                    {
+                        getRoomResponse = new GetRoomResponse
+                        {
+                            isSuccess = false,
+                            message = "Error retrieving room."
+                        };
+                    }
+                }
             }
-
-            var room = result.Data; // RoomDto
-
-            return View(room);
+            catch (Exception ex)
+            {
+                getRoomResponse = new GetRoomResponse
+                {
+                    isSuccess = false,
+                    message = $"Error retrieving room {ex.Message}."
+                };
+            }
+            return View(getRoomResponse.data);
         }
 
         // GET: RoomController/Create
-        public ActionResult Create()
+        public IActionResult Create()
         {
             return View();
         }
@@ -57,107 +97,194 @@ namespace SGRH.Web.Controllers
         // POST: RoomController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateRoomDto createRoomDto)
+        public async Task<IActionResult> Create(CreateRoomModel createRoomModel)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(createRoomDto); // regresa el formulario con errores
-            }
+            RoomCreateResponse createResponse = null;
 
-            var result = await _roomService.CreateRoom(createRoomDto);
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:5171/api/");
 
-            if (result.IsSuccess)
-            {
-                return RedirectToAction(nameof(Index));
+                    var response = await client.PostAsJsonAsync("Room/CreateRoom", createRoomModel);
+
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    createResponse = System.Text.Json.JsonSerializer.Deserialize<RoomCreateResponse>(responseString);
+
+                    if (createResponse != null && !createResponse.isSuccess)
+                    {
+                        ModelState.AddModelError("", createResponse.message);
+                        return View(createRoomModel);
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, result.Message);
-                return View(createRoomDto);
+                ModelState.AddModelError("", "Internal error: " + ex.Message);
+                return View(createRoomModel);
             }
         }
 
         // GET: RoomController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var result = await _roomService.GetRoomsById(id);
-
-            if (!result.IsSuccess)
+            GetRoomResponse getRoomResponse = null;
+            try
             {
-                return NotFound();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:5171/api/");
+                    var response = await client.GetAsync($"Room/GetRoomById?id={id}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        getRoomResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomResponse>(responseString);
+                    }
+                    else
+                    {
+                        getRoomResponse = new GetRoomResponse
+                        {
+                            isSuccess = false,
+                            message = "Error retrieving room."
+                        };
+                    }
+                }
             }
-
-            var dto = new ModifyRoomDto
+            catch (Exception ex)
             {
-                RoomId = result.Data.RoomId,
-                RoomNumber = result.Data.RoomNumber,
-                CategoryId = result.Data.CategoryId,
-                FloorId = result.Data.FloorId,
-                Status = result.Data.Status
+                getRoomResponse = new GetRoomResponse
+                {
+                    isSuccess = false,
+                    message = $"Error retrieving room {ex.Message}."
+                };
+            }
+            if (getRoomResponse?.data == null)
+                return NotFound();
+            var editModel = new EditRoomModel
+            {
+                roomId = getRoomResponse.data.roomId,
+                roomNumber = getRoomResponse.data.roomNumber,
+                categoryId = getRoomResponse.data.categoryId,
+                floorId = getRoomResponse.data.floorId,
+                description = getRoomResponse.data.description,
+                roomImgUrl = getRoomResponse.data.roomImgUrl,
+                status = getRoomResponse.data.status
             };
-
-            return View(dto);
+            return View(editModel);
         }
 
         // POST: RoomController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ModifyRoomDto modifyRoomDto)
+        public async Task<IActionResult> Edit(EditRoomModel editRoomModel)
         {
-            if (!ModelState.IsValid)
+            RoomEditResponse editResponse = null;
+
+            try
             {
-                return View(modifyRoomDto);
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:5171/api/");
+
+                    var response = await client.PutAsJsonAsync("Room/ModifyRoom", editRoomModel);
+
+                    var responseString = await response.Content.ReadAsStringAsync(); 
+
+                    editResponse = System.Text.Json.JsonSerializer.Deserialize<RoomEditResponse>(responseString);
+
+                    if (editResponse != null && !editResponse.isSuccess)
+                    {
+                        ModelState.AddModelError("", editResponse.message);
+                        return View(editRoomModel);
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }
             }
-
-            var result = await _roomService.UpdateRoom(modifyRoomDto);
-
-            if (result.IsSuccess)
+            catch (Exception ex)
             {
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Internal error: " + ex.Message);
+                return View(editRoomModel);
             }
-
-            ModelState.AddModelError(string.Empty, result.Message);
-            return View(modifyRoomDto);
         }
 
         // GET: RoomController/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _roomService.GetRoomsById(id);
-
-            if (!result.IsSuccess)
+            GetRoomResponse getRoomResponse = null;
+            try
             {
-                return NotFound();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:5171/api/");
+                    var response = await client.GetAsync($"Room/GetRoomById?id={id}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        getRoomResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomResponse>(responseString);
+                    }
+                    else
+                    {
+                        getRoomResponse = new GetRoomResponse
+                        {
+                            isSuccess = false,
+                            message = "Error retrieving room."
+                        };
+                    }
+                }
             }
-
-            var disableDto = new DisableRoomDto
+            catch (Exception ex)
             {
-                RoomId = id
-                // UpdatedBy se completa en el formulario  
+                getRoomResponse = new GetRoomResponse
+                {
+                    isSuccess = false,
+                    message = $"Error retrieving room {ex.Message}."
+                };
+            }
+            if (getRoomResponse?.data == null)
+                return NotFound();
+            var deleteModel = new DeleteRoomModel
+            {
+                roomId = getRoomResponse.data.roomId
             };
-
-            return View(disableDto);
+            return View(deleteModel);
         }
 
         // POST: RoomController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(DisableRoomDto disableRoomDto)
+        public async Task<IActionResult> Delete(int id, DeleteRoomModel deleteRoomModel)
         {
-            if (!ModelState.IsValid)
+            DeleteRoomResponse deleteResponse = null;
+            try
             {
-                return View(disableRoomDto);
+                using (var client = new HttpClient()) // http://localhost:5171/api/Room/DeleteRoom
+                {
+                    client.BaseAddress = new Uri("http://localhost:5171/api/");
+
+                    var response = await client.PutAsJsonAsync("Room/DisableRoom", deleteRoomModel);
+
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    deleteResponse = System.Text.Json.JsonSerializer.Deserialize<DeleteRoomResponse>(responseString);
+
+                    if (deleteResponse != null && !deleteResponse.isSuccess)
+                    {
+                        ModelState.AddModelError("", deleteResponse.message);
+                        return View(deleteRoomModel);
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
             }
-
-            var result = await _roomService.DeleteRoom(disableRoomDto);
-
-            if (result.IsSuccess)
+            catch (Exception ex)
             {
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Internal error: " + ex.Message);
+                return View(deleteRoomModel);
             }
-
-            ModelState.AddModelError(string.Empty, result.Message);
-            return View(disableRoomDto);
         }
     }
 }
