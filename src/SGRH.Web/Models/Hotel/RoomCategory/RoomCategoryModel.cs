@@ -10,19 +10,4 @@
         public int MaxCapacity { get; set; }
         public string Amenities { get; set; }
     }
-
-    public class GetAllRoomCategoryResponse
-    {
-        public bool isSuccess { get; set; }
-        public string message { get; set; }
-        public List<RoomCategoryModel> data { get; set; }
-    }
-
-    public class GetRoomCategoryResponse
-    {
-        public bool isSuccess { get; set; }
-        public string message { get; set; }
-        public RoomCategoryModel data { get; set; }
-    }
-
 }

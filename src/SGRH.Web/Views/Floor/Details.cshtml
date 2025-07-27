@@ -1,7 +1,7 @@
 ﻿@model SGRH.Web.Models.Hotel.Floor.FloorModel
 
 @{
-    ViewData["Title"] = "Floor Details";
+    ViewData["Title"] = "Details";
 }
 
 <h1>Floor Details</h1>
@@ -48,6 +48,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.FloorId" class="btn btn-warning btn-sm">Edit</a> |
-    <a asp-action="Index" class="btn btn-secondary btn-sm">Back to List</a>
-</div>tn-secondary">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.FloorId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

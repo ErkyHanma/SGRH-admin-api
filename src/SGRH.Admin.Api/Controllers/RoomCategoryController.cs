@@ -4,7 +4,6 @@ using SGRH.Application.Common.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-//using SGRH.Application.Common.Logging; // Mantener si se usará el logger en el futuro, aunque no esté en el constructor actual
 using SGRH.Application.Dtos.Hotel.RoomCategory;
 using SGRH.Application.Interfaces.Services.Hotel;
 
@@ -35,7 +34,7 @@ namespace SGRH.Api.Controllers
         }
 
         // GET api/RoomCategory/5
-        [HttpGet("{id}")]
+        [HttpGet("{GetRoomCategoryById}")]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _roomCategoryService.GetRoomCategoryById(id);
