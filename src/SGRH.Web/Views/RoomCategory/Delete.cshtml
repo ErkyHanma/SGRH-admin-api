@@ -10,18 +10,7 @@
 <div>
     <h4>Room Category</h4>
     <hr />
-    @* Opcional: Mostrar detalles de la categoría de habitación para confirmar, si no se usan en el modelo DisableRoomCategoryModel *@
-    @* <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CategoryId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CategoryId)
-        </dd>
-        // Si quieres mostrar más datos de la categoría antes de deshabilitar, necesitas pasar el RoomCategoryModel completo o partes de él.
-        // Por ahora, solo se muestra el ID que está en DisableRoomCategoryModel.
-    </dl> *@
-
+  
     <form asp-action="Delete">
         <input asp-for="CategoryId" type="hidden" />
         <div class="form-group">

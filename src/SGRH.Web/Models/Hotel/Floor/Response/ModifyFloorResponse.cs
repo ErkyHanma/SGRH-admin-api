@@ -2,8 +2,8 @@
 
 namespace SGRH.Web.Models.Hotel.Floor.Response
 {
-    public class ModifyFloorResponse: BaseResponse
+    public class ModifyFloorResponse : BaseResponse
     {
-        public ModifyFloorModel data { get; set; }
+        public ModifyFloorModel Data { get; set; } // Cambiado de 'data' a 'Data'
     }
 }

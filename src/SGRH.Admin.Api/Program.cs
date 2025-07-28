@@ -29,6 +29,7 @@ namespace SGRH.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             // Load .env variables
             Env.Load();
             var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
@@ -81,6 +82,12 @@ namespace SGRH.Api
             // Service Module
             builder.Services.AddServiceDependency();
 
+
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                });
 
             // User Management Module
             builder.Services.AddUserManagementRepositories(builder.Configuration);

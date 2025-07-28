@@ -2,8 +2,8 @@
 
 namespace SGRH.Web.Models.Hotel.Floor.Response
 {
-    public class GetFloorResponse:BaseResponse
+    public class GetFloorResponse : BaseResponse 
     {
-        public FloorModel data { get; set; }
-    } 
+        public FloorModel Data { get; set; }
+    }
 }

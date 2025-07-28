@@ -4,6 +4,6 @@ namespace SGRH.Web.Models.Hotel.RoomCategory.Response
 {
     public class GetAllRoomCategoriesResponse : BaseResponse
     {
-        public List<RoomCategoryModel> data { get; set; }
+        public List<RoomCategoryModel> Data { get; set; } 
     }
 }

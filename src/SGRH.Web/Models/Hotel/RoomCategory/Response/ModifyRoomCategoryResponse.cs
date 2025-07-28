@@ -4,7 +4,7 @@ namespace SGRH.Web.Models.Hotel.RoomCategory.Response
 {
     public class ModifyRoomCategoryResponse: BaseResponse
     {
-        public ModifyRoomCategoryModel data { get; set; }
+        public ModifyRoomCategoryModel Data { get; set; }
     }
     
    

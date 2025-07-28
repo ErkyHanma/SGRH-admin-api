@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SGRH.Web.Models.Hotel.RoomCategory.Response;
 using SGRH.Web.Models.Hotel.RoomCategory;
-using System.Net.Http.Json; // Necesario para PostAsJsonAsync y PutAsJsonAsync
+using System.Net.Http.Json; 
 
 namespace SGRH.Web.Controllers
 {
@@ -11,82 +10,66 @@ namespace SGRH.Web.Controllers
         // GET: RoomCategoryController
         public async Task<IActionResult> Index()
         {
-            GetAllRoomCategoriesResponse getAllRoomCategoriesResponse = null; //
+            GetAllRoomCategoriesResponse getAllRoomCategoriesResponse = null;
+            List<RoomCategoryModel> roomCategories = new List<RoomCategoryModel>(); 
 
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
                     var response = await client.GetAsync("RoomCategory/GetRoomCategories");
 
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getAllRoomCategoriesResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllRoomCategoriesResponse>(responseString); //
-                    }
-                    else
-                    {
-                        getAllRoomCategoriesResponse = new GetAllRoomCategoriesResponse //
+                        
+                        getAllRoomCategoriesResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllRoomCategoriesResponse>(responseString);
+                        if (getAllRoomCategoriesResponse != null && getAllRoomCategoriesResponse.Data != null) 
                         {
-                            isSuccess = false,
-                            message = "Error retrieving room categories."
-                        };
+                            roomCategories = getAllRoomCategoriesResponse.Data; 
+                        }
                     }
                 }
-
             }
             catch (Exception ex)
             {
-                getAllRoomCategoriesResponse = new GetAllRoomCategoriesResponse //
-                {
-                    isSuccess = false,
-                    message = $"Error retrieving room categories {ex.Message}."
-                };
+                ModelState.AddModelError("", $"Error retrieving room categories: {ex.Message}");
             }
-
-            // Asumiendo que el campo 'data' en GetAllRoomCategoriesResponse contiene la lista
-            return View(getAllRoomCategoriesResponse.data); //
+            return View(roomCategories);
         }
 
         // GET: RoomCategoryController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            GetRoomCategoryResponse getRoomCategoryResponse = null; //
+            GetRoomCategoryResponse getRoomCategoryResponse = null;
+            RoomCategoryModel roomCategory = null;
+
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
                     var response = await client.GetAsync($"RoomCategory/GetRoomCategoryById?id={id}");
 
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getRoomCategoryResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomCategoryResponse>(responseString); //
-                    }
-                    else
-                    {
-                        getRoomCategoryResponse = new GetRoomCategoryResponse //
+                        getRoomCategoryResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomCategoryResponse>(responseString);
+                        if (getRoomCategoryResponse != null && getRoomCategoryResponse.Data != null) 
                         {
-                            isSuccess = false,
-                            message = "Error retrieving room category."
-                        };
+                            roomCategory = getRoomCategoryResponse.Data; 
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                getRoomCategoryResponse = new GetRoomCategoryResponse //
-                {
-                    isSuccess = false,
-                    message = $"Error retrieving room category {ex.Message}."
-                };
+                ModelState.AddModelError("", $"Error retrieving room category details: {ex.Message}");
             }
-            // Asumiendo que el campo 'data' en GetRoomCategoryResponse contiene el objeto
-            return View(getRoomCategoryResponse.data); //
+            if (roomCategory == null)
+                return NotFound();
+            return View(roomCategory);
         }
 
         // GET: RoomCategoryController/Create
@@ -98,42 +81,38 @@ namespace SGRH.Web.Controllers
         // POST: RoomCategoryController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateRoomCategoryModel createRoomCategoryModel) //
+        public async Task<IActionResult> Create(CreateRoomCategoryModel createRoomCategoryModel)
         {
-            CreateRoomCategoryResponse createResponse = null; //
-
+            CreateRoomCategoryResponse createResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
                     var response = await client.PostAsJsonAsync("RoomCategory/CreateRoomCategory", createRoomCategoryModel);
-
                     var responseString = await response.Content.ReadAsStringAsync();
+                    createResponse = System.Text.Json.JsonSerializer.Deserialize<CreateRoomCategoryResponse>(responseString);
 
-                    createResponse = System.Text.Json.JsonSerializer.Deserialize<CreateRoomCategoryResponse>(responseString); //
-
-                    if (createResponse != null && !createResponse.isSuccess) //
+                    if (createResponse != null && !createResponse.isSuccess) 
                     {
-                        ModelState.AddModelError("", createResponse.message); //
-                        return View(createRoomCategoryModel); //
+                        ModelState.AddModelError("", createResponse.message); 
+                        return View(createRoomCategoryModel);
                     }
-
                     return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Internal error: " + ex.Message);
-                return View(createRoomCategoryModel); //
+                return View(createRoomCategoryModel);
             }
         }
 
         // GET: RoomCategoryController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            GetRoomCategoryResponse getRoomCategoryResponse = null; //
+            GetRoomCategoryResponse getRoomCategoryResponse = null;
+            RoomCategoryModel roomCategoryData = null;
             try
             {
                 using (var client = new HttpClient())
@@ -143,81 +122,67 @@ namespace SGRH.Web.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getRoomCategoryResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomCategoryResponse>(responseString); //
-                    }
-                    else
-                    {
-                        getRoomCategoryResponse = new GetRoomCategoryResponse //
+                        getRoomCategoryResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomCategoryResponse>(responseString);
+                        if (getRoomCategoryResponse != null && getRoomCategoryResponse.Data != null) 
                         {
-                            isSuccess = false,
-                            message = "Error retrieving room category."
-                        };
+                            roomCategoryData = getRoomCategoryResponse.Data; 
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                getRoomCategoryResponse = new GetRoomCategoryResponse //
-                {
-                    isSuccess = false,
-                    message = $"Error retrieving room category {ex.Message}."
-                };
+                ModelState.AddModelError("", $"Error retrieving room category for edit: {ex.Message}");
             }
-            if (getRoomCategoryResponse?.data == null) //
+            if (roomCategoryData == null)
                 return NotFound();
-
-            // Mapear los datos obtenidos a ModifyRoomCategoryModel
-            var editModel = new ModifyRoomCategoryModel //
+            var editModel = new ModifyRoomCategoryModel
             {
-                CategoryId = getRoomCategoryResponse.data.CategoryId, //
-                Name = getRoomCategoryResponse.data.Name, //
-                Description = getRoomCategoryResponse.data.Description, //
-                MaxCapacity = getRoomCategoryResponse.data.MaxCapacity, //
-                Amenities = getRoomCategoryResponse.data.Amenities, //
-                // UpdatedBy necesitará ser establecido, posiblemente desde la sesión o un valor predeterminado
+                CategoryId = roomCategoryData.CategoryId,
+                Name = roomCategoryData.Name,
+                Description = roomCategoryData.Description,
+                MaxCapacity = roomCategoryData.MaxCapacity,
+                Amenities = roomCategoryData.Amenities,
+                
             };
-            return View(editModel); //
+            return View(editModel);
         }
 
         // POST: RoomCategoryController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ModifyRoomCategoryModel modifyRoomCategoryModel) //
+        public async Task<IActionResult> Edit(ModifyRoomCategoryModel modifyRoomCategoryModel)
         {
-            ModifyRoomCategoryResponse modifyResponse = null; //
-
+            ModifyRoomCategoryResponse modifyResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
                     var response = await client.PutAsJsonAsync("RoomCategory/ModifyRoomCategory", modifyRoomCategoryModel);
-
                     var responseString = await response.Content.ReadAsStringAsync();
+                    modifyResponse = System.Text.Json.JsonSerializer.Deserialize<ModifyRoomCategoryResponse>(responseString);
 
-                    modifyResponse = System.Text.Json.JsonSerializer.Deserialize<ModifyRoomCategoryResponse>(responseString); //
-
-                    if (modifyResponse != null && !modifyResponse.isSuccess) //
+                    if (modifyResponse != null && !modifyResponse.isSuccess) 
                     {
-                        ModelState.AddModelError("", modifyResponse.message); //
-                        return View(modifyRoomCategoryModel); //
+                        ModelState.AddModelError("", modifyResponse.message); 
+                        return View(modifyRoomCategoryModel);
                     }
-
                     return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Internal error: " + ex.Message);
-                return View(modifyRoomCategoryModel); //
+                return View(modifyRoomCategoryModel);
             }
         }
 
         // GET: RoomCategoryController/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            GetRoomCategoryResponse getRoomCategoryResponse = null; //
+            GetRoomCategoryResponse getRoomCategoryResponse = null;
+            RoomCategoryModel roomCategoryData = null;
             try
             {
                 using (var client = new HttpClient())
@@ -227,61 +192,47 @@ namespace SGRH.Web.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getRoomCategoryResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomCategoryResponse>(responseString); //
-                    }
-                    else
-                    {
-                        getRoomCategoryResponse = new GetRoomCategoryResponse //
+                        getRoomCategoryResponse = System.Text.Json.JsonSerializer.Deserialize<GetRoomCategoryResponse>(responseString);
+                        if (getRoomCategoryResponse != null && getRoomCategoryResponse.Data != null) // Usar .Data
                         {
-                            isSuccess = false,
-                            message = "Error retrieving room category."
-                        };
+                            roomCategoryData = getRoomCategoryResponse.Data; // Usar .Data
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                getRoomCategoryResponse = new GetRoomCategoryResponse //
-                {
-                    isSuccess = false,
-                    message = $"Error retrieving room category {ex.Message}."
-                };
+                ModelState.AddModelError("", $"Error retrieving room category for delete: {ex.Message}");
             }
-            if (getRoomCategoryResponse?.data == null) //
+            if (roomCategoryData == null)
                 return NotFound();
-
-            // Mapear el ID a DisableRoomCategoryModel
-            var deleteModel = new DisableRoomCategoryModel //
+            var deleteModel = new DisableRoomCategoryModel
             {
-                CategoryId = getRoomCategoryResponse.data.CategoryId //
-                // UpdatedBy necesitará ser establecido, posiblemente desde la sesión o un valor predeterminado
+                CategoryId = roomCategoryData.CategoryId
+                
             };
-            return View(deleteModel); //
+            return View(deleteModel);
         }
 
         // POST: RoomCategoryController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, DisableRoomCategoryModel disableRoomCategoryModel) //
+        public async Task<IActionResult> Delete(int id, DisableRoomCategoryModel disableRoomCategoryModel)
         {
-            DisableRoomCategoryResponse deleteResponse = null; //
+            DisableRoomCategoryResponse deleteResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
-                    // Asumiendo que la "eliminación" de una categoría de habitación es deshabilitarla
                     var response = await client.PutAsJsonAsync("RoomCategory/DisableRoomCategory", disableRoomCategoryModel);
-
                     var responseString = await response.Content.ReadAsStringAsync();
+                    deleteResponse = System.Text.Json.JsonSerializer.Deserialize<DisableRoomCategoryResponse>(responseString);
 
-                    deleteResponse = System.Text.Json.JsonSerializer.Deserialize<DisableRoomCategoryResponse>(responseString); //
-
-                    if (deleteResponse != null && !deleteResponse.isSuccess) //
+                    if (deleteResponse != null && !deleteResponse.isSuccess) 
                     {
-                        ModelState.AddModelError("", deleteResponse.message); //
-                        return View(disableRoomCategoryModel); //
+                        ModelState.AddModelError("", deleteResponse.message); 
+                        return View(disableRoomCategoryModel);
                     }
                     return RedirectToAction(nameof(Index));
                 }
@@ -289,7 +240,7 @@ namespace SGRH.Web.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Internal error: " + ex.Message);
-                return View(disableRoomCategoryModel); //
+                return View(disableRoomCategoryModel);
             }
         }
     }

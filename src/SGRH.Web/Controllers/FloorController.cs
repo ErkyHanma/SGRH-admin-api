@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SGRH.Web.Models.Hotel.Floor.Response;
 using SGRH.Web.Models.Hotel.Floor;
-using System.Net.Http.Json; // Necesario para PostAsJsonAsync y PutAsJsonAsync
+using System.Net.Http.Json;
 
 namespace SGRH.Web.Controllers
 {
@@ -12,81 +11,65 @@ namespace SGRH.Web.Controllers
         public async Task<IActionResult> Index()
         {
             GetAllFloorsResponse getAllFloorsResponse = null;
+            List<FloorModel> floors = new List<FloorModel>(); 
 
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
                     var response = await client.GetAsync("Floor/GetFloors");
 
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
+                        
                         getAllFloorsResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllFloorsResponse>(responseString);
-                    }
-                    else
-                    {
-                        getAllFloorsResponse = new GetAllFloorsResponse
+                        if (getAllFloorsResponse != null && getAllFloorsResponse.Data != null) 
                         {
-                            isSuccess = false,
-                            message = "Error retrieving floors."
-                        };
+                            floors = getAllFloorsResponse.Data;
+                        }
                     }
                 }
-
             }
             catch (Exception ex)
             {
-                getAllFloorsResponse = new GetAllFloorsResponse
-                {
-                    isSuccess = false,
-                    message = $"Error retrieving floors {ex.Message}."
-                };
+                ModelState.AddModelError("", $"Error retrieving floors: {ex.Message}");
             }
-
-            return View(getAllFloorsResponse.data);
+            return View(floors);
         }
-
-
 
         // GET: FloorController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            GetFloorResponse getFloorResponse = null; 
+            GetFloorResponse getFloorResponse = null;
+            FloorModel floor = null;
+
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
                     var response = await client.GetAsync($"Floor/GetFloorById?id={id}");
 
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString); 
-                    }
-                    else
-                    {
-                        getFloorResponse = new GetFloorResponse 
+                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString);
+                        if (getFloorResponse != null && getFloorResponse.Data != null) 
                         {
-                            isSuccess = false,
-                            message = "Error retrieving floor."
-                        };
+                            floor = getFloorResponse.Data; 
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                getFloorResponse = new GetFloorResponse 
-                {
-                    isSuccess = false,
-                    message = $"Error retrieving floor {ex.Message}."
-                };
+                ModelState.AddModelError("", $"Error retrieving floor details: {ex.Message}");
             }
-            return View(getFloorResponse.data);
+            if (floor == null)
+                return NotFound();
+            return View(floor);
         }
 
         // GET: FloorController/Create
@@ -101,25 +84,20 @@ namespace SGRH.Web.Controllers
         public async Task<IActionResult> Create(CreateFloorModel createFloorModel)
         {
             CreateFloorResponse createResponse = null;
-
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
                     var response = await client.PostAsJsonAsync("Floor/CreateFloor", createFloorModel);
-
                     var responseString = await response.Content.ReadAsStringAsync();
-
                     createResponse = System.Text.Json.JsonSerializer.Deserialize<CreateFloorResponse>(responseString);
 
-                    if (createResponse != null && !createResponse.isSuccess)
+                    if (createResponse != null && !createResponse.isSuccess) 
                     {
-                        ModelState.AddModelError("", createResponse.message);
+                        ModelState.AddModelError("", createResponse.message); 
                         return View(createFloorModel);
                     }
-
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -133,7 +111,8 @@ namespace SGRH.Web.Controllers
         // GET: FloorController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            GetFloorResponse getFloorResponse = null; // Changed
+            GetFloorResponse getFloorResponse = null;
+            FloorModel floorData = null;
             try
             {
                 using (var client = new HttpClient())
@@ -143,34 +122,26 @@ namespace SGRH.Web.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString); // Changed
-                    }
-                    else
-                    {
-                        getFloorResponse = new GetFloorResponse // Changed
+                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString);
+                        if (getFloorResponse != null && getFloorResponse.Data != null) 
                         {
-                            isSuccess = false,
-                            message = "Error retrieving floor."
-                        };
+                            floorData = getFloorResponse.Data; 
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                getFloorResponse = new GetFloorResponse // Changed
-                {
-                    isSuccess = false,
-                    message = $"Error retrieving floor {ex.Message}."
-                };
+                ModelState.AddModelError("", $"Error retrieving floor for edit: {ex.Message}");
             }
-            if (getFloorResponse?.data == null)
+            if (floorData == null)
                 return NotFound();
             var editModel = new ModifyFloorModel
             {
-                FloorId = getFloorResponse.data.FloorId,
-                FloorNumber = getFloorResponse.data.FloorNumber,
-                Description = getFloorResponse.data.Description,
-                Status = getFloorResponse.data.Status
+                FloorId = floorData.FloorId,
+                FloorNumber = floorData.FloorNumber,
+                Description = floorData.Description,
+                Status = floorData.Status,
                 
             };
             return View(editModel);
@@ -182,25 +153,20 @@ namespace SGRH.Web.Controllers
         public async Task<IActionResult> Edit(ModifyFloorModel modifyFloorModel)
         {
             ModifyFloorResponse modifyResponse = null;
-
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
                     var response = await client.PutAsJsonAsync("Floor/ModifyFloor", modifyFloorModel);
-
                     var responseString = await response.Content.ReadAsStringAsync();
-
                     modifyResponse = System.Text.Json.JsonSerializer.Deserialize<ModifyFloorResponse>(responseString);
 
-                    if (modifyResponse != null && !modifyResponse.isSuccess)
+                    if (modifyResponse != null && !modifyResponse.isSuccess) 
                     {
-                        ModelState.AddModelError("", modifyResponse.message);
+                        ModelState.AddModelError("", modifyResponse.message); 
                         return View(modifyFloorModel);
                     }
-
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -214,7 +180,8 @@ namespace SGRH.Web.Controllers
         // GET: FloorController/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            GetFloorResponse getFloorResponse = null; // Changed
+            GetFloorResponse getFloorResponse = null;
+            FloorModel floorData = null;
             try
             {
                 using (var client = new HttpClient())
@@ -224,31 +191,23 @@ namespace SGRH.Web.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString); // Changed
-                    }
-                    else
-                    {
-                        getFloorResponse = new GetFloorResponse // Changed
+                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString);
+                        if (getFloorResponse != null && getFloorResponse.Data != null) 
                         {
-                            isSuccess = false,
-                            message = "Error retrieving floor."
-                        };
+                            floorData = getFloorResponse.Data; 
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                getFloorResponse = new GetFloorResponse // Changed
-                {
-                    isSuccess = false,
-                    message = $"Error retrieving floor {ex.Message}."
-                };
+                ModelState.AddModelError("", $"Error retrieving floor for delete: {ex.Message}");
             }
-            if (getFloorResponse?.data == null)
+            if (floorData == null)
                 return NotFound();
             var deleteModel = new DisableFloorModel
             {
-                FloorId = getFloorResponse.data.FloorId
+                FloorId = floorData.FloorId
                 
             };
             return View(deleteModel);
@@ -265,17 +224,13 @@ namespace SGRH.Web.Controllers
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("http://localhost:5171/api/");
-
-                
                     var response = await client.PutAsJsonAsync("Floor/DisableFloor", disableFloorModel);
-
                     var responseString = await response.Content.ReadAsStringAsync();
-
                     deleteResponse = System.Text.Json.JsonSerializer.Deserialize<DisableFloorResponse>(responseString);
 
-                    if (deleteResponse != null && !deleteResponse.isSuccess)
+                    if (deleteResponse != null && !deleteResponse.isSuccess) 
                     {
-                        ModelState.AddModelError("", deleteResponse.message);
+                        ModelState.AddModelError("", deleteResponse.message); 
                         return View(disableFloorModel);
                     }
                     return RedirectToAction(nameof(Index));
