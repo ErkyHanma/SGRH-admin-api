@@ -1,20 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGRH.Web.Models;
+using SGRH.Web.Interfaces.HttpClients.ReservationModule;
 using SGRH.Web.Models.ReservationModule.Reservation;
 using SGRH.Web.Models.ReservationModule.Reservation.Response;
-using SGRH.Web.Models.ServiceModule;
-using System.Text.Json;
 
 namespace SGRH.Web.Controllers.ReservationModule
 {
     public class ReservationController : Controller
     {
 
-        private readonly IConfiguration _configuration;
+        private readonly IReservationHttpClient _reservationHttpClient;
 
-        public ReservationController(IConfiguration configuration)
+        public ReservationController(IReservationHttpClient reservationHttpClient)
         {
-            _configuration = configuration;
+            _reservationHttpClient = reservationHttpClient;
         }
 
         //GET: ReservationController
@@ -24,33 +22,15 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.GetAsync("Reservation");
+                getAllReservationResponse = await _reservationHttpClient.GetAllReservationAsync();
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getAllReservationResponse = JsonSerializer.Deserialize<GetAllReservationResponse>(responseString);
-                    }
-                    else
-                    {
-                        getAllReservationResponse = new GetAllReservationResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
-                }
             }
             catch (Exception ex)
             {
                 getAllReservationResponse = new GetAllReservationResponse
                 {
                     isSuccess = false,
-                    message = "Error retrieving data."
+                    message = $"Error retrieving data.{ex.Message}"
                 };
 
             }
@@ -68,26 +48,7 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.GetAsync($"Reservation/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getReservationByIdResponse = JsonSerializer.Deserialize<GetReservationByIdResponse>(responseString);
-                    }
-                    else
-                    {
-                        getReservationByIdResponse = new GetReservationByIdResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
-                }
+                getReservationByIdResponse = await _reservationHttpClient.GetReservationByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -118,39 +79,21 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                using (var client = new HttpClient())
+                createReservationResponse = await _reservationHttpClient.CreateReservationAsync(createReservationModel);
+
+
+                if (createReservationResponse != null && createReservationResponse.isSuccess)
                 {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.PostAsJsonAsync("Reservation/CreateReservation", createReservationModel);
+                    return RedirectToAction(nameof(Index));
+                }
 
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        createReservationResponse = JsonSerializer.Deserialize<CreateReservationResponse>(responseString);
-
-
-                        if (createReservationResponse != null && createReservationResponse.isSuccess)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
-
-                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
-                        {
-                            ModelState.AddModelError(string.Empty, errorResponse.message);
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
-                        }
-
-                    }
-
+                if (createReservationResponse != null && !string.IsNullOrEmpty(createReservationResponse.message))
+                {
+                    ModelState.AddModelError(string.Empty, createReservationResponse.message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
                 }
             }
             catch (Exception ex)
@@ -169,26 +112,7 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.GetAsync($"Reservation/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        editReservationResponse = JsonSerializer.Deserialize<EditReservationResponse>(responseString);
-                    }
-                    else
-                    {
-                        editReservationResponse = new EditReservationResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
-                }
+                editReservationResponse = await _reservationHttpClient.GetEditReservationByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -199,7 +123,6 @@ namespace SGRH.Web.Controllers.ReservationModule
                 };
 
             }
-
 
             return View(editReservationResponse?.data ?? new EditReservationModel());
 
@@ -214,40 +137,24 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                using (var client = new HttpClient())
+
+                editReservationResponse = await _reservationHttpClient.EditReservationAsync(editReservationModel);
+
+
+                if (editReservationResponse != null && editReservationResponse.isSuccess)
                 {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.PostAsJsonAsync("Reservation/UpdateReservation", editReservationModel);
-
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        editReservationResponse = JsonSerializer.Deserialize<EditReservationResponse>(responseString);
-
-
-                        if (editReservationResponse != null && editReservationResponse.isSuccess)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
-
-                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
-                        {
-                            ModelState.AddModelError(string.Empty, errorResponse.message);
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
-                        }
-
-                    }
-
+                    return RedirectToAction(nameof(Index));
                 }
+
+                if (editReservationResponse != null && !string.IsNullOrEmpty(editReservationResponse.message))
+                {
+                    ModelState.AddModelError(string.Empty, editReservationResponse.message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                }
+
             }
             catch (Exception ex)
             {
@@ -265,26 +172,7 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.GetAsync($"Reservation/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        deleteReservationResponse = JsonSerializer.Deserialize<DeleteReservationResponse>(responseString);
-                    }
-                    else
-                    {
-                        deleteReservationResponse = new DeleteReservationResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
-                }
+                deleteReservationResponse = await _reservationHttpClient.GetDeleteReservationByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -295,7 +183,6 @@ namespace SGRH.Web.Controllers.ReservationModule
                 };
 
             }
-
 
             return View(deleteReservationResponse?.data ?? new DeleteReservationModel());
         }
@@ -309,40 +196,25 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                using (var client = new HttpClient())
+
+                deleteReservationResponse = await _reservationHttpClient.DeleteReservationAsync(deleteReservationModel);
+
+
+                if (deleteReservationResponse != null && deleteReservationResponse.isSuccess)
                 {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.PostAsJsonAsync("Reservation/DisableReservation", deleteReservationModel);
-
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        deleteReservationResponse = JsonSerializer.Deserialize<DeleteReservationResponse>(responseString);
-
-
-                        if (deleteReservationResponse != null && deleteReservationResponse.isSuccess)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        var errorResponse = JsonSerializer.Deserialize<BaseResponse<ServiceModel>>(responseString);
-
-                        if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.message))
-                        {
-                            ModelState.AddModelError(string.Empty, errorResponse.message);
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
-                        }
-
-                    }
-
+                    return RedirectToAction(nameof(Index));
                 }
+
+                if (deleteReservationResponse != null && !string.IsNullOrEmpty(deleteReservationResponse.message))
+                {
+                    ModelState.AddModelError(string.Empty, deleteReservationResponse.message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                }
+
+
             }
             catch (Exception ex)
             {
@@ -352,8 +224,6 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             return View(deleteReservationResponse);
         }
-
-
 
 
     }

@@ -16,7 +16,9 @@ using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
 using SGRH.Persistence.Repositories.UserManagement;
+using SGRH.Web.Interfaces.HttpClients.ReservationModule;
 using SGRH.Web.Interfaces.HttpClients.ServiceModule;
+using SGRH.Web.Services.HttpClients.ReservationModule;
 using SGRH.Web.Services.HttpClients.ServiceModule;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +31,16 @@ builder.Services.AddTransient<IServiceHttpClient, ServiceHttpClient>();
 var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
 
 builder.Services.AddHttpClient<IServiceHttpClient, ServiceHttpClient>(client =>
+{
+    client.BaseAddress = new Uri(baseUrl);
+});
+
+builder.Services.AddHttpClient<IReservationHttpClient, ReservationHttpClient>(client =>
+{
+    client.BaseAddress = new Uri(baseUrl);
+});
+
+builder.Services.AddHttpClient<IReservationServiceHttpClient, ReservationServiceHttpClient>(client =>
 {
     client.BaseAddress = new Uri(baseUrl);
 });
