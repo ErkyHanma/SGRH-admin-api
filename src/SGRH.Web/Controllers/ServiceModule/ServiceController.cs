@@ -8,12 +8,10 @@ namespace SGRH.Web.Controllers.ServiceModule
     public class ServiceController : Controller
     {
 
-        private readonly IConfiguration _configuration;
         private readonly IServiceHttpClient _serviceHttpClient;
 
-        public ServiceController(IConfiguration configuration, IServiceHttpClient serviceHttpClient)
+        public ServiceController(IServiceHttpClient serviceHttpClient)
         {
-            _configuration = configuration;
             _serviceHttpClient = serviceHttpClient;
         }
 
@@ -36,7 +34,7 @@ namespace SGRH.Web.Controllers.ServiceModule
                 };
             }
 
-            return View(getAllServiceResponse?.data ?? new List<ServiceModel>());
+            return View(getAllServiceResponse?.data ?? []);
         }
 
         // GET: ServiceController/Details/5
@@ -74,15 +72,13 @@ namespace SGRH.Web.Controllers.ServiceModule
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateServiceModel createServiceModel)
         {
-            CreateServiceResponse createServiceResponse = null;
 
             try
             {
-                createServiceResponse = await _serviceHttpClient.CreateServiceAsync(createServiceModel);
+                var createServiceResponse = await _serviceHttpClient.CreateServiceAsync(createServiceModel);
 
-                if (createServiceResponse != null && createServiceResponse.isSuccess)
+                if (createServiceResponse.isSuccess)
                 {
-
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -133,11 +129,10 @@ namespace SGRH.Web.Controllers.ServiceModule
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ServiceModel serviceModel)
         {
-            EditServiceResponse editServiceResponse = null;
 
             try
             {
-                editServiceResponse = await _serviceHttpClient.EditServiceAsync(serviceModel);
+                var editServiceResponse = await _serviceHttpClient.EditServiceAsync(serviceModel);
 
                 if (editServiceResponse != null && editServiceResponse.isSuccess)
                 {
@@ -159,7 +154,6 @@ namespace SGRH.Web.Controllers.ServiceModule
                 ModelState.AddModelError(string.Empty, "Error retrieving data.");
             }
 
-            // If something went wrong, stay on form
             return View(serviceModel);
         }
 
@@ -191,11 +185,10 @@ namespace SGRH.Web.Controllers.ServiceModule
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(DeleteServiceModel deleteServiceModel)
         {
-            DeleteServiceResponse deleteServiceResponse = null;
 
             try
             {
-                deleteServiceResponse = await _serviceHttpClient.DeleteServiceAsync(deleteServiceModel);
+                var deleteServiceResponse = await _serviceHttpClient.DeleteServiceAsync(deleteServiceModel);
 
                 if (deleteServiceResponse != null && deleteServiceResponse.isSuccess)
                 {

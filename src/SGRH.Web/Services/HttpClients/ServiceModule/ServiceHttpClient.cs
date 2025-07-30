@@ -1,4 +1,5 @@
-﻿using SGRH.Web.Interfaces.HttpClients.ServiceModule;
+﻿using SGRH.Application.Common.Logging;
+using SGRH.Web.Interfaces.HttpClients.ServiceModule;
 using SGRH.Web.Models.ServiceModule;
 using SGRH.Web.Models.ServiceModule.Response;
 using System.Text.Json;
@@ -9,15 +10,19 @@ namespace SGRH.Web.Services.HttpClients.ServiceModule
     {
 
         private readonly HttpClient _client;
+        private readonly IAppLogger<ServiceHttpClient> _logger;
 
-        public ServiceHttpClient(HttpClient client)
+
+
+        public ServiceHttpClient(HttpClient client, IAppLogger<ServiceHttpClient> logger)
         {
             _client = client;
+            _logger = logger;
+
         }
 
         public async Task<GetAllServicesResponse> GetAllServicesAsync()
         {
-            GetAllServicesResponse getAllServiceResponse = null;
 
             try
             {
@@ -26,35 +31,24 @@ namespace SGRH.Web.Services.HttpClients.ServiceModule
                 if (response.IsSuccessStatusCode)
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
-                    getAllServiceResponse = JsonSerializer.Deserialize<GetAllServicesResponse>(responseString);
+                    return JsonSerializer.Deserialize<GetAllServicesResponse>(responseString);
 
                 }
                 else
                 {
-                    getAllServiceResponse = new GetAllServicesResponse
-                    {
-                        isSuccess = false,
-                        message = "Error retrieving data."
-                    };
+                    return new GetAllServicesResponse { isSuccess = false, message = "Error retrieving services." };
                 }
             }
 
             catch (Exception ex)
             {
-                getAllServiceResponse = new GetAllServicesResponse
-                {
-                    isSuccess = false,
-                    message = "Error retrieving data."
-                };
+                _logger.ErrorEx(ex, "An exception occurred while retrieving services.");
+                return new GetAllServicesResponse { isSuccess = false, message = "Error retrieving services." };
             }
-
-            return getAllServiceResponse;
 
         }
         public async Task<GetServiceByIdResponse> GetServiceByIdAsync(int id)
         {
-            GetServiceByIdResponse getServiceByIdResponse = null;
-
             try
             {
                 var response = await _client.GetAsync($"Service/{id}");
@@ -62,163 +56,144 @@ namespace SGRH.Web.Services.HttpClients.ServiceModule
                 if (response.IsSuccessStatusCode)
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
-                    getServiceByIdResponse = JsonSerializer.Deserialize<GetServiceByIdResponse>(responseString);
+                    return JsonSerializer.Deserialize<GetServiceByIdResponse>(responseString);
                 }
                 else
                 {
-                    getServiceByIdResponse = new GetServiceByIdResponse
-                    {
-                        isSuccess = false,
-                        message = "Error retrieving data"
-                    };
+                    return new GetServiceByIdResponse { isSuccess = false, message = "Error retrieving services." };
                 }
             }
             catch (Exception ex)
             {
-                getServiceByIdResponse = new GetServiceByIdResponse
-                {
-                    isSuccess = false,
-                    message = "Error retrieving data"
-                };
+                _logger.ErrorEx(ex, "An exception occurred while retrieving service.");
+                return new GetServiceByIdResponse { isSuccess = false, message = "Error retrieving service." };
             }
-
-            return getServiceByIdResponse;
         }
         public async Task<CreateServiceResponse> CreateServiceAsync(CreateServiceModel createServiceModel)
         {
-
-            CreateServiceResponse createServiceResponse = null;
 
             try
             {
                 var response = await _client.PostAsJsonAsync("Service/CreateService", createServiceModel);
                 var responseContent = await response.Content.ReadAsStringAsync();
+                var createServiceResponse = JsonSerializer.Deserialize<CreateServiceResponse>(responseContent);
 
-                createServiceResponse = JsonSerializer.Deserialize<CreateServiceResponse>(responseContent);
-
-
-            }
-            catch (Exception ex)
-            {
-                createServiceResponse = new CreateServiceResponse
+                if (response.IsSuccessStatusCode && createServiceResponse is not null)
                 {
-                    isSuccess = false,
-                    message = "Error while creating service"
-                };
-            }
-            return createServiceResponse;
-        }
-        public async Task<EditServiceResponse> GetEditServiceByIdAsync(int id)
-        {
-            EditServiceResponse editServiceResponse = null;
-
-            try
-            {
-                var response = await _client.GetAsync($"Service/{id}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    editServiceResponse = JsonSerializer.Deserialize<EditServiceResponse>(responseString);
+                    return createServiceResponse;
                 }
                 else
                 {
-                    editServiceResponse = new EditServiceResponse
-                    {
-                        isSuccess = false,
-                        message = "Error retrieving data"
-                    };
+                    return new CreateServiceResponse { isSuccess = false, message = createServiceResponse?.message ?? "Error creating services." };
                 }
             }
             catch (Exception ex)
             {
-                editServiceResponse = new EditServiceResponse
-                {
-                    isSuccess = false,
-                    message = "Error retrieving data"
-                };
+                _logger.ErrorEx(ex, "An exception occurred while creating services.");
+                return new CreateServiceResponse { isSuccess = false, message = "Error creating services." };
             }
 
-            return editServiceResponse;
+        }
+        public async Task<EditServiceResponse> GetEditServiceByIdAsync(int id)
+        {
+            try
+            {
+                var response = await _client.GetAsync($"Service/{id}");
+                var responseString = await response.Content.ReadAsStringAsync();
+                var editServiceResponse = JsonSerializer.Deserialize<EditServiceResponse>(responseString);
+
+                if (response.IsSuccessStatusCode && editServiceResponse is not null)
+                {
+                    return editServiceResponse;
+                }
+                else
+                {
+                    return new EditServiceResponse { isSuccess = false, message = editServiceResponse?.message ?? "Error retrieving service." };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorEx(ex, "An exception occurred while retrieving service.");
+                return new EditServiceResponse { isSuccess = false, message = "Error retrieving service." };
+            }
         }
         public async Task<EditServiceResponse> EditServiceAsync(ServiceModel serviceModel)
         {
-            EditServiceResponse editServiceResponse = null;
 
             try
             {
                 var response = await _client.PostAsJsonAsync($"Service/UpdateService", serviceModel);
-
                 var responseContent = await response.Content.ReadAsStringAsync();
+                var editServiceResponse = JsonSerializer.Deserialize<EditServiceResponse>(responseContent);
 
-                editServiceResponse = JsonSerializer.Deserialize<EditServiceResponse>(responseContent);
-
-            }
-            catch (Exception ex)
-            {
-                editServiceResponse = new EditServiceResponse
+                if (response.IsSuccessStatusCode && editServiceResponse is not null)
                 {
-                    isSuccess = false,
-                    message = "Error while creating service"
-                };
-            }
-            return editServiceResponse;
-        }
-        public async Task<DeleteServiceResponse> GetDeleteServiceByIdAsync(int id)
-        {
-            DeleteServiceResponse deleteServiceResponse = null;
-
-            try
-            {
-                var response = await _client.GetAsync($"Service/{id}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    deleteServiceResponse = JsonSerializer.Deserialize<DeleteServiceResponse>(responseString);
+                    return editServiceResponse;
                 }
                 else
                 {
-                    deleteServiceResponse = new DeleteServiceResponse
-                    {
-                        isSuccess = false,
-                        message = "Error retrieving data"
-                    };
+                    return new EditServiceResponse { isSuccess = false, message = editServiceResponse?.message ?? "Error modifying service." };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorEx(ex, "An exception occurred modifying service");
+                return new EditServiceResponse
+                {
+                    isSuccess = false,
+                    message = $"Error while creating service. {ex.Message}"
+                };
+            }
+        }
+        public async Task<DeleteServiceResponse> GetDeleteServiceByIdAsync(int id)
+        {
+            try
+            {
+                var response = await _client.GetAsync($"Service/{id}");
+                var responseString = await response.Content.ReadAsStringAsync();
+                var deleteServiceResponse = JsonSerializer.Deserialize<DeleteServiceResponse>(responseString);
+
+                if (response.IsSuccessStatusCode && deleteServiceResponse is not null)
+                {
+                    return deleteServiceResponse;
+                }
+                else
+                {
+                    return new DeleteServiceResponse { isSuccess = false, message = deleteServiceResponse?.message ?? "Error retrieving service." };
                 }
             }
             catch (Exception ex)
             {
-                deleteServiceResponse = new DeleteServiceResponse
-                {
-                    isSuccess = false,
-                    message = "Error retrieving data"
-                };
+                _logger.ErrorEx(ex, "An exception occurred while retrieving service.");
+                return new DeleteServiceResponse { isSuccess = false, message = "Error retrieving service." };
             }
-
-            return deleteServiceResponse;
         }
         public async Task<DeleteServiceResponse> DeleteServiceAsync(DeleteServiceModel deleteServiceModel)
         {
-            DeleteServiceResponse deleteServiceResponse = null;
 
             try
             {
                 var response = await _client.PostAsJsonAsync($"Service/DisableService", deleteServiceModel);
-
                 var responseContent = await response.Content.ReadAsStringAsync();
+                var deleteServiceResponse = JsonSerializer.Deserialize<DeleteServiceResponse>(responseContent);
 
-                deleteServiceResponse = JsonSerializer.Deserialize<DeleteServiceResponse>(responseContent);
+                if (response.IsSuccessStatusCode && deleteServiceResponse is not null)
+                {
+                    return deleteServiceResponse;
+                }
+                else
+                {
+                    return new DeleteServiceResponse { isSuccess = false, message = deleteServiceResponse?.message ?? "Error while deleting service." };
+                }
+
 
             }
             catch (Exception ex)
             {
-                deleteServiceResponse = new DeleteServiceResponse
-                {
-                    isSuccess = false,
-                    message = "Error while creating service"
-                };
+                _logger.ErrorEx(ex, "An exception occurred deleting service");
+                return new DeleteServiceResponse { isSuccess = false, message = "Error while deleting service" };
             }
-            return deleteServiceResponse;
         }
 
 

@@ -36,7 +36,7 @@ namespace SGRH.Web.Controllers.ReservationModule
             }
 
 
-            return View(getAllReservationResponse?.data ?? new List<ReservationModel>());
+            return View(getAllReservationResponse?.data ?? []);
 
 
         }
@@ -75,12 +75,10 @@ namespace SGRH.Web.Controllers.ReservationModule
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateReservationModel createReservationModel)
         {
-            CreateReservationResponse createReservationResponse = null;
 
             try
             {
-                createReservationResponse = await _reservationHttpClient.CreateReservationAsync(createReservationModel);
-
+                var createReservationResponse = await _reservationHttpClient.CreateReservationAsync(createReservationModel);
 
                 if (createReservationResponse != null && createReservationResponse.isSuccess)
                 {
@@ -133,12 +131,10 @@ namespace SGRH.Web.Controllers.ReservationModule
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditReservationModel editReservationModel)
         {
-            EditReservationResponse editReservationResponse = null;
 
             try
             {
-
-                editReservationResponse = await _reservationHttpClient.EditReservationAsync(editReservationModel);
+                var editReservationResponse = await _reservationHttpClient.EditReservationAsync(editReservationModel);
 
 
                 if (editReservationResponse != null && editReservationResponse.isSuccess)
@@ -162,7 +158,7 @@ namespace SGRH.Web.Controllers.ReservationModule
             }
 
 
-            return View(editReservationResponse);
+            return View(editReservationModel);
         }
 
         // GET: ReservationController/Delete/5
@@ -192,12 +188,10 @@ namespace SGRH.Web.Controllers.ReservationModule
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(DeleteReservationModel deleteReservationModel)
         {
-            DeleteReservationResponse deleteReservationResponse = null;
 
             try
             {
-
-                deleteReservationResponse = await _reservationHttpClient.DeleteReservationAsync(deleteReservationModel);
+                var deleteReservationResponse = await _reservationHttpClient.DeleteReservationAsync(deleteReservationModel);
 
 
                 if (deleteReservationResponse != null && deleteReservationResponse.isSuccess)
@@ -214,15 +208,14 @@ namespace SGRH.Web.Controllers.ReservationModule
                     ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
                 }
 
-
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Error retrieving data.");
+                ModelState.AddModelError(string.Empty, $"Error retrieving data. {ex.Message}");
             }
 
 
-            return View(deleteReservationResponse);
+            return View(deleteReservationModel);
         }
 
 

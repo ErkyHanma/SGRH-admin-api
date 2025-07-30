@@ -1,68 +1,48 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGRH.Web.Interfaces.HttpClients.ReservationModule;
 using SGRH.Web.Models.ReservationModule.ReservationService;
-using SGRH.Web.Models.ReservationModule.ReservationService.Response;
 using SGRH.Web.Models.ServiceModule;
-using SGRH.Web.Models.ServiceModule.Response;
-using System.Text.Json;
 
 namespace SGRH.Web.Controllers.ReservationModule
 {
     public class ReservationServiceController : Controller
     {
-        private readonly IConfiguration _configuration;
         private readonly IReservationServiceHttpClient _reservationServiceHttpClient;
 
-        public ReservationServiceController(IConfiguration configuration, IReservationServiceHttpClient reservationServiceHttpClient)
+        public ReservationServiceController(IReservationServiceHttpClient reservationServiceHttpClient)
         {
-            _configuration = configuration;
             _reservationServiceHttpClient = reservationServiceHttpClient;
         }
 
         // GET: ReservationServiceController/Add/5
         public async Task<IActionResult> Add(int id)
         {
-            GetAllServicesResponse getAllServicesResponse = null;
             AddReservationServiceModel model = null;
 
             try
             {
-                using (var client = new HttpClient())
+                var getAllServicesResponse = await _reservationServiceHttpClient.GetReservationServicesAsync(id);
+
+                if (getAllServicesResponse.isSuccess)
                 {
-                    var baseUrl = _configuration["ApiSettings:BaseUrl"];
-                    client.BaseAddress = new Uri(baseUrl ?? "");
-                    var response = await client.GetAsync($"Service");
+                    ViewBag.Services = getAllServicesResponse.data ?? new List<ServiceModel>();
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getAllServicesResponse = JsonSerializer.Deserialize<GetAllServicesResponse>(responseString);
-
-                        ViewBag.Services = getAllServicesResponse.data ?? new List<ServiceModel>();
-
-                        model = new AddReservationServiceModel
-                        {
-                            reservationId = id
-                        };
-
-                    }
-                    else
-                    {
-                        getAllServicesResponse = new GetAllServicesResponse
-                        {
-                            isSuccess = false,
-                            message = "Error retrieving data."
-                        };
-                    }
+                    model = new AddReservationServiceModel { reservationId = id };
                 }
+
+                if (getAllServicesResponse != null && !string.IsNullOrEmpty(getAllServicesResponse.message))
+                {
+                    ModelState.AddModelError(string.Empty, getAllServicesResponse.message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while retrieving the services.");
+                }
+
             }
             catch (Exception ex)
             {
-                getAllServicesResponse = new GetAllServicesResponse
-                {
-                    isSuccess = false,
-                    message = "Error retrieving data."
-                };
+                ModelState.AddModelError(string.Empty, "An error occurred while retrieving the services.");
 
             }
 
@@ -74,12 +54,10 @@ namespace SGRH.Web.Controllers.ReservationModule
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(AddReservationServiceModel addReservationServiceModel)
         {
-            AddReservationServiceResponse addReservationServiceResponse = null;
 
             try
             {
-
-                addReservationServiceResponse = await _reservationServiceHttpClient.AddReservationAsync(addReservationServiceModel);
+                var addReservationServiceResponse = await _reservationServiceHttpClient.AddReservationAsync(addReservationServiceModel);
 
 
                 if (addReservationServiceResponse != null && addReservationServiceResponse.isSuccess)
@@ -106,9 +84,8 @@ namespace SGRH.Web.Controllers.ReservationModule
             }
 
 
-            return View(addReservationServiceResponse);
+            return View(addReservationServiceModel);
         }
-
 
         // GET: ReservationServiceController/Delete/5
         public async Task<IActionResult> Delete(int id)
@@ -126,11 +103,9 @@ namespace SGRH.Web.Controllers.ReservationModule
         public async Task<IActionResult> Delete(DeleteReservationServiceModel deleteReservationServiceModel)
         {
 
-            DeleteReservationServiceResponse deleteReservationServiceResponse = null;
-
             try
             {
-                deleteReservationServiceResponse = await _reservationServiceHttpClient.DeleteReservationAsync(deleteReservationServiceModel);
+                var deleteReservationServiceResponse = await _reservationServiceHttpClient.DeleteReservationAsync(deleteReservationServiceModel);
 
 
                 if (deleteReservationServiceResponse != null && deleteReservationServiceResponse.isSuccess)
@@ -155,7 +130,7 @@ namespace SGRH.Web.Controllers.ReservationModule
             }
 
 
-            return View(deleteReservationServiceResponse);
+            return View(deleteReservationServiceModel);
         }
 
     }
