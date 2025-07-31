@@ -28,21 +28,6 @@
                 <input asp-for="nightPrice" class="form-control" />
                 <span asp-validation-for="nightPrice" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
-                </label>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isDeleted" /> @Html.DisplayNameFor(model => model.isDeleted)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="createdAt" class="control-label"></label>
-                <input asp-for="createdAt" class="form-control" />
-                <span asp-validation-for="createdAt" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="createdBy" class="control-label"></label>
                 <input asp-for="createdBy" class="form-control" />
