@@ -18,6 +18,12 @@ using SGRH.IOC.Dependencies.Hotel;
 using SGRH.IOC.Dependencies.Report;
 using SGRH.IOC.Dependencies.ReservationModule;
 using SGRH.IOC.Dependencies.ServiceModule;
+using NuGet.Configuration;
+using SGRH.Web.Infrastructure.Http;
+using SGRH.Web.Repositories.Interfaces.Hotel;
+using SGRH.Web.Repositories;
+using SGRH.Web.Infrastructure.Endpoints.Rate;
+using SGRH.Web.Infrastructure.Endpoints.Room;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -81,6 +87,20 @@ builder.Services.AddUserManagementRepositories(builder.Configuration);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddUserManagementRepositories(builder.Configuration);
+
+// Http Related
+
+builder.Services.AddHttpClient<IHttpClientService, HttpClientService>();
+
+builder.Services.AddTransient<IRateEndpoints, RateEndpoints>();
+builder.Services.AddTransient<IRoomEndpoints, RoomEndpoints>();
+
+builder.Services.AddScoped<IRateApiRepository, RateApiRepository>();
+builder.Services.AddScoped<IRoomApiRepository, RoomApiRepository>();
+
+// Logger
+
+builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
 
 var app = builder.Build();
 
