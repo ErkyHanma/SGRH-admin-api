@@ -1,246 +1,144 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SGRH.Web.Models.Hotel.Floor.Response;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using SGRH.Web.Models.Hotel.Floor;
-using System.Net.Http.Json;
+using SGRH.Web.Models.Hotel.Floor.Responses;
+using SGRH.Web.Repositories.Interfaces.Hotel;
+using System.Threading.Tasks;
 
 namespace SGRH.Web.Controllers
 {
+    [Route("Floor")]
     public class FloorController : Controller
     {
-        // GET: FloorController
+        private readonly IFloorApiRepository _floorApiRepository;
+
+        public FloorController(IFloorApiRepository floorApiRepository)
+        {
+            _floorApiRepository = floorApiRepository;
+        }
+
+        // GET: Floor/Index 
         public async Task<IActionResult> Index()
         {
-            GetAllFloorsResponse getAllFloorsResponse = null;
-            List<FloorModel> floors = new List<FloorModel>(); 
-
-            try
+            GetAllFloorsResponse response = await _floorApiRepository.GetFloorsAsync();
+            if (response.IsSuccess)
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:5171/api/");
-                    var response = await client.GetAsync("Floor/GetFloors");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        
-                        getAllFloorsResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllFloorsResponse>(responseString);
-                        if (getAllFloorsResponse != null && getAllFloorsResponse.Data != null) 
-                        {
-                            floors = getAllFloorsResponse.Data;
-                        }
-                    }
-                }
+                return View(response.Data); 
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error retrieving floors: {ex.Message}");
-            }
-            return View(floors);
+            
+            ViewBag.ErrorMessage = response.Message ?? "Error al obtener los pisos.";
+            return View(new List<FloorModel>()); 
         }
 
-        // GET: FloorController/Details/5
+        // GET: Floor/Details/5
+        [HttpGet("Details/{id}")]
         public async Task<IActionResult> Details(int id)
         {
-            GetFloorResponse getFloorResponse = null;
-            FloorModel floor = null;
-
-            try
+            GetFloorResponse response = await _floorApiRepository.GetFloorByIdAsync(id);
+            if (response.IsSuccess && response.Data != null)
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:5171/api/");
-                    var response = await client.GetAsync($"Floor/GetFloorById?id={id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString);
-                        if (getFloorResponse != null && getFloorResponse.Data != null) 
-                        {
-                            floor = getFloorResponse.Data; 
-                        }
-                    }
-                }
+                return View(response.Data);
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error retrieving floor details: {ex.Message}");
-            }
-            if (floor == null)
-                return NotFound();
-            return View(floor);
+           
+            ViewBag.ErrorMessage = response.Message ?? "Piso no encontrado o error al obtenerlo.";
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: FloorController/Create
+        // GET: Floor/Create
+        [HttpGet("Create")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: FloorController/Create
-        [HttpPost]
+        // POST: Floor/Create
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateFloorModel createFloorModel)
+        public async Task<IActionResult> Create([FromForm] CreateFloorModel model)
         {
-            CreateFloorResponse createResponse = null;
-            try
+            if (ModelState.IsValid)
             {
-                using (var client = new HttpClient())
+                FloorCreateResponse response = await _floorApiRepository.CreateFloorAsync(model);
+                if (response.IsSuccess)
                 {
-                    client.BaseAddress = new Uri("http://localhost:5171/api/");
-                    var response = await client.PostAsJsonAsync("Floor/CreateFloor", createFloorModel);
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    createResponse = System.Text.Json.JsonSerializer.Deserialize<CreateFloorResponse>(responseString);
-
-                    if (createResponse != null && !createResponse.isSuccess) 
-                    {
-                        ModelState.AddModelError("", createResponse.message); 
-                        return View(createFloorModel);
-                    }
+                    TempData["SuccessMessage"] = response.Message ?? "Piso creado correctamente.";
                     return RedirectToAction(nameof(Index));
                 }
+                ModelState.AddModelError("", response.Message ?? "Error al crear el piso.");
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Internal error: " + ex.Message);
-                return View(createFloorModel);
-            }
+            return View(model);
         }
 
-        // GET: FloorController/Edit/5
+        // GET: Floor/Edit/5
+        [HttpGet("Edit/{id}")]
         public async Task<IActionResult> Edit(int id)
         {
-            GetFloorResponse getFloorResponse = null;
-            FloorModel floorData = null;
-            try
+            GetFloorResponse response = await _floorApiRepository.GetFloorByIdAsync(id);
+            if (response.IsSuccess && response.Data != null)
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:5171/api/");
-                    var response = await client.GetAsync($"Floor/GetFloorById?id={id}");
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString);
-                        if (getFloorResponse != null && getFloorResponse.Data != null) 
-                        {
-                            floorData = getFloorResponse.Data; 
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error retrieving floor for edit: {ex.Message}");
-            }
-            if (floorData == null)
-                return NotFound();
-            var editModel = new ModifyFloorModel
-            {
-                FloorId = floorData.FloorId,
-                FloorNumber = floorData.FloorNumber,
-                Description = floorData.Description,
-                Status = floorData.Status,
                 
-            };
-            return View(editModel);
+                var editModel = new EditFloorModel
+                {
+                    FloorId = response.Data.FloorId,
+                    FloorNumber = response.Data.FloorNumber,
+                    Description = response.Data.Description,
+                    Status = response.Data.Status
+                    
+                };
+                return View(editModel);
+            }
+            ViewBag.ErrorMessage = response.Message ?? "Piso no encontrado para edición.";
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: FloorController/Edit/5
-        [HttpPost]
+        // POST: Floor/Edit
+        [HttpPost("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ModifyFloorModel modifyFloorModel)
+        public async Task<IActionResult> Edit([FromForm] EditFloorModel model)
         {
-            ModifyFloorResponse modifyResponse = null;
-            try
+            if (ModelState.IsValid)
             {
-                using (var client = new HttpClient())
+                FloorEditResponse response = await _floorApiRepository.EditFloorAsync(model);
+                if (response.IsSuccess)
                 {
-                    client.BaseAddress = new Uri("http://localhost:5171/api/");
-                    var response = await client.PutAsJsonAsync("Floor/ModifyFloor", modifyFloorModel);
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    modifyResponse = System.Text.Json.JsonSerializer.Deserialize<ModifyFloorResponse>(responseString);
-
-                    if (modifyResponse != null && !modifyResponse.isSuccess) 
-                    {
-                        ModelState.AddModelError("", modifyResponse.message); 
-                        return View(modifyFloorModel);
-                    }
+                    TempData["SuccessMessage"] = response.Message ?? "Piso actualizado correctamente.";
                     return RedirectToAction(nameof(Index));
                 }
+                ModelState.AddModelError("", response.Message ?? "Error al actualizar el piso.");
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Internal error: " + ex.Message);
-                return View(modifyFloorModel);
-            }
+            return View(model);
         }
 
-        // GET: FloorController/Delete/5
+        // GET: Floor/Delete/5 
+        [HttpGet("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            GetFloorResponse getFloorResponse = null;
-            FloorModel floorData = null;
-            try
+            GetFloorResponse response = await _floorApiRepository.GetFloorByIdAsync(id);
+            if (response.IsSuccess && response.Data != null)
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:5171/api/");
-                    var response = await client.GetAsync($"Floor/GetFloorById?id={id}");
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getFloorResponse = System.Text.Json.JsonSerializer.Deserialize<GetFloorResponse>(responseString);
-                        if (getFloorResponse != null && getFloorResponse.Data != null) 
-                        {
-                            floorData = getFloorResponse.Data; 
-                        }
-                    }
-                }
+
+                var deleteModel = new DeleteFloorModel { FloorId = response.Data.FloorId };
+                ViewBag.FloorNumber = response.Data.FloorNumber; 
+                return View(deleteModel);
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error retrieving floor for delete: {ex.Message}");
-            }
-            if (floorData == null)
-                return NotFound();
-            var deleteModel = new DisableFloorModel
-            {
-                FloorId = floorData.FloorId
-                
-            };
-            return View(deleteModel);
+            ViewBag.ErrorMessage = response.Message ?? "Piso no encontrado para deshabilitar.";
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: FloorController/Delete/5
-        [HttpPost]
+        // POST: Floor/Delete
+        [HttpPost("DeleteConfirmed")] 
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, DisableFloorModel disableFloorModel)
+        public async Task<IActionResult> DeleteConfirmed([FromForm] DeleteFloorModel model)
         {
-            DisableFloorResponse deleteResponse = null;
-            try
+            DeleteFloorResponse response = await _floorApiRepository.DeleteFloorAsync(model);
+            if (response.IsSuccess)
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:5171/api/");
-                    var response = await client.PutAsJsonAsync("Floor/DisableFloor", disableFloorModel);
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    deleteResponse = System.Text.Json.JsonSerializer.Deserialize<DisableFloorResponse>(responseString);
-
-                    if (deleteResponse != null && !deleteResponse.isSuccess) 
-                    {
-                        ModelState.AddModelError("", deleteResponse.message); 
-                        return View(disableFloorModel);
-                    }
-                    return RedirectToAction(nameof(Index));
-                }
+                TempData["SuccessMessage"] = response.Message ?? "Piso deshabilitado correctamente.";
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Internal error: " + ex.Message);
-                return View(disableFloorModel);
-            }
+            ModelState.AddModelError("", response.Message ?? "Error al deshabilitar el piso.");
+            // Si hay un error, redirige de nuevo a la vista de confirmación de eliminación o al Index
+            return RedirectToAction(nameof(Delete), new { id = model.FloorId });
         }
     }
 }

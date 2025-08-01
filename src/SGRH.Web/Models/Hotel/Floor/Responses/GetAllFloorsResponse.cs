@@ -1,6 +1,7 @@
-﻿using SGRH.Web.Models.Base;
+﻿using SGRH.Web.Models.Hotel.Floor;
+using SGRH.Web.Models.Base;
 
-namespace SGRH.Web.Models.Hotel.Floor.Response
+namespace SGRH.Web.Models.Hotel.Floor.Responses
 {
     public class GetAllFloorsResponse : BaseResponse
     {

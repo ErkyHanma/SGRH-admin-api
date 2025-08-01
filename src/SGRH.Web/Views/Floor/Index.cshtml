@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>List of All Active Floors</h1>
+<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New Floor</a>
@@ -16,6 +16,12 @@
                 @Html.DisplayNameFor(model => model.FloorId)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedBy)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.FloorNumber)
             </th>
             <th>
@@ -24,43 +30,36 @@
             <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
-            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FloorId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FloorNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedAt)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedBy)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.FloorId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.FloorId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.FloorId">Delete</a>
-                </td>
-            </tr>
-        }
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FloorId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FloorNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                    @Html.ActionLink("Edit", "Edit", new { id=item.FloorId }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.FloorId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.FloorId })
+            </td>
+        </tr>
+}
     </tbody>
 </table>

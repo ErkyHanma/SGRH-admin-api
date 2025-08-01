@@ -12,15 +12,20 @@ using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Application.Interfaces.Services.Report;
 using SGRH.Application.Services.Hotel;
 using SGRH.Application.Services.Report;
+using SGRH.IOC.Dependencies.Hotel;
+using SGRH.IOC.Dependencies.ReservationModule;
+using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
 using SGRH.Persistence.Repositories.Report;
 using SGRH.Persistence.Repositories.UserManagement;
-
-using SGRH.IOC.Dependencies.ReservationModule;
-using SGRH.IOC.Dependencies.ServiceModule;
-using SGRH.IOC.Dependencies.Hotel;
-
+using SGRH.Web.Infrastructure.Http;
+using SGRH.Web.Repositories.Base;
+using NuGet.Configuration;
+using SGRH.Web.Repositories.Interfaces.Hotel;
+using SGRH.Web.Repositories;
+using SGRH.Web.Infrastructure.Endpoints.RoomCategory;
+using SGRH.Web.Infrastructure.Endpoints.Floor;
 
 
 
@@ -91,6 +96,18 @@ builder.Services.AddServiceDependency();
 builder.Services.AddUserManagementRepositories(builder.Configuration);
 
 
+
+builder.Services.AddHttpClient<IHttpClientService, HttpClientService>();
+
+builder.Services.AddTransient<IRoomCategoryEndpoints, RoomCategoryEndpoints>();
+builder.Services.AddTransient<IFloorEndpoints, FloorEndpoints>();
+
+builder.Services.AddScoped<IRoomCategoryApiRepository, RoomCategoryApiRepository>();
+builder.Services.AddScoped<IFloorApiRepository, FloorApiRepository>();
+
+// Logger
+
+builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
 
 
 

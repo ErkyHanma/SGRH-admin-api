@@ -35,7 +35,7 @@ namespace SGRH.Api.Controllers
         }
 
         // GET api/Floor/5
-        [HttpGet("{GetFloorById}")]
+        [HttpGet("GetFloorById")]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _floorService.GetFloorsById(id);

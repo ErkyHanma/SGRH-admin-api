@@ -34,7 +34,7 @@ namespace SGRH.Api.Controllers
         }
 
         // GET api/RoomCategory/5
-        [HttpGet("{GetRoomCategoryById}")]
+        [HttpGet("GetRoomCategoryById")]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _roomCategoryService.GetRoomCategoryById(id);

@@ -1,18 +1,17 @@
-﻿@model SGRH.Web.Models.Hotel.RoomCategory.ModifyRoomCategoryModel
+﻿@model SGRH.Web.Models.Hotel.RoomCategory.EditRoomCategoryModel
 
 @{
-    ViewData["Title"] = "Edit Room Category";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>Edit Room Category</h1>
+<h1>Edit</h1>
 
-<h4>Edit a room category here!</h4>
+<h4>EditRoomCategoryModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="CategoryId" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -34,6 +33,11 @@
                 <span asp-validation-for="Amenities" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <input asp-for="CategoryId" class="form-control" />
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="UpdatedBy" class="control-label"></label>
                 <input asp-for="UpdatedBy" class="form-control" />
                 <span asp-validation-for="UpdatedBy" class="text-danger"></span>
@@ -50,7 +54,5 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

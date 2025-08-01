@@ -1,18 +1,17 @@
-﻿@model SGRH.Web.Models.Hotel.Floor.ModifyFloorModel
+﻿@model SGRH.Web.Models.Hotel.Floor.EditFloorModel
 
 @{
-    ViewData["Title"] = "Edit Floor";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>Edit Floor</h1>
+<h1>Edit</h1>
 
-<h4>Edit a floor here!</h4>
+<h4>EditFloorModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="FloorId" />
             <div class="form-group">
                 <label asp-for="FloorNumber" class="control-label"></label>
                 <input asp-for="FloorNumber" class="form-control" />
@@ -23,10 +22,15 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Status" /> @Html.DisplayNameFor(model => model.Status)
-                </label>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FloorId" class="control-label"></label>
+                <input asp-for="FloorId" class="form-control" />
+                <span asp-validation-for="FloorId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="UpdatedBy" class="control-label"></label>
@@ -45,7 +49,5 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
