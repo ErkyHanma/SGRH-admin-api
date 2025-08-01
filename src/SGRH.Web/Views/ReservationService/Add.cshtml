@@ -8,6 +8,7 @@
 <h1>Add Service to Reservation</h1>
 
 <form asp-action="Add" method="post">
+    @* <div asp-validation-summary="ModelOnly" class="text-danger"></div> *@
     <input type="hidden" asp-for="reservationId" />
 
     <div class="form-group">

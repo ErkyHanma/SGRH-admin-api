@@ -16,8 +16,10 @@ using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
 using SGRH.Persistence.Repositories.UserManagement;
+using SGRH.Web.Interfaces.HttpClients;
 using SGRH.Web.Interfaces.HttpClients.ReservationModule;
 using SGRH.Web.Interfaces.HttpClients.ServiceModule;
+using SGRH.Web.Services.HttpClients;
 using SGRH.Web.Services.HttpClients.ReservationModule;
 using SGRH.Web.Services.HttpClients.ServiceModule;
 
@@ -27,20 +29,14 @@ var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 builder.Configuration["ConnectionStrings:SGRHConnection"] = "Host=aws-0-us-east-2.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.vcnsurdtnpeycpifqzxl;Password=Erkyhanma002;SSL Mode=Require;Trust Server Certificate=true";
 
 builder.Services.AddTransient<IServiceHttpClient, ServiceHttpClient>();
+builder.Services.AddTransient<IReservationHttpClient, ReservationHttpClient>();
+builder.Services.AddTransient<IReservationServiceHttpClient, ReservationServiceHttpClient>();
 
+
+// HttpClient
 var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
 
-builder.Services.AddHttpClient<IServiceHttpClient, ServiceHttpClient>(client =>
-{
-    client.BaseAddress = new Uri(baseUrl);
-});
-
-builder.Services.AddHttpClient<IReservationHttpClient, ReservationHttpClient>(client =>
-{
-    client.BaseAddress = new Uri(baseUrl);
-});
-
-builder.Services.AddHttpClient<IReservationServiceHttpClient, ReservationServiceHttpClient>(client =>
+builder.Services.AddHttpClient<IBaseHttpClientMethods, BaseHttpClientMethods>(client =>
 {
     client.BaseAddress = new Uri(baseUrl);
 });

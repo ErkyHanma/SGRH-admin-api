@@ -66,7 +66,6 @@ namespace SGRH.Web.Controllers.ReservationModule
 
                 }
 
-
                 if (addReservationServiceResponse != null && !string.IsNullOrEmpty(addReservationServiceResponse.message))
                 {
                     ModelState.AddModelError(string.Empty, addReservationServiceResponse.message);
