@@ -4,6 +4,6 @@ namespace SGRH.Web.Models.Hotel.Floor.Responses
 {
     public class FloorEditResponse : BaseResponse
     {
-        // public FloorModel Data { get; set; }
+        //public FloorModel Data { get; set; }
     }
 }
