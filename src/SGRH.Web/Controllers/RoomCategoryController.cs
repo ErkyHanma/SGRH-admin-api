@@ -87,8 +87,8 @@ namespace SGRH.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: RoomCategory/Edit
-        [HttpPost("Edit")]
+        // PUT: RoomCategory/Edit
+        [HttpPut("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromForm] EditRoomCategoryModel model)
         {
@@ -120,8 +120,8 @@ namespace SGRH.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: RoomCategory/DeleteConfirmed
-        [HttpPost("DeleteConfirmed")]
+        // PUT: RoomCategory/DeleteConfirmed
+        [HttpPut("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed([FromForm] DeleteRoomCategoryModel model)
         {

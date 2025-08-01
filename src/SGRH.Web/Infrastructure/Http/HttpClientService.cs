@@ -1,9 +1,7 @@
 ﻿
 using SGRH.Application.Common.Logging;
-//using SGRH.Domain.Entities.UserManagement;
-//using SGRH.Web.Models.Hotel.Room.Responses;
 using System.Text.Json;
-//using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace SGRH.Web.Infrastructure.Http
 {

@@ -92,7 +92,7 @@ namespace SGRH.Web.Controllers
         }
 
         // POST: Floor/Edit
-        [HttpPost("Edit")]
+        [HttpPut("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromForm] EditFloorModel model)
         {
@@ -126,7 +126,7 @@ namespace SGRH.Web.Controllers
         }
 
         // POST: Floor/Delete
-        [HttpPost("DeleteConfirmed")] 
+        [HttpPut("DeleteConfirmed")] 
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed([FromForm] DeleteFloorModel model)
         {

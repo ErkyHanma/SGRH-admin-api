@@ -1,5 +1,4 @@
-﻿// SGRH.Web.Repositories/RoomCategoryApiRepository.cs
-using SGRH.Application.Common.Logging;
+﻿using SGRH.Application.Common.Logging;
 using SGRH.Web.Infrastructure.Endpoints.RoomCategory;
 using SGRH.Web.Infrastructure.Http;
 using SGRH.Web.Models.Hotel.RoomCategory;
