@@ -45,7 +45,15 @@ namespace SGRH.Web.Controllers.ServiceModule
 
             try
             {
-                getServiceByIdResponse = await _serviceHttpClient.GetServiceByIdAsync(id);
+                var response = await _serviceHttpClient.GetServiceByIdAsync<ServiceModel>(id);
+
+                getServiceByIdResponse = new GetServiceByIdResponse
+                {
+                    isSuccess = response.isSuccess,
+                    message = response.message,
+                    data = response.data
+                }
+              ;
             }
             catch (Exception ex)
             {
@@ -109,7 +117,15 @@ namespace SGRH.Web.Controllers.ServiceModule
 
             try
             {
-                editServiceResponse = await _serviceHttpClient.GetEditServiceByIdAsync(id);
+                var response = await _serviceHttpClient.GetServiceByIdAsync<ServiceModel>(id);
+
+                editServiceResponse = new EditServiceResponse
+                {
+                    isSuccess = response.isSuccess,
+                    message = response.message,
+                    data = response.data
+                }
+                ;
             }
             catch (Exception ex)
             {
@@ -146,7 +162,7 @@ namespace SGRH.Web.Controllers.ServiceModule
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                    ModelState.AddModelError(string.Empty, "An error occurred while modifiying the service.");
                 }
             }
             catch (Exception ex)
@@ -165,7 +181,15 @@ namespace SGRH.Web.Controllers.ServiceModule
 
             try
             {
-                deleteServiceResponse = await _serviceHttpClient.GetDeleteServiceByIdAsync(id);
+                var response = await _serviceHttpClient.GetServiceByIdAsync<DeleteServiceModel>(id);
+
+                deleteServiceResponse = new DeleteServiceResponse
+                {
+                    isSuccess = response.isSuccess,
+                    message = response.message,
+                    data = response.data
+                }
+               ;
             }
             catch (Exception ex)
             {
@@ -195,14 +219,13 @@ namespace SGRH.Web.Controllers.ServiceModule
                     return RedirectToAction(nameof(Index));
                 }
 
-
                 if (deleteServiceResponse != null && !deleteServiceResponse.isSuccess && !string.IsNullOrEmpty(deleteServiceResponse.message))
                 {
                     ModelState.AddModelError(string.Empty, deleteServiceResponse.message);
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "An error occurred while creating the service.");
+                    ModelState.AddModelError(string.Empty, "An error occurred while deleting the service.");
                 }
             }
             catch

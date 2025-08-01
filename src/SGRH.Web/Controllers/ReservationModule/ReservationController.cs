@@ -48,14 +48,21 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                getReservationByIdResponse = await _reservationHttpClient.GetReservationByIdAsync(id);
+                var response = await _reservationHttpClient.GetReservationByIdAsync<ReservationModel>(id);
+
+                getReservationByIdResponse = new GetReservationByIdResponse
+                {
+                    isSuccess = response.isSuccess,
+                    message = response.message,
+                    data = response.data
+                };
             }
             catch (Exception ex)
             {
                 getReservationByIdResponse = new GetReservationByIdResponse
                 {
                     isSuccess = false,
-                    message = "Error retrieving data."
+                    message = $"Error retrieving data.{ex.Message}"
                 };
 
             }
@@ -110,7 +117,14 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                editReservationResponse = await _reservationHttpClient.GetEditReservationByIdAsync(id);
+                var response = await _reservationHttpClient.GetReservationByIdAsync<EditReservationModel>(id);
+
+                editReservationResponse = new EditReservationResponse
+                {
+                    isSuccess = response.isSuccess,
+                    message = response.message,
+                    data = response.data
+                };
             }
             catch (Exception ex)
             {
@@ -168,7 +182,14 @@ namespace SGRH.Web.Controllers.ReservationModule
 
             try
             {
-                deleteReservationResponse = await _reservationHttpClient.GetDeleteReservationByIdAsync(id);
+                var response = await _reservationHttpClient.GetReservationByIdAsync<DeleteReservationModel>(id);
+
+                deleteReservationResponse = new DeleteReservationResponse
+                {
+                    isSuccess = response.isSuccess,
+                    message = response.message,
+                    data = response.data
+                };
             }
             catch (Exception ex)
             {

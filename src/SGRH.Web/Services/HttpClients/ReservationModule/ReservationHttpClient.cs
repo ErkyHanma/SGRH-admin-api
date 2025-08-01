@@ -1,8 +1,8 @@
 ﻿using SGRH.Application.Common.Logging;
 using SGRH.Web.Interfaces.HttpClients.ReservationModule;
+using SGRH.Web.Models;
 using SGRH.Web.Models.ReservationModule.Reservation;
 using SGRH.Web.Models.ReservationModule.Reservation.Response;
-using SGRH.Web.Services.HttpClients.ServiceModule;
 using System.Text.Json;
 
 namespace SGRH.Web.Services.HttpClients.ReservationModule
@@ -10,9 +10,9 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
     public class ReservationHttpClient : IReservationHttpClient
     {
         private readonly HttpClient _client;
-        private readonly IAppLogger<ServiceHttpClient> _logger;
+        private readonly IAppLogger<ReservationHttpClient> _logger;
 
-        public ReservationHttpClient(HttpClient client, IAppLogger<ServiceHttpClient> logger)
+        public ReservationHttpClient(HttpClient client, IAppLogger<ReservationHttpClient> logger)
         {
             _client = client;
             _logger = logger;
@@ -43,9 +43,8 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
 
 
         }
-        public async Task<GetReservationByIdResponse> GetReservationByIdAsync(int id)
+        public async Task<BaseResponse<TModel>> GetReservationByIdAsync<TModel>(int id)
         {
-
             try
             {
                 var response = await _client.GetAsync($"Reservation/{id}");
@@ -53,20 +52,18 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
                 if (response.IsSuccessStatusCode)
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<GetReservationByIdResponse>(responseString);
+                    return JsonSerializer.Deserialize<BaseResponse<TModel>>(responseString);
                 }
                 else
                 {
-                    return new GetReservationByIdResponse { isSuccess = false, message = "Error retrieving reservation" };
+                    return new BaseResponse<TModel> { isSuccess = false, message = "Error retrieving reservation." };
                 }
             }
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "An exception occurred while retrieving reservation.");
-                return new GetReservationByIdResponse { isSuccess = false, message = $"Error retrieving reservation. {ex.Message}" };
+                return new BaseResponse<TModel> { isSuccess = false, message = "Error retrieving reservation." };
             }
-
-
         }
         public async Task<CreateReservationResponse> CreateReservationAsync(CreateReservationModel createReservationModel)
         {
@@ -94,29 +91,6 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
             }
 
         }
-        public async Task<EditReservationResponse> GetEditReservationByIdAsync(int id)
-        {
-            try
-            {
-                var response = await _client.GetAsync($"Reservation/{id}");
-                var responseString = await response.Content.ReadAsStringAsync();
-                var editReservationResponse = JsonSerializer.Deserialize<EditReservationResponse>(responseString);
-
-                if (response.IsSuccessStatusCode && editReservationResponse is not null)
-                {
-                    return editReservationResponse;
-                }
-                else
-                {
-                    return new EditReservationResponse { isSuccess = false, message = editReservationResponse?.message ?? "Error retrieving reservation" };
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorEx(ex, "An exception occurred while retrieving reservation.");
-                return new EditReservationResponse { isSuccess = false, message = $"Error retrieving reservation. {ex.Message}" };
-            }
-        }
         public async Task<EditReservationResponse> EditReservationAsync(EditReservationModel editReservationModel)
         {
 
@@ -143,29 +117,6 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
             }
 
 
-        }
-        public async Task<DeleteReservationResponse> GetDeleteReservationByIdAsync(int id)
-        {
-            try
-            {
-                var response = await _client.GetAsync($"Reservation/{id}");
-                var responseString = await response.Content.ReadAsStringAsync();
-                var deleteReservationResponse = JsonSerializer.Deserialize<DeleteReservationResponse>(responseString);
-
-                if (response.IsSuccessStatusCode && deleteReservationResponse is not null)
-                {
-                    return deleteReservationResponse;
-                }
-                else
-                {
-                    return new DeleteReservationResponse { isSuccess = false, message = deleteReservationResponse?.message ?? "Error retrieving reservation" };
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorEx(ex, "An exception occurred while retrieving reservation.");
-                return new DeleteReservationResponse { isSuccess = false, message = $"Error retrieving reservation. {ex.Message}" };
-            }
         }
         public async Task<DeleteReservationResponse> DeleteReservationAsync(DeleteReservationModel deleteReservationModel)
         {
@@ -198,3 +149,5 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
 
     }
 }
+
+
