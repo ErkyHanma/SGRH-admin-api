@@ -3,91 +3,123 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Text.Json; // used for JSON serialization/deserialization
-using System.Collections.Generic; // used for lists (e.g., list of clients)
-using SGRH.Web.Models.Clients; // used for ClientViewModel, ClientCreateViewModel, ClientEditViewModel
-using SGRH.Web.Models; // Used for OperationResult
-using Microsoft.AspNetCore.Http; // Needed for IFormCollection in POST actions
+using System.Text.Json;
+using System.Collections.Generic;
+using SGRH.Web.Models.Clients;
+using SGRH.Web.Models;
+using System.Text;
 
 namespace SGRH.Web.Controllers
 {
-    public class ClientsController : Controller // Class name is now ClientsController (plural)
+    public class ClientsController : Controller
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiBaseUrl;
 
         public ClientsController(IConfiguration configuration)
         {
-            // Read API base URL from appsettings.json
             _apiBaseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl") ?? throw new InvalidOperationException("ApiSettings:BaseUrl not found in configuration.");
-
-            // Initialize HttpClient and set its base address
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(_apiBaseUrl);
         }
 
-        // GET: ClientsController
         public async Task<IActionResult> Index()
         {
             List<ClientViewModel> clients = new List<ClientViewModel>();
             try
             {
-                // Making the GET request to the API
-                // Assuming your API endpoint for getting all clients is /api/Clients
                 HttpResponseMessage response = await _httpClient.GetAsync("Clients");
 
                 if (response.IsSuccessStatusCode)
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-
-                    // Deserialize the API response directly into a List<ClientViewModel>
                     clients = JsonSerializer.Deserialize<List<ClientViewModel>>(apiResponse,
                                                                  new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                                                                 ?? new List<ClientViewModel>(); // Handle null result
+                                                                 ?? new List<ClientViewModel>();
                 }
                 else
                 {
-                    // Handle non-successful HTTP status codes
                     ViewBag.ErrorMessage = $"Error: {response.StatusCode} - {response.ReasonPhrase}";
                 }
             }
             catch (HttpRequestException ex)
             {
-                // Handle network or request-specific errors
                 ViewBag.ErrorMessage = $"Network error: {ex.Message}";
             }
             catch (JsonException ex)
             {
-                // Handle JSON deserialization errors
                 ViewBag.ErrorMessage = $"Data format error: {ex.Message}";
             }
             catch (Exception ex)
             {
-                // Catch any other unexpected errors
                 ViewBag.ErrorMessage = $"An unexpected error occurred: {ex.Message}";
             }
 
-            return View(clients); // Pass the list of clients to the view
+            return View(clients);
         }
 
-        // GET: ClientsController/Details/5
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int? id)
         {
-            // This action will later fetch details for a specific client from the API.
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ClientViewModel client = null;
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"Clients/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    client = JsonSerializer.Deserialize<ClientViewModel>(apiResponse,
+                                                                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (client == null)
+                    {
+                        ViewBag.ErrorMessage = $"Client with ID {id} not found or could not be deserialized.";
+                        return View();
+                    }
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    ViewBag.ErrorMessage = $"Client with ID {id} not found.";
+                    return View();
+                }
+                else
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    ViewBag.ErrorMessage = $"Error fetching client details: {response.StatusCode} - {errorContent}";
+                    return View();
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                ViewBag.ErrorMessage = $"Network error trying to fetch client details: {ex.Message}";
+                return View();
+            }
+            catch (JsonException ex)
+            {
+                ViewBag.ErrorMessage = $"Data format error fetching client details: {ex.Message}";
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"An unexpected error occurred while fetching client details: {ex.Message}";
+                return View();
+            }
+
+            return View(client);
         }
 
-        // GET: ClientsController/Create
         public IActionResult Create()
         {
-            // This action will simply display the form to create a new client.
             return View();
         }
 
-        // POST: ClientsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientCreateViewModel client) // Este es el cambio que estábamos implementando
+        public async Task<IActionResult> Create(ClientCreateViewModel client)
         {
             if (ModelState.IsValid)
             {
@@ -100,7 +132,7 @@ namespace SGRH.Web.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        TempData["SuccessMessage"] = "Cliente creado exitosamente.";
+                        TempData["SuccessMessage"] = "Client created successfully.";
                         return RedirectToAction(nameof(Index));
                     }
                     else
@@ -109,78 +141,255 @@ namespace SGRH.Web.Controllers
                         try
                         {
                             var operationResult = JsonSerializer.Deserialize<OperationResult<string>>(errorResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                            ViewBag.ErrorMessage = $"Error al crear el cliente: {operationResult?.Message ?? errorResponse}";
+                            ViewBag.ErrorMessage = $"Error creating client: {operationResult?.Message ?? errorResponse}";
                         }
                         catch (JsonException)
                         {
-                            ViewBag.ErrorMessage = $"Error al crear el cliente: {errorResponse}";
+                            ViewBag.ErrorMessage = $"Error creating client: {errorResponse}";
                         }
                         return View(client);
                     }
                 }
                 catch (HttpRequestException ex)
                 {
-                    ViewBag.ErrorMessage = $"Error de red al intentar crear el cliente: {ex.Message}";
+                    ViewBag.ErrorMessage = $"Network error trying to create client: {ex.Message}";
                 }
                 catch (JsonException ex)
                 {
-                    ViewBag.ErrorMessage = $"Error de formato de datos al crear el cliente: {ex.Message}";
+                    ViewBag.ErrorMessage = $"Data format error creating client: {ex.Message}";
                 }
                 catch (Exception ex)
                 {
-                    ViewBag.ErrorMessage = $"Ocurrió un error inesperado al crear el cliente: {ex.Message}";
+                    ViewBag.ErrorMessage = $"An unexpected error occurred while creating client: {ex.Message}";
                 }
             }
             return View(client);
         }
 
-        // GET: ClientsController/Edit/5
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int? id)
         {
-            // This action will later fetch client data for the edit form.
-            return View();
-        }
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        // POST: ClientsController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, IFormCollection collection) // Placeholder, will be ClientEditViewModel later
-        {
             try
             {
-                // Placeholder for API call logic
-                return RedirectToAction(nameof(Index));
+                var response = await _httpClient.GetAsync($"Clients/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var clientString = await response.Content.ReadAsStringAsync();
+                    var clientViewModel = JsonSerializer.Deserialize<ClientEditViewModel>(clientString,
+                                                                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    if (clientViewModel == null)
+                    {
+                        return NotFound($"Could not deserialize client with ID {id}.");
+                    }
+
+                    clientViewModel.PasswordHash = null;
+
+                    return View(clientViewModel);
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return NotFound($"Client with ID {id} not found.");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    ViewBag.ErrorMessage = $"Error fetching client: {response.StatusCode} - {errorContent}";
+                    return View();
+                }
             }
-            catch
+            catch (HttpRequestException ex)
             {
-                // Placeholder for error handling
+                ViewBag.ErrorMessage = $"Network error trying to fetch client: {ex.Message}";
+                return View();
+            }
+            catch (JsonException ex)
+            {
+                ViewBag.ErrorMessage = $"Data format error fetching client: {ex.Message}";
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"An unexpected error occurred while fetching client: {ex.Message}";
                 return View();
             }
         }
 
-        // GET: ClientsController/Delete/5
-        public IActionResult Delete(int id)
-        {
-            // This action will later fetch client data for delete confirmation.
-            return View();
-        }
-
-        // POST: ClientsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [ActionName("Delete")] // Needed to differentiate from GET Delete when both are named "Delete" by convention
-        public IActionResult DeleteConfirmed(int id) // Placeholder for ViewModel/collection
+        public async Task<IActionResult> Edit(int id, ClientEditViewModel clientViewModel)
+        {
+            ViewBag.DebugMessage = $"Route ID: {id}, ViewModel UserId: {clientViewModel.UserId}"; // Punto de interrupción aquí
+
+            if (id != clientViewModel.UserId)
+            {
+                ViewBag.ErrorMessage = $"Error updating client: ID from route does not match client's UserId. {ViewBag.DebugMessage}";
+                return View(clientViewModel);
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var apiUpdateData = new
+                    {
+                        id = clientViewModel.UserId,
+                        firstName = clientViewModel.FirstName,
+                        lastName = clientViewModel.LastName,
+                        email = clientViewModel.Email,
+                        passwordHash = clientViewModel.PasswordHash,
+                        roleId = clientViewModel.RoleId,
+                        phone = clientViewModel.Phone,
+                        address = clientViewModel.Address,
+                        createdAt = clientViewModel.CreatedAt,
+                        createdBy = clientViewModel.CreatedBy,
+                        updatedAt = DateTime.UtcNow,
+                        updatedBy = clientViewModel.UpdatedBy ?? 1,
+                        deletedAt = clientViewModel.DeletedAt,
+                        deletedBy = clientViewModel.DeletedBy,
+                        isActive = clientViewModel.IsActive,
+                        isDeleted = clientViewModel.IsDeleted
+                    };
+
+                    var jsonContent = JsonSerializer.Serialize(apiUpdateData);
+                    var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                    var response = await _httpClient.PutAsync($"Clients/{id}", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TempData["SuccessMessage"] = "Client updated successfully.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var operationResult = JsonSerializer.Deserialize<OperationResult<string>>(errorContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                            ViewBag.ErrorMessage = $"Error updating client: {operationResult?.Message ?? errorContent}";
+                        }
+                        catch (JsonException)
+                        {
+                            ViewBag.ErrorMessage = $"Error updating client: {errorContent}";
+                        }
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    ViewBag.ErrorMessage = $"Network error trying to update client: {ex.Message}";
+                }
+                catch (JsonException ex)
+                {
+                    ViewBag.ErrorMessage = $"Data format error updating client: {ex.Message}";
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.ErrorMessage = $"An unexpected error occurred while updating client: {ex.Message}";
+                }
+            }
+            return View(clientViewModel);
+        }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ClientViewModel client = null;
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"Clients/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    client = JsonSerializer.Deserialize<ClientViewModel>(apiResponse,
+                                                                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (client == null)
+                    {
+                        ViewBag.ErrorMessage = $"Client with ID {id} not found or could not be deserialized for deletion.";
+                        return View();
+                    }
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    ViewBag.ErrorMessage = $"Client with ID {id} not found.";
+                    return View();
+                }
+                else
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    ViewBag.ErrorMessage = $"Error fetching client for deletion: {response.StatusCode} - {errorContent}";
+                    return View();
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                ViewBag.ErrorMessage = $"Network error trying to fetch client for deletion: {ex.Message}";
+                return View();
+            }
+            catch (JsonException ex)
+            {
+                ViewBag.ErrorMessage = $"Data format error fetching client for deletion: {ex.Message}";
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"An unexpected error occurred while fetching client for deletion: {ex.Message}";
+                return View();
+            }
+
+            return View(client);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
-                // Placeholder for API call logic
-                return RedirectToAction(nameof(Index));
+                HttpResponseMessage response = await _httpClient.DeleteAsync($"Clients/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["SuccessMessage"] = "Client deleted successfully.";
+                    return RedirectToAction(nameof(Index));
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    TempData["ErrorMessage"] = $"Client with ID {id} not found for deletion.";
+                }
+                else
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        var operationResult = JsonSerializer.Deserialize<OperationResult<string>>(errorContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        TempData["ErrorMessage"] = $"Error deleting client: {operationResult?.Message ?? errorContent}";
+                    }
+                    catch (JsonException)
+                    {
+                        TempData["ErrorMessage"] = $"Error deleting client: {errorContent}";
+                    }
+                }
             }
-            catch
+            catch (HttpRequestException ex)
             {
-                // Placeholder for error handling
-                return View();
+                TempData["ErrorMessage"] = $"Network error trying to delete client: {ex.Message}";
             }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An unexpected error occurred while deleting client: {ex.Message}";
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

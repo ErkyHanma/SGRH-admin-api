@@ -1,11 +1,12 @@
 ﻿// src/SGRH.Web/Models/Clients/ClientEditViewModel.cs
+using System; // Necesario para DateTime y DateTime?
 using System.ComponentModel.DataAnnotations;
 
 namespace SGRH.Web.Models.Clients
 {
     public class ClientEditViewModel
     {
-        [Required] // User ID is necessary to identify the client to edit
+        [Required] // El ID de usuario es esencial para identificar el cliente a editar
         public int UserId { get; set; }
 
         [Required(ErrorMessage = "First Name is required.")]
@@ -20,13 +21,31 @@ namespace SGRH.Web.Models.Clients
         [EmailAddress(ErrorMessage = "Invalid Email Address.")]
         public string Email { get; set; } = string.Empty;
 
+        // PasswordHash: Hacemos que sea nullable (string?) en el ViewModel
+        // porque no siempre se va a cambiar la contraseña al editar otros datos.
+        // Tu API de actualización debería manejar que este campo pueda ser nulo si no se envía.
+        [DataType(DataType.Password)]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
+        public string? PasswordHash { get; set; }
+
+        [Required(ErrorMessage = "Role is required.")] // RoleId es típicamente requerido
+        public int RoleId { get; set; }
+
         [StringLength(20, ErrorMessage = "Phone cannot exceed 20 characters.")]
-        public string Phone { get; set; } = string.Empty;
+        public string? Phone { get; set; } // Puede ser nullable si tu API lo permite
 
         [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
-        public string Address { get; set; } = string.Empty;
+        public string? Address { get; set; } // Puede ser nullable si tu API lo permite
 
-        // Do not include PasswordHash here unless you have a specific field for changing password on edit.
-        // If the API requires it for update, add it, but be careful with security handling.
+        // --- Propiedades de auditoría y estado (que estaban faltando) ---
+        public DateTime? CreatedAt { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public int? UpdatedBy { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public int? DeletedBy { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IsActive { get; set; }
+        // -----------------------------------------------------------------
     }
 }

@@ -1,5 +1,6 @@
 ﻿// src/SGRH.Web/Models/Clients/ClientCreateViewModel.cs
-using System.ComponentModel.DataAnnotations; // For validation attributes
+using System; // Agregado para DateTime
+using System.ComponentModel.DataAnnotations; // Para atributos de validación
 
 namespace SGRH.Web.Models.Clients
 {
@@ -20,16 +21,21 @@ namespace SGRH.Web.Models.Clients
         [Required(ErrorMessage = "Password is required.")]
         [DataType(DataType.Password)]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
-        public string PasswordHash { get; set; } = string.Empty; // Necessary for creation
+        public string PasswordHash { get; set; } = string.Empty;
 
-        // If your API requires a RoleId for creating a Client, add it here.
-        // [Required(ErrorMessage = "Role is required.")]
-        public int RoleId { get; set; } // Adjust if the name is different in your API
+        public int RoleId { get; set; }
 
         [StringLength(20, ErrorMessage = "Phone cannot exceed 20 characters.")]
         public string Phone { get; set; } = string.Empty;
 
         [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
         public string Address { get; set; } = string.Empty;
+
+        
+        public DateTime? CreatedAt { get; set; }
+        public int? CreatedBy { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IsActive { get; set; }
+        // -----------------------------------------------------------
     }
 }
