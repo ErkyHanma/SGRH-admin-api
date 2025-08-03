@@ -4,6 +4,7 @@ using SGRH.Web.Interfaces.HttpClients.ReservationModule;
 using SGRH.Web.Models;
 using SGRH.Web.Models.ReservationModule.Reservation;
 using SGRH.Web.Models.ReservationModule.Reservation.Response;
+using SGRH.Web.Models.ReservationModule.Reservation.Validation;
 
 namespace SGRH.Web.Services.HttpClients.ReservationModule
 {
@@ -64,6 +65,15 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
 
             try
             {
+
+                CreateReservationModelValidator createReservationValidator = new();
+                var validationResult = createReservationValidator.Validate(createReservationModel);
+
+                if (!validationResult.isSuccess)
+                {
+                    return validationResult;
+                }
+
                 var createReservationResponse = await _httpClient.PostAsync<CreateReservationResponse>("Reservation/CreateReservation", createReservationModel);
 
                 return createReservationResponse ?? new CreateReservationResponse
@@ -85,6 +95,16 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
 
             try
             {
+
+                EditReservationModelValidator editReservationModelValidator = new();
+                var validationResult = editReservationModelValidator.Validate(editReservationModel);
+
+                if (!validationResult.isSuccess)
+                {
+                    return validationResult;
+                }
+
+
                 var editReservationResponse = await _httpClient.PostAsync<EditReservationResponse>("Reservation/UpdateReservation", editReservationModel);
 
                 return editReservationResponse ?? new EditReservationResponse
@@ -107,6 +127,14 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
 
             try
             {
+                DeleteReservationModelValidator deleteReservationModelValidator = new();
+                var validationResult = deleteReservationModelValidator.Validate(deleteReservationModel);
+
+                if (!validationResult.isSuccess)
+                {
+                    return validationResult;
+                }
+
                 var deleteReservationResponse = await _httpClient.PostAsync<DeleteReservationResponse>("Reservation/DisableReservation", deleteReservationModel);
 
                 return deleteReservationResponse ?? new DeleteReservationResponse

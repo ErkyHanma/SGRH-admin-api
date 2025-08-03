@@ -4,6 +4,7 @@ using SGRH.Web.Interfaces.HttpClients.ServiceModule;
 using SGRH.Web.Models;
 using SGRH.Web.Models.ServiceModule;
 using SGRH.Web.Models.ServiceModule.Response;
+using SGRH.Web.Models.ServiceModule.Validation;
 
 namespace SGRH.Web.Services.HttpClients.ServiceModule
 {
@@ -46,6 +47,17 @@ namespace SGRH.Web.Services.HttpClients.ServiceModule
         {
             try
             {
+
+                if (id < 0)
+                {
+                    return new BaseResponse<TModel>
+                    {
+                        isSuccess = false,
+                        message = "The provided ID is invalid."
+                    };
+                }
+
+
                 var response = await _httpClient.GetAsync<BaseResponse<TModel>>($"Service/{id}");
 
                 return response ?? new BaseResponse<TModel>
@@ -65,6 +77,15 @@ namespace SGRH.Web.Services.HttpClients.ServiceModule
 
             try
             {
+                CreateServiceModelValidator createServiceModelValidation = new();
+                var validationResult = createServiceModelValidation.Validate(createServiceModel);
+
+
+                if (!validationResult.isSuccess)
+                {
+                    return validationResult;
+                }
+
                 var createServiceResponse = await _httpClient.PostAsync<CreateServiceResponse>("Service/CreateService", createServiceModel);
 
                 return createServiceResponse ?? new CreateServiceResponse
@@ -84,6 +105,16 @@ namespace SGRH.Web.Services.HttpClients.ServiceModule
         {
             try
             {
+                EditServiceModelValidator editServiceModelValidation = new();
+                var validationResult = editServiceModelValidation.Validate(serviceModel);
+
+
+                if (!validationResult.isSuccess)
+                {
+                    return validationResult;
+                }
+
+
                 var editServiceResponse = await _httpClient.PostAsync<EditServiceResponse>("Service/UpdateService", serviceModel);
 
                 return editServiceResponse ?? new EditServiceResponse
@@ -107,6 +138,14 @@ namespace SGRH.Web.Services.HttpClients.ServiceModule
         {
             try
             {
+                DeleteServiceModelValidator deleteServiceModelValidation = new();
+                var validationResult = deleteServiceModelValidation.Validate(deleteServiceModel);
+
+                if (!validationResult.isSuccess)
+                {
+                    return validationResult;
+                }
+
                 var deleteServiceResponse = await _httpClient.PostAsync<DeleteServiceResponse>("Service/DisableService", deleteServiceModel);
 
                 return deleteServiceResponse ?? new DeleteServiceResponse

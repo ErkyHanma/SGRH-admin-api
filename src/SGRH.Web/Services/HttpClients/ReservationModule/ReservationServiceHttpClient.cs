@@ -3,6 +3,7 @@ using SGRH.Web.Interfaces.HttpClients;
 using SGRH.Web.Interfaces.HttpClients.ReservationModule;
 using SGRH.Web.Models.ReservationModule.ReservationService;
 using SGRH.Web.Models.ReservationModule.ReservationService.Response;
+using SGRH.Web.Models.ReservationModule.ReservationService.Validation;
 using SGRH.Web.Models.ServiceModule.Response;
 
 namespace SGRH.Web.Services.HttpClients.ReservationModule
@@ -45,6 +46,15 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
 
             try
             {
+                CreateReservationServiceModelValidator createReservationServiceModelValidator = new();
+                var validationResult = createReservationServiceModelValidator.Validate(addReservationServiceModel);
+
+                if (!validationResult.isSuccess)
+                {
+                    return validationResult;
+                }
+
+
                 var addReservationServiceResponse = await _httpClient.PostAsync<AddReservationServiceResponse>("ReservationService/AddReservationService", addReservationServiceModel);
 
                 return addReservationServiceResponse ?? new AddReservationServiceResponse
@@ -65,6 +75,14 @@ namespace SGRH.Web.Services.HttpClients.ReservationModule
 
             try
             {
+                DeleteReservationServiceModelValidator deleteReservationServiceModelValidator = new();
+                var validationResult = deleteReservationServiceModelValidator.Validate(deleteReservationServiceModel);
+
+                if (!validationResult.isSuccess)
+                {
+                    return validationResult;
+                }
+
                 var deleteServiceResponse = await _httpClient.PostAsync<DeleteReservationServiceResponse>("ReservationService/DeleteReservationService", deleteReservationServiceModel);
 
                 return deleteServiceResponse ?? new DeleteReservationServiceResponse
