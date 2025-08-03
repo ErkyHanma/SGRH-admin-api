@@ -1,4 +1,4 @@
-﻿namespace SGRH.Web.Infrastructure.Endpoints.Rate
+﻿namespace SGRH.Web.Infrastructure.Endpoints.Room
 {
     public interface IRoomEndpoints
     {

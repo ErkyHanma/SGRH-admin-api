@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SGRH.Web.Models.Hotel.Rates.Responses;
+﻿using Microsoft.AspNetCore.Mvc;
 using SGRH.Web.Models.Hotel.Rates;
 using SGRH.Web.Repositories.Interfaces.Hotel;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
-using SGRH.Web.Models.Hotel.Room;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 
 namespace SGRH.Web.Controllers.Hotel
 {

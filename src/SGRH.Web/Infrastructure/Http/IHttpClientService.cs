@@ -1,6 +1,4 @@
-﻿using SGRH.IOC;
-
-namespace SGRH.Web.Infrastructure.Http
+﻿namespace SGRH.Web.Infrastructure.Http
 {
     public interface IHttpClientService
     {

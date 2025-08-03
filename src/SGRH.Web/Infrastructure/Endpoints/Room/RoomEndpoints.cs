@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
-using SGRH.Web.Infrastructure.Endpoints.Rate;
+﻿
 
 namespace SGRH.Web.Infrastructure.Endpoints.Room
 {

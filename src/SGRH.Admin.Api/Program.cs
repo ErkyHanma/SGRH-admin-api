@@ -12,13 +12,13 @@ using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Application.Interfaces.Services.Report;
 using SGRH.Application.Services.Hotel;
+using SGRH.Infrastructure.Common.Logging;
 using SGRH.IOC.Dependencies.Hotel;
 using SGRH.IOC.Dependencies.Report;
 using SGRH.IOC.Dependencies.ReservationModule;
 using SGRH.IOC.Dependencies.ServiceModule;
 using SGRH.Persistence.Context;
 using SGRH.Persistence.Repositories.Hotel;
-using SGRH.Persistence.Repositories.Report;
 using SGRH.Persistence.Repositories.UserManagement;
 
 namespace SGRH.Api
