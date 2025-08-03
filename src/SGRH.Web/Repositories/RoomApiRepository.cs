@@ -1,5 +1,5 @@
-﻿using SGRH.Application.Common.Logging;
-using SGRH.Web.Infrastructure.Endpoints.Rate;
+﻿using SGRH.Infrastructure.Common.Logging;
+using SGRH.Web.Infrastructure.Endpoints.Room;
 using SGRH.Web.Infrastructure.Http;
 using SGRH.Web.Models.Hotel.Room;
 using SGRH.Web.Models.Hotel.Room.Responses;
@@ -37,38 +37,40 @@ namespace SGRH.Web.Repositories
             return await GetAsync<GetRoomResponse>(endpoint);
         }
 
-        public Task<RoomCreateResponse> CreateRoomAsync(CreateRoomModel createRoomModel)
+        public async Task<RoomCreateResponse> CreateRoomAsync(CreateRoomModel createRoomModel)
         {
-            if (createRoomModel != null)
-                _appLogger.Info("Creating new room: {RoomNumber}", createRoomModel.roomNumber);
+            if (createRoomModel == null)
+            {
+                _appLogger.ErrorNoEx("CreateRoomModel cannot be null");
+                return new RoomCreateResponse();
+            }
 
-            return ExecuteApiCall<CreateRoomModel, RoomCreateResponse>(
-                _endpoints.CreateRoom,
-                createRoomModel,
-                _httpClientService.PostAsync<RoomCreateResponse, CreateRoomModel>);
+            _appLogger.Info("Creating new room: {RoomNumber}", createRoomModel.roomNumber);
+            return await PostAsync<CreateRoomModel, RoomCreateResponse>(_endpoints.CreateRoom, createRoomModel);
         }
 
-        public Task<RoomEditResponse> EditRoomAsync(EditRoomModel editRoomModel)
+        public async Task<RoomEditResponse> EditRoomAsync(EditRoomModel editRoomModel)
         {
-            if (editRoomModel != null)
-                _appLogger.Info("Updating room with ID: {RoomId}", editRoomModel.roomId);
+            if (editRoomModel == null)
+            {
+                _appLogger.ErrorNoEx("EditRoomModel cannot be null");
+                return new RoomEditResponse();
+            }
 
-            return ExecuteApiCall<EditRoomModel, RoomEditResponse>(
-                _endpoints.ModifyRoom,
-                editRoomModel,
-                _httpClientService.PutAsync<RoomEditResponse, EditRoomModel>);
+            _appLogger.Info("Updating room with ID: {RoomId}", editRoomModel.roomId);
+            return await PutAsync<EditRoomModel, RoomEditResponse>(_endpoints.ModifyRoom, editRoomModel);
         }
 
-        public Task<DeleteRoomResponse> DeleteRoomAsync(DeleteRoomModel deleteRoomModel)
+        public async Task<DeleteRoomResponse> DeleteRoomAsync(DeleteRoomModel deleteRoomModel)
         {
-            if (deleteRoomModel != null)
-                _appLogger.Info("Disabling room with ID: {RoomId}", deleteRoomModel.roomId);
+            if (deleteRoomModel == null)
+            {
+                _appLogger.ErrorNoEx("DeleteRoomModel cannot be null");
+                return new DeleteRoomResponse();
+            }
 
-            return ExecuteApiCall<DeleteRoomModel, DeleteRoomResponse>(
-                _endpoints.DisableRoom,
-                deleteRoomModel,
-                _httpClientService.PutAsync<DeleteRoomResponse, DeleteRoomModel>);
+            _appLogger.Info("Disabling room with ID: {RoomId}", deleteRoomModel.roomId);
+            return await PutAsync<DeleteRoomModel, DeleteRoomResponse>(_endpoints.DisableRoom, deleteRoomModel);
         }
-
     }
 }

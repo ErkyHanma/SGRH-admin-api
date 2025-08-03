@@ -1,11 +1,10 @@
-﻿using SGRH.Application.Common.Logging;
-using SGRH.Web.Infrastructure.Http;
-using SGRH.Web.Infrastructure.Endpoints;
+﻿using SGRH.Web.Infrastructure.Http;
 using SGRH.Web.Models.Hotel.Rates;
 using SGRH.Web.Models.Hotel.Rates.Responses;
 using SGRH.Web.Repositories.Base;
 using SGRH.Web.Repositories.Interfaces.Hotel;
 using SGRH.Web.Infrastructure.Endpoints.Rate;
+using SGRH.Infrastructure.Common.Logging;
 
 namespace SGRH.Web.Repositories
 {
@@ -38,43 +37,45 @@ namespace SGRH.Web.Repositories
             return await GetAsync<GetRateResponse>(endpoint);
         }
 
-        public Task<RateCreateResponse> CreateRateAsync(RateCreateModel rateCreateModel)
+        public async Task<RateCreateResponse> CreateRateAsync(RateCreateModel rateCreateModel)
         {
-            if (rateCreateModel != null)
+            if (rateCreateModel == null)
             {
-                rateCreateModel.createdAt = DateTime.Now;
-                _appLogger.Info("Creating new rate for category: {CategoryId}", rateCreateModel.categoryId);
+                _appLogger.ErrorNoEx("RateCreateModel cannot be null");
+                return new RateCreateResponse();
             }
 
-            return ExecuteApiCall<RateCreateModel, RateCreateResponse>(
-                _endpoints.CreateRate,
-                rateCreateModel,
-                _httpClientService.PostAsync<RateCreateResponse, RateCreateModel>);
+            rateCreateModel.createdAt = DateTime.Now;
+            _appLogger.Info("Creating new rate for category: {CategoryId}", rateCreateModel.categoryId);
+
+            return await PostAsync<RateCreateModel, RateCreateResponse>(_endpoints.CreateRate, rateCreateModel);
         }
 
-        public Task<RateEditResponse> EditRateAsync(RateEditModel rateEditModel)
+        public async Task<RateEditResponse> EditRateAsync(RateEditModel rateEditModel)
         {
-            if (rateEditModel != null)
+            if (rateEditModel == null)
             {
-                rateEditModel.updatedAt = DateTime.Now;
-                _appLogger.Info("Updating rate with ID: {RateId}", rateEditModel.rateId);
+                _appLogger.ErrorNoEx("RateEditModel cannot be null");
+                return new RateEditResponse();
             }
 
-            return ExecuteApiCall<RateEditModel, RateEditResponse>(
-                _endpoints.UpdateRate,
-                rateEditModel,
-                _httpClientService.PutAsync<RateEditResponse, RateEditModel>);
+            rateEditModel.updatedAt = DateTime.Now;
+            _appLogger.Info("Updating rate with ID: {RateId}", rateEditModel.rateId);
+
+            return await PutAsync<RateEditModel, RateEditResponse>(_endpoints.UpdateRate, rateEditModel);
         }
 
         public async Task<DeleteRateResponse> DeleteRateAsync(RateDeleteModel rateDeleteModel)
         {
-            if (rateDeleteModel != null)
-                _appLogger.Info("Deleting rate with ID: {RateId}", rateDeleteModel.rateId);
+            if (rateDeleteModel == null)
+            {
+                _appLogger.ErrorNoEx("RateDeleteModel cannot be null");
+                return new DeleteRateResponse();
+            }
 
-            return await ExecuteApiCall<RateDeleteModel, DeleteRateResponse>(
-                _endpoints.DeleteRate,
-                rateDeleteModel,
-                _httpClientService.PutAsync<DeleteRateResponse, RateDeleteModel>);
+            _appLogger.Info("Deleting rate with ID: {RateId}", rateDeleteModel.rateId);
+            return await PutAsync<RateDeleteModel, DeleteRateResponse>(_endpoints.DeleteRate, rateDeleteModel);
         }
+
     }
 }
