@@ -18,26 +18,22 @@ using SGRH.IOC.Dependencies.Hotel;
 using SGRH.IOC.Dependencies.Report;
 using SGRH.IOC.Dependencies.ReservationModule;
 using SGRH.IOC.Dependencies.ServiceModule;
-using NuGet.Configuration;
 using SGRH.Web.Infrastructure.Http;
 using SGRH.Web.Repositories.Interfaces.Hotel;
 using SGRH.Web.Repositories;
 using SGRH.Web.Infrastructure.Endpoints.Rate;
 using SGRH.Web.Infrastructure.Endpoints.Room;
+using SGRH.Infrastructure.Common.Logging;
+using SGRH.Web.Infrastructure.IOC.Http;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load .env variables
-//Env.Load();
-
-//var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-//builder.Configuration["ConnectionStrings:SGRHConnection"] = connectionString;
-
 // Logger
+
 builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));
 
-// FluentValidation - Hotel module
+// FluentValidation - Hotel module (Elliam - Floor, Room Category)
 
 builder.Services.AddScoped<IValidator<CreateFloorDto>, CreateFloorValidator>();
 builder.Services.AddScoped<IValidator<ModifyFloorDto>, ModifyFloorValidator>();
@@ -53,14 +49,12 @@ builder.Services.AddDbContext<SGRHContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("SGRHConnection"));
 });
 
-// Hotel Module
+// Hotel Module (Cristian - Room, Rates)
 
 builder.Services.AddRoomDependency();
 builder.Services.AddRatesDependency();
 
-builder.Services.AddScoped<IRatesRepository, RatesRepository>();
-builder.Services.AddTransient<IRatesService, RatesService>();
-builder.Services.AddTransient<IRateMapper, RateMapper>();
+// Hotel Module (Elliam - Floor, Room Category)
 
 builder.Services.AddScoped<IFloorRepository, FloorRepository>();
 builder.Services.AddTransient<IFloorService, FloorService>();
@@ -68,9 +62,9 @@ builder.Services.AddTransient<IFloorService, FloorService>();
 builder.Services.AddScoped<IRoomCategoryRepository, RoomCategoryRepository>();
 builder.Services.AddTransient<IRoomCategoryService, RoomCategoryService>();
 
-// Report Module
+// Report Module (Cristian - Report)
 
-builder.Services.AddReportDependency();
+builder.Services.AddReportDependency(); 
 
 // Reservations 
 
@@ -80,7 +74,6 @@ builder.Services.AddReservationServiceDependency();
 // Service Module
 builder.Services.AddServiceDependency();
 
-
 // User Management Module
 builder.Services.AddUserManagementRepositories(builder.Configuration);
 
@@ -88,15 +81,12 @@ builder.Services.AddUserManagementRepositories(builder.Configuration);
 builder.Services.AddControllersWithViews();
 builder.Services.AddUserManagementRepositories(builder.Configuration);
 
-// Http Related
 
-builder.Services.AddHttpClient<IHttpClientService, HttpClientService>();
+// Http Related (Cristian - HttpClient, RoomHttp, RateHttp)
 
-builder.Services.AddTransient<IRateEndpoints, RateEndpoints>();
-builder.Services.AddTransient<IRoomEndpoints, RoomEndpoints>();
-
-builder.Services.AddScoped<IRateApiRepository, RateApiRepository>();
-builder.Services.AddScoped<IRoomApiRepository, RoomApiRepository>();
+builder.Services.AddHttpClientDependency();
+builder.Services.AddRateHttpDependency();
+builder.Services.AddRoomHttpDependency();
 
 // Logger
 
