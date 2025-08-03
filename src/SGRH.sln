@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SGRH.Application.Test", "SG
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{221F5AC0-6746-42EC-B2D6-A6931A951AFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGRH.Infrastructure.Common", "SGRH.Infrastructure.Common\SGRH.Infrastructure.Common.csproj", "{90DA6B9C-9B3E-4B2F-9E4A-4C16C1E5BDE0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{C11BDAB7-557B-49F3-AC1D-FD2BC2E4EC57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C11BDAB7-557B-49F3-AC1D-FD2BC2E4EC57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C11BDAB7-557B-49F3-AC1D-FD2BC2E4EC57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90DA6B9C-9B3E-4B2F-9E4A-4C16C1E5BDE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90DA6B9C-9B3E-4B2F-9E4A-4C16C1E5BDE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90DA6B9C-9B3E-4B2F-9E4A-4C16C1E5BDE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90DA6B9C-9B3E-4B2F-9E4A-4C16C1E5BDE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{8DFC7AE9-965E-41DB-AA93-FE6FAF00BBAC} = {06099F17-1A6B-477A-B713-3EFEFD474D4C}
 		{79123D6F-BCA8-4DBB-9177-5CFF4F01D539} = {F035619A-50D7-4002-AF32-B41D35C479F9}
 		{C11BDAB7-557B-49F3-AC1D-FD2BC2E4EC57} = {F035619A-50D7-4002-AF32-B41D35C479F9}
+		{90DA6B9C-9B3E-4B2F-9E4A-4C16C1E5BDE0} = {3B393859-3E1A-47D1-A42A-1E49953EDACA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {89FE0751-44DE-4FAD-A10A-390AB190418E}
