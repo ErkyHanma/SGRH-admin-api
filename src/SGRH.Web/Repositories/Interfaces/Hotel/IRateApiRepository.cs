@@ -1,6 +1,4 @@
-﻿using SGRH.Web.Models.Hotel.Room.Responses;
-using SGRH.Web.Models.Hotel.Room;
-using SGRH.Web.Models.Hotel.Rates;
+﻿using SGRH.Web.Models.Hotel.Rates;
 using SGRH.Web.Models.Hotel.Rates.Responses;
 
 namespace SGRH.Web.Repositories.Interfaces.Hotel
