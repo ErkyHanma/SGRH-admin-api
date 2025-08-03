@@ -1,14 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
-using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Rate;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Domain.Base;
 using SGRH.Application.Interfaces.Mappers.Hotel;
 using FluentValidation;
-using SGRH.Application.Dtos.Hotel.Room;
-using SGRH.Application.UseCases.Hotel.Room;
 using SGRH.Application.Interfaces.UseCases;
+using SGRH.Infrastructure.Common.Logging;
 
 namespace SGRH.Application.Services.Hotel
 {

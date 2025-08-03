@@ -4,6 +4,7 @@ using SGRH.Application.Dtos.ServiceModule.Validator;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.ServiceModule;
+using SGRH.Infrastructure.Common.Logging;
 using SGRH.Persistence.Context;
 using System.Linq.Expressions;
 

@@ -4,6 +4,7 @@ using SGRH.Application.Dtos.ReservationModule.Reservation;
 using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Domain.Base;
+using SGRH.Infrastructure.Common.Logging;
 using SGRH.Persistence.Helpers;
 
 namespace SGRH.Persistence.Repositories.ReservationModule

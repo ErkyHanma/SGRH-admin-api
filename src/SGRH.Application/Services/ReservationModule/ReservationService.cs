@@ -1,9 +1,9 @@
-﻿using SGRH.Application.Common.Logging;
-using SGRH.Application.Dtos.ReservationModule.Reservation;
+﻿using SGRH.Application.Dtos.ReservationModule.Reservation;
 using SGRH.Application.Dtos.ReservationModule.Reservation.Validators;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
 using SGRH.Application.Interfaces.Services.ReservationModule;
 using SGRH.Domain.Base;
+using SGRH.Infrastructure.Common.Logging;
 
 namespace SGRH.Application.Services.ReservationModule
 {

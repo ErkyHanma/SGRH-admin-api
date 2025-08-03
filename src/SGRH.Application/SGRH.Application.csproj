@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SGRH.Domain\SGRH.Domain.csproj" />
+    <ProjectReference Include="..\SGRH.Infrastructure.Common\SGRH.Infrastructure.Common.csproj" />
   </ItemGroup>
 
 </Project>

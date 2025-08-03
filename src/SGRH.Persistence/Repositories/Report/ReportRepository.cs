@@ -4,6 +4,7 @@ using SGRH.Application.Dtos.Report;
 using SGRH.Application.Dtos.Report.InputDtos;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Domain.Base;
+using SGRH.Infrastructure.Common.Logging;
 using SGRH.Persistence.Helpers;
 
 namespace SGRH.Persistence.Repositories.Report

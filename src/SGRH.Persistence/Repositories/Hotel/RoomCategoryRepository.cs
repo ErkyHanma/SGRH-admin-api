@@ -6,6 +6,7 @@ using SGRH.Application.Common.Logging; // Nuevo using
 using SGRH.Application.Dtos.Hotel.RoomCategory;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
+using SGRH.Infrastructure.Common.Logging;
 using SGRH.Persistence.Helpers;
 
 namespace SGRH.Persistence.Repositories.Hotel

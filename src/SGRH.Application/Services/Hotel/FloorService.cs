@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Floor;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Domain.Base;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using SGRH.Infrastructure.Common.Logging;
+
 
 namespace SGRH.Application.Services.Hotel
 {

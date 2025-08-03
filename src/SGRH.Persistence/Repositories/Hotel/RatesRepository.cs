@@ -5,6 +5,7 @@ using SGRH.Application.Dtos.Hotel.Rate;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.Hotel;
+using SGRH.Infrastructure.Common.Logging;
 using SGRH.Persistence.Context;
 using System;
 using System.Collections.Generic;

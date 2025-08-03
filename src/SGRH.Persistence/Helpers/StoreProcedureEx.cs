@@ -1,6 +1,7 @@
 using Npgsql;
 using SGRH.Application.Common.Logging;
 using SGRH.Domain.Base;
+using SGRH.Infrastructure.Common.Logging;
 using System.Data;
 
 namespace SGRH.Persistence.Helpers

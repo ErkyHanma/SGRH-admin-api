@@ -1,18 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
-using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Dtos.Report;
 using SGRH.Application.Dtos.Report.InputDtos;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Report;
 using SGRH.Application.Interfaces.UseCases;
-using SGRH.Application.UseCases.Report;
 using SGRH.Domain.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SGRH.Infrastructure.Common.Logging;
+
 
 namespace SGRH.Application.Services.Report
 {

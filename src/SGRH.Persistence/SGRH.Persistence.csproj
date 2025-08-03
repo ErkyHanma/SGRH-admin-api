@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SGRH.Application\SGRH.Application.csproj" />
+    <ProjectReference Include="..\SGRH.Infrastructure.Common\SGRH.Infrastructure.Common.csproj" />
   </ItemGroup>
 
 </Project>
