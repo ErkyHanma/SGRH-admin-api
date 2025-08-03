@@ -1,6 +1,5 @@
-﻿using SGRH.Application.Common.Logging;
+﻿using SGRH.Infrastructure.Common.Logging;
 using SGRH.Web.Infrastructure.Http;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SGRH.Web.Repositories.Base
 {
@@ -16,25 +15,22 @@ namespace SGRH.Web.Repositories.Base
             
         }
 
-        protected async Task<TResponse> ExecuteApiCall<TRequest, TResponse>(
-            string endpoint,
-            TRequest request,
-            Func<string, TRequest, Task<TResponse>> apiCall) // <- Insertar una funcion como parametro, devuelve tipo esperado
+        protected async Task<TResponse> PostAsync<TRequest, TResponse>(string endpoint, TRequest request) 
             where TResponse : class, new()
         {
             if (request == null)
             {
-                _appLogger.ErrorNoEx("Null request provided for {Endpoint}", endpoint);
+                _appLogger.ErrorNoEx("Null request provided for POST to {Endpoint}", endpoint);
                 return new TResponse();
             }
 
             try
             {
-                var response = await apiCall(endpoint, request);
+                var response = await _httpClientService.PostAsync<TResponse, TRequest>(endpoint, request);
 
                 if (response == null)
                 {
-                    _appLogger.ErrorNoEx("Null response received from {Endpoint}", endpoint);
+                    _appLogger.ErrorNoEx("Null response from POST to {Endpoint}", endpoint);
                     return new TResponse();
                 }
 
@@ -43,7 +39,35 @@ namespace SGRH.Web.Repositories.Base
             }
             catch (Exception ex)
             {
-                _appLogger.ErrorEx(ex, "Exception during API call to {Endpoint}", endpoint);
+                _appLogger.ErrorEx(ex, "Exception during POST to {Endpoint}", endpoint);
+                return new TResponse();
+            }
+        }
+
+        protected async Task<TResponse> PutAsync<TRequest, TResponse>(string endpoint, TRequest request)
+            where TResponse : class, new()
+        {
+            if (request == null)
+            {
+                _appLogger.ErrorNoEx("Null request provided for PUT to {Endpoint}", endpoint);
+                return new TResponse();
+            }
+
+            try
+            {
+                var response = await _httpClientService.PutAsync<TResponse, TRequest>(endpoint, request);
+                if (response == null)
+                {
+                    _appLogger.ErrorNoEx("Null response from PUT to {Endpoint}", endpoint);
+                    return new TResponse();
+                }
+
+                LogApiResult(endpoint, response);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _appLogger.ErrorEx(ex, "Exception during PUT to {Endpoint}", endpoint);
                 return new TResponse();
             }
         }
