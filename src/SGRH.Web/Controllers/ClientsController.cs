@@ -1,89 +1,76 @@
-﻿// File: C:\Users\ander\Source\Repos\SGRH-admin-api\src\SGRH.Web\Controllers\ClientsController.cs
-
-using Microsoft.AspNetCore.Mvc;
-using SGRH.Web.Interfaces; // <-- Esta es la referencia correcta para el proyecto Web.
-using SGRH.Web.Models;
-using SGRH.Web.ViewModels;
-using System.Diagnostics;
-using System.Threading.Tasks;
-<<<<<<< Updated upstream
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Text.Json;
-using System.Collections.Generic;
-using SGRH.Web.Models.Clients;
 using SGRH.Web.Models;
+using SGRH.Web.Models.Clients;
+using SGRH.Web.ViewModels;
+using System.Text.Json;
 using System.Text;
-=======
-
-// IMPORTANTE: Asegúrate de que esta línea NO esté presente:
-// using Core.SGRH.Application.Interfaces.UserManagement;
->>>>>>> Stashed changes
+using System.Diagnostics;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
 
 namespace SGRH.Web.Controllers
 {
     public class ClientsController : Controller
     {
-        // Dependency Injection of the Client Service.
-        private readonly IClientService _clientService;
+        private readonly HttpClient _httpClient;
+        private readonly string _apiBaseUrl;
 
-        public ClientsController(IClientService clientService)
+        // Constructor que inyecta IConfiguration para obtener la URL base de la API.
+        public ClientsController(IConfiguration configuration)
         {
-<<<<<<< Updated upstream
-            _apiBaseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl") ?? throw new InvalidOperationException("ApiSettings:BaseUrl not found in configuration.");
+            _apiBaseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl") ??
+                          throw new InvalidOperationException("ApiSettings:BaseUrl not found in configuration.");
+
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(_apiBaseUrl);
         }
 
-=======
-            _clientService = clientService;
-        }
-
         // GET: /Clients/
-        // Displays a list of all clients.
->>>>>>> Stashed changes
+        // Muestra una lista de todos los clientes.
         public async Task<IActionResult> Index()
         {
+            List<ClientViewModel> clients = new List<ClientViewModel>();
             try
             {
-<<<<<<< Updated upstream
+                // Realiza la petición GET a la API
                 HttpResponseMessage response = await _httpClient.GetAsync("Clients");
-=======
-                // Call the service to get the list of clients.
-                var clients = await _clientService.GetClientsAsync();
->>>>>>> Stashed changes
 
-                // If the clients list is null or empty, it logs a debug message
-                // before returning the view. This is useful for debugging.
-                if (clients == null || clients.Count == 0)
+                if (response.IsSuccessStatusCode)
                 {
-<<<<<<< Updated upstream
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     clients = JsonSerializer.Deserialize<List<ClientViewModel>>(apiResponse,
-                                                                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                                                                 ?? new List<ClientViewModel>();
+                                                                                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                              ?? new List<ClientViewModel>();
                 }
                 else
                 {
+                    Debug.WriteLine($"ERROR: API returned a non-success status code: {response.StatusCode}");
                     ViewBag.ErrorMessage = $"Error: {response.StatusCode} - {response.ReasonPhrase}";
                 }
             }
             catch (HttpRequestException ex)
             {
+                Debug.WriteLine($"ERROR: A network exception occurred while fetching clients: {ex.Message}");
                 ViewBag.ErrorMessage = $"Network error: {ex.Message}";
             }
             catch (JsonException ex)
             {
+                Debug.WriteLine($"ERROR: A JSON deserialization exception occurred: {ex.Message}");
                 ViewBag.ErrorMessage = $"Data format error: {ex.Message}";
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"ERROR: An unexpected exception occurred: {ex.Message}");
                 ViewBag.ErrorMessage = $"An unexpected error occurred: {ex.Message}";
             }
 
             return View(clients);
         }
 
+        // GET: ClientsController/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -100,7 +87,7 @@ namespace SGRH.Web.Controllers
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     client = JsonSerializer.Deserialize<ClientViewModel>(apiResponse,
-                                                                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                                                          new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (client == null)
                     {
                         ViewBag.ErrorMessage = $"Client with ID {id} not found or could not be deserialized.";
@@ -138,11 +125,13 @@ namespace SGRH.Web.Controllers
             return View(client);
         }
 
+        // GET: ClientsController/Create
         public IActionResult Create()
         {
             return View();
         }
 
+        // POST: ClientsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClientCreateViewModel client)
@@ -152,13 +141,13 @@ namespace SGRH.Web.Controllers
                 try
                 {
                     var jsonContent = JsonSerializer.Serialize(client);
-                    var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+                    var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                     HttpResponseMessage response = await _httpClient.PostAsync("Clients", content);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        TempData["SuccessMessage"] = "Client created successfully.";
+                        TempData["SuccessMessage"] = "Cliente creado exitosamente.";
                         return RedirectToAction(nameof(Index));
                     }
                     else
@@ -166,32 +155,34 @@ namespace SGRH.Web.Controllers
                         string errorResponse = await response.Content.ReadAsStringAsync();
                         try
                         {
+                            // Intenta deserializar el error de la API
                             var operationResult = JsonSerializer.Deserialize<OperationResult<string>>(errorResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                            ViewBag.ErrorMessage = $"Error creating client: {operationResult?.Message ?? errorResponse}";
+                            ViewBag.ErrorMessage = $"Error al crear el cliente: {operationResult?.Message ?? errorResponse}";
                         }
                         catch (JsonException)
                         {
-                            ViewBag.ErrorMessage = $"Error creating client: {errorResponse}";
+                            ViewBag.ErrorMessage = $"Error al crear el cliente: {errorResponse}";
                         }
                         return View(client);
                     }
                 }
                 catch (HttpRequestException ex)
                 {
-                    ViewBag.ErrorMessage = $"Network error trying to create client: {ex.Message}";
+                    ViewBag.ErrorMessage = $"Error de red al intentar crear el cliente: {ex.Message}";
                 }
                 catch (JsonException ex)
                 {
-                    ViewBag.ErrorMessage = $"Data format error creating client: {ex.Message}";
+                    ViewBag.ErrorMessage = $"Error de formato de datos al crear el cliente: {ex.Message}";
                 }
                 catch (Exception ex)
                 {
-                    ViewBag.ErrorMessage = $"An unexpected error occurred while creating client: {ex.Message}";
+                    ViewBag.ErrorMessage = $"Ocurrió un error inesperado al crear el cliente: {ex.Message}";
                 }
             }
             return View(client);
         }
 
+        // GET: ClientsController/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -207,14 +198,12 @@ namespace SGRH.Web.Controllers
                 {
                     var clientString = await response.Content.ReadAsStringAsync();
                     var clientViewModel = JsonSerializer.Deserialize<ClientEditViewModel>(clientString,
-                                                                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                                                                          new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                     if (clientViewModel == null)
                     {
                         return NotFound($"Could not deserialize client with ID {id}.");
                     }
-
-                    clientViewModel.PasswordHash = null;
 
                     return View(clientViewModel);
                 }
@@ -246,15 +235,14 @@ namespace SGRH.Web.Controllers
             }
         }
 
+        // POST: ClientsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ClientEditViewModel clientViewModel)
         {
-            ViewBag.DebugMessage = $"Route ID: {id}, ViewModel UserId: {clientViewModel.UserId}"; // Punto de interrupción aquí
-
             if (id != clientViewModel.UserId)
             {
-                ViewBag.ErrorMessage = $"Error updating client: ID from route does not match client's UserId. {ViewBag.DebugMessage}";
+                ViewBag.ErrorMessage = $"Error updating client: ID from route does not match client's UserId.";
                 return View(clientViewModel);
             }
 
@@ -262,27 +250,7 @@ namespace SGRH.Web.Controllers
             {
                 try
                 {
-                    var apiUpdateData = new
-                    {
-                        id = clientViewModel.UserId,
-                        firstName = clientViewModel.FirstName,
-                        lastName = clientViewModel.LastName,
-                        email = clientViewModel.Email,
-                        passwordHash = clientViewModel.PasswordHash,
-                        roleId = clientViewModel.RoleId,
-                        phone = clientViewModel.Phone,
-                        address = clientViewModel.Address,
-                        createdAt = clientViewModel.CreatedAt,
-                        createdBy = clientViewModel.CreatedBy,
-                        updatedAt = DateTime.UtcNow,
-                        updatedBy = clientViewModel.UpdatedBy ?? 1,
-                        deletedAt = clientViewModel.DeletedAt,
-                        deletedBy = clientViewModel.DeletedBy,
-                        isActive = clientViewModel.IsActive,
-                        isDeleted = clientViewModel.IsDeleted
-                    };
-
-                    var jsonContent = JsonSerializer.Serialize(apiUpdateData);
+                    var jsonContent = JsonSerializer.Serialize(clientViewModel);
                     var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                     var response = await _httpClient.PutAsync($"Clients/{id}", content);
@@ -322,6 +290,7 @@ namespace SGRH.Web.Controllers
             return View(clientViewModel);
         }
 
+        // GET: ClientsController/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -338,10 +307,10 @@ namespace SGRH.Web.Controllers
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     client = JsonSerializer.Deserialize<ClientViewModel>(apiResponse,
-                                                                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                                                          new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (client == null)
                     {
-                        ViewBag.ErrorMessage = $"Client with ID {id} not found or could not be deserialized for deletion.";
+                        ViewBag.ErrorMessage = $"Client with ID {id} not found for deletion.";
                         return View();
                     }
                 }
@@ -376,6 +345,7 @@ namespace SGRH.Web.Controllers
             return View(client);
         }
 
+        // POST: ClientsController/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -387,7 +357,6 @@ namespace SGRH.Web.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     TempData["SuccessMessage"] = "Client deleted successfully.";
-                    return RedirectToAction(nameof(Index));
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
@@ -410,20 +379,6 @@ namespace SGRH.Web.Controllers
             catch (HttpRequestException ex)
             {
                 TempData["ErrorMessage"] = $"Network error trying to delete client: {ex.Message}";
-=======
-                    Debug.WriteLine("DEBUG: The clients list is empty or null.");
-                }
-
-                // Pass the list to the view.
-                return View(clients);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception for detailed error information.
-                Debug.WriteLine($"ERROR: An exception occurred while fetching clients: {ex.Message}");
-                // Return an error view or a redirect to a general error page.
-                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
->>>>>>> Stashed changes
             }
             catch (Exception ex)
             {

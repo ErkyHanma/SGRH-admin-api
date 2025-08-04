@@ -1,4 +1,4 @@
-﻿@model SGRH.Web.Models.Clients.ClientCreateViewModel
+﻿@model SGRH.Web.ViewModels.ClientCreateViewModel
 
 @{
     ViewData["Title"] = "Create New Client";
@@ -27,9 +27,14 @@
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PasswordHash" class="control-label"></label>
-                <input asp-for="PasswordHash" class="form-control" type="password" />
-                <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" type="password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RoleId" class="control-label"></label>
@@ -46,12 +51,12 @@
                 <input asp-for="Address" class="form-control" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
-            @* Campos ocultos para CreatedAt, CreatedBy, IsDeleted, IsActive *@
-            @* Considera configurar estos valores en el controlador en lugar de la vista por seguridad y consistencia *@
-            <input type="hidden" asp-for="CreatedAt" value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")" />
-            <input type="hidden" asp-for="CreatedBy" value="1" />
-            <input type="hidden" asp-for="IsDeleted" value="false" />
-            <input type="hidden" asp-for="IsActive" value="true" />
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
 
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
