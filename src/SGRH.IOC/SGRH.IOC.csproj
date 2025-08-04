@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SGRH.Application\SGRH.Application.csproj" />
     <ProjectReference Include="..\SGRH.Persistence\SGRH.Persistence.csproj" />
+    <ProjectReference Include="..\SGRH.Web\SGRH.Web.csproj" />
   </ItemGroup>
 
 </Project>

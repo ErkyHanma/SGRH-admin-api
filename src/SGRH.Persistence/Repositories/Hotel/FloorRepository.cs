@@ -2,9 +2,9 @@
 // using FluentValidation.Internal; // No es necesario si no se usa directamente
 using Microsoft.Extensions.Configuration; // Nuevo using
 // using Microsoft.Extensions.Logging; // Reemplazado por SGRH.Application.Common.Logging
-using SGRH.Application.Common.Logging; // Nuevo using
 using SGRH.Application.Dtos.Hotel.Floor;
 using SGRH.Application.Interfaces.Repositories.Hotel;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Helpers;
 

@@ -1,5 +1,5 @@
 using Npgsql;
-using SGRH.Application.Common.Logging;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
 using System.Data;
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SGRH.Common.Common;
 using System.Text.Json;
 
 namespace SGRH.Application.Common.Logging

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SGRH.Application.Common.Logging
+﻿namespace SGRH.Common.Common
 {
     public interface IAppLogger<T>
     {
@@ -13,4 +7,3 @@ namespace SGRH.Application.Common.Logging
         void ErrorEx(Exception ex, string message, params object[] args);
     }
 }
-

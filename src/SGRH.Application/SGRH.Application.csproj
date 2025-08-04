@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SGRH.Common\SGRH.Common.csproj" />
     <ProjectReference Include="..\SGRH.Domain\SGRH.Domain.csproj" />
   </ItemGroup>
 

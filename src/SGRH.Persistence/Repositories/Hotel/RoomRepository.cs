@@ -1,8 +1,8 @@
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
-using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Interfaces.Repositories.Hotel;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Helpers;
 
@@ -24,7 +24,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                               IValidator<DisableRoomDto> disableValidator)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("SGRHConnection"); 
+            _connectionString = _configuration.GetConnectionString("SGRHConnection");
             _logger = logger;
             _createValidator = createValidator;
             _modifyValidator = modifyValidator;

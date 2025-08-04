@@ -1,4 +1,5 @@
-﻿using SGRH.Application.Common.Logging;
+﻿using SGRH.Common.Common;
+
 using SGRH.Web.Interfaces.HttpClients;
 using SGRH.Web.Interfaces.HttpClients.ReservationModule;
 using SGRH.Web.Models;

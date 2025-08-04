@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Configuration;
-using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Report;
 using SGRH.Application.Dtos.Report.InputDtos;
 using SGRH.Application.Interfaces.Repositories.Report;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Helpers;
 
@@ -141,7 +141,7 @@ namespace SGRH.Persistence.Repositories.Report
             }
         }
 
-        
+
     }
 }
 

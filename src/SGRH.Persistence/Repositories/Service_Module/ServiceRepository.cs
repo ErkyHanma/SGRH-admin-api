@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SGRH.Application.Common.Logging;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.ServiceModule;
 using SGRH.Persistence.Context;

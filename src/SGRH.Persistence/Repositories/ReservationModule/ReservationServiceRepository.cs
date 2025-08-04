@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
-using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.ReservationModule.ReservationService;
 using SGRH.Application.Interfaces.Repositories.ReservationModule;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
 using SGRH.Persistence.Helpers;
 

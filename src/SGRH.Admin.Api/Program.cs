@@ -10,6 +10,7 @@ using SGRH.Application.Interfaces.Mappers.Hotel;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Application.Services.Hotel;
+using SGRH.Common.Common;
 using SGRH.IOC.Dependencies.Hotel;
 using SGRH.IOC.Dependencies.Report;
 using SGRH.IOC.Dependencies.ReservationModule;

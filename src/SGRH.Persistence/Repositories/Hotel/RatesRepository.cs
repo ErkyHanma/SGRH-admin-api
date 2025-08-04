@@ -1,16 +1,11 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using SGRH.Application.Common.Logging;
-using SGRH.Application.Dtos.Hotel.Rate;
 using SGRH.Application.Interfaces.Repositories.Hotel;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
 using SGRH.Domain.Entities.Hotel;
 using SGRH.Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace SGRH.Persistence.Repositories.Hotel
 {
@@ -84,7 +79,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             return await _context.Rate.AnyAsync(filter);
         }
-        public async Task<OperationResult<IEnumerable<Rate>>> GetAllAsync() 
+        public async Task<OperationResult<IEnumerable<Rate>>> GetAllAsync()
         {
             try
             {
@@ -104,7 +99,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                var rates = await _context.Rate 
+                var rates = await _context.Rate
                     .Where(filter) // Aplicar un filtro y obtener todas las tarifas no eliminadas 
                     .Where(r => !r.IsDeleted)
                     .ToListAsync();
@@ -141,7 +136,7 @@ namespace SGRH.Persistence.Repositories.Hotel
         {
             try
             {
-                var rates = await _context.Rate 
+                var rates = await _context.Rate
                     .Where(r => r.CategoryId == categoryId && !r.IsDeleted) // Obtener todas las tasas de una categoría y que no estén eliminadas
                     .ToListAsync();
 
@@ -170,7 +165,7 @@ namespace SGRH.Persistence.Repositories.Hotel
                 existing.CategoryId = entity.CategoryId;
                 existing.SeasonId = entity.SeasonId;
                 existing.NightPrice = entity.NightPrice;
-                existing.UpdatedAt = DateTime.Now.Date; 
+                existing.UpdatedAt = DateTime.Now.Date;
                 existing.UpdatedBy = entity.UpdatedBy;
 
                 _context.Rate.Update(existing);

@@ -1,17 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
-using SGRH.Application.Common.Logging;
-using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Dtos.Report;
 using SGRH.Application.Dtos.Report.InputDtos;
 using SGRH.Application.Interfaces.Repositories.Report;
 using SGRH.Application.Interfaces.Services.Report;
 using SGRH.Application.UseCases.Report;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace SGRH.Application.Services.Report
 {
@@ -55,7 +50,7 @@ namespace SGRH.Application.Services.Report
 
                 return operationResult;
 
-            } 
+            }
             catch (Exception ex)
             {
                 _logger.ErrorEx(ex, "Error generating occupancy report."); // deberia estar en el archivo de configuracion?
@@ -63,7 +58,7 @@ namespace SGRH.Application.Services.Report
             }
         }
 
-        public async Task<OperationResult<IEnumerable<RatesReportDto>>> GetRatesReport(ReportDateRangeRequestDto request) 
+        public async Task<OperationResult<IEnumerable<RatesReportDto>>> GetRatesReport(ReportDateRangeRequestDto request)
         {
             try
             {
@@ -151,6 +146,6 @@ namespace SGRH.Application.Services.Report
             }
         }
 
-      
+
     }
 }

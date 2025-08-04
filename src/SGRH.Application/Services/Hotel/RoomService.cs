@@ -1,14 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using SGRH.Application.Common.Logging;
 using SGRH.Application.Dtos.Hotel.Room;
 using SGRH.Application.Interfaces.Repositories.Hotel;
 using SGRH.Application.Interfaces.Services.Hotel;
 using SGRH.Application.UseCases.Hotel.Room;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace SGRH.Application.Services.Hotel
 {
     public sealed class RoomService : IRoomService

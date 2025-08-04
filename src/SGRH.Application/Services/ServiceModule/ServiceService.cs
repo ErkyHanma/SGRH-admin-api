@@ -1,11 +1,9 @@
-﻿
-
-using SGRH.Application.Common.Logging;
-using SGRH.Application.Dtos.ServiceModule;
+﻿using SGRH.Application.Dtos.ServiceModule;
 using SGRH.Application.Dtos.ServiceModule.Validators;
 using SGRH.Application.Interfaces.Mappers.ServiceModule;
 using SGRH.Application.Interfaces.Repositories.ServiceModule;
 using SGRH.Application.Interfaces.Services.Service_Module;
+using SGRH.Common.Common;
 using SGRH.Domain.Base;
 
 namespace SGRH.Application.Services.ServiceModule
