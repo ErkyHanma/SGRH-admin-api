@@ -1,11 +1,16 @@
+<<<<<<< Updated upstream
 ﻿// src/SGRH.Web/Models/Clients/ClientEditViewModel.cs
 using System; // Necesario para DateTime y DateTime?
+=======
+﻿// Archivo: SGRH.Web/Models/Clients/ClientEditViewModel.cs
+>>>>>>> Stashed changes
 using System.ComponentModel.DataAnnotations;
 
 namespace SGRH.Web.Models.Clients
 {
     public class ClientEditViewModel
     {
+<<<<<<< Updated upstream
         [Required] // El ID de usuario es esencial para identificar el cliente a editar
         public int UserId { get; set; }
 
@@ -47,5 +52,20 @@ namespace SGRH.Web.Models.Clients
         public bool IsDeleted { get; set; }
         public bool IsActive { get; set; }
         // -----------------------------------------------------------------
+=======
+        [Required]
+        public int Id { get; set; }
+        [Required]
+        public string? FirstName { get; set; }
+        [Required]
+        public string? LastName { get; set; }
+        [Required]
+        [EmailAddress]
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Address { get; set; }
+        public string? UserId { get; set; }
+        public bool IsActive { get; set; }
+>>>>>>> Stashed changes
     }
 }

@@ -1,6 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
+﻿// File: C:\Users\ander\Source\Repos\SGRH-admin-api\src\SGRH.Web\Controllers\ClientsController.cs
+
+using Microsoft.AspNetCore.Mvc;
+using SGRH.Web.Interfaces; // <-- Esta es la referencia correcta para el proyecto Web.
+using SGRH.Web.Models;
+using SGRH.Web.ViewModels;
+using System.Diagnostics;
 using System.Threading.Tasks;
+<<<<<<< Updated upstream
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Text.Json;
@@ -8,30 +14,50 @@ using System.Collections.Generic;
 using SGRH.Web.Models.Clients;
 using SGRH.Web.Models;
 using System.Text;
+=======
+
+// IMPORTANTE: Asegúrate de que esta línea NO esté presente:
+// using Core.SGRH.Application.Interfaces.UserManagement;
+>>>>>>> Stashed changes
 
 namespace SGRH.Web.Controllers
 {
     public class ClientsController : Controller
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _apiBaseUrl;
+        // Dependency Injection of the Client Service.
+        private readonly IClientService _clientService;
 
-        public ClientsController(IConfiguration configuration)
+        public ClientsController(IClientService clientService)
         {
+<<<<<<< Updated upstream
             _apiBaseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl") ?? throw new InvalidOperationException("ApiSettings:BaseUrl not found in configuration.");
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(_apiBaseUrl);
         }
 
+=======
+            _clientService = clientService;
+        }
+
+        // GET: /Clients/
+        // Displays a list of all clients.
+>>>>>>> Stashed changes
         public async Task<IActionResult> Index()
         {
-            List<ClientViewModel> clients = new List<ClientViewModel>();
             try
             {
+<<<<<<< Updated upstream
                 HttpResponseMessage response = await _httpClient.GetAsync("Clients");
+=======
+                // Call the service to get the list of clients.
+                var clients = await _clientService.GetClientsAsync();
+>>>>>>> Stashed changes
 
-                if (response.IsSuccessStatusCode)
+                // If the clients list is null or empty, it logs a debug message
+                // before returning the view. This is useful for debugging.
+                if (clients == null || clients.Count == 0)
                 {
+<<<<<<< Updated upstream
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     clients = JsonSerializer.Deserialize<List<ClientViewModel>>(apiResponse,
                                                                  new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
@@ -384,6 +410,20 @@ namespace SGRH.Web.Controllers
             catch (HttpRequestException ex)
             {
                 TempData["ErrorMessage"] = $"Network error trying to delete client: {ex.Message}";
+=======
+                    Debug.WriteLine("DEBUG: The clients list is empty or null.");
+                }
+
+                // Pass the list to the view.
+                return View(clients);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for detailed error information.
+                Debug.WriteLine($"ERROR: An exception occurred while fetching clients: {ex.Message}");
+                // Return an error view or a redirect to a general error page.
+                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+>>>>>>> Stashed changes
             }
             catch (Exception ex)
             {

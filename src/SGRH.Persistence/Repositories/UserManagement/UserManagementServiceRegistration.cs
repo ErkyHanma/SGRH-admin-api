@@ -1,4 +1,4 @@
-﻿using Core.Application.Interfaces.Repositories.UserManagement;
+﻿using Core.SGRH.Application.Interfaces.Repositories.UserManagement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SGRH.Persistence.Repositories.UserManagement;

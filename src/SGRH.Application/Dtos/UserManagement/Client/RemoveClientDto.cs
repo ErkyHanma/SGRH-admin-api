@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SGRH.Application.Dtos.UserManagement.Client
 {
-    public class RemoveClientDto : DtoBase
+    // DTO para la eliminación de un cliente. 
+    // Aunque el ID se pasa por la URL, este DTO puede ser útil
+    // para la capa de servicio si se requiere un objeto DTO para la eliminación.
+    public class RemoveClientDto
     {
-        // Only the Id is needed to remove a client.
+        [Required]
+        public int UserId { get; set; }
     }
 }

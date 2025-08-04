@@ -1,0 +1,131 @@
+[33m22dc2b8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32m2021-0853-Clientes[m[33m, [m[1;31morigin/2021-0853-Clientes[m[33m)[m Consumo de API con Errores, se borro un archivo para el uso de la vista de Delete client, sigo intentando, pero he presentado dificultades con el consumo de la API en esta rama con el cambio de nombre.
+[33md7b6e88[m Consumo de API Parcial, hago este PUSH por que no habia cambiado el nombre de mi rama.
+[33m26fe8e1[m[33m ([m[1;31morigin/2021-0853[m[33m, [m[1;32m2021-0853[m[33m)[m Automated Testing - Modulo clientes, aun no cambio el nombre de mi rama hasta que el profe corrija los archivos con mi enlace con el nombre viejo.
+[33md48729b[m Terminación de la BLL, ya que poseía errores con los using en el archivo program.cs de SGRH.api
+[33m4beed8e[m Combinación de cambios con conflictos.
+[33m67b7467[m feat: CRUD basico para Cliente funcionando (directo repositorio-controlador) fix: Corregido mapeo de nombres de columnas y validacion de FK refactor: Preparacion para BLL
+[33mf57bd04[m Merge branch 'develop' into 2021-0853
+[33mecd8cfc[m Merge pull request #17 from ErkyHanma/2024-1867Floor-RoomCategory
+[33me23b97d[m Merge branch 'develop' into 2024-1867Floor-RoomCategory
+[33m22a9e26[m Merge pull request #16 from ErkyHanma/2024-2016
+[33m435cb64[m Merge branch 'develop' into 2024-2016
+[33m2c5c865[m Merge pull request #15 from ErkyHanma/2024-1824
+[33m139ee90[m Avance parcial: ClientsController integrado y conexión a PostgreSQL establecida (pendiente mejora SQL, ya que no logra usar la tabla Clients)
+[33m81beb65[m Refactor logging, DTOs, and repository structure
+[33m02873cb[m Add Folder EntityConfiguration
+[33m558a90a[m Add RateConfiguration
+[33m2e3952f[m Folder Hotel and RateMapper
+[33ma78fe3f[m Add folder for mappers and RateMapper
+[33m49c4e05[m Minor changes in IRateService method
+[33mfd7bef5[m Add OnModelCreating method
+[33mc0bec8d[m Refactor DeleteAsync for use on service layer
+[33m4c5734d[m Minor changes to AuditEntity
+[33me27f8c0[m Refactor RatesService now using mappers
+[33m4ffbe93[m Add builders for Room, Report, and Rate modules
+[33m0a2c4d2[m Small changes to RoomController
+[33m43e5d7c[m Adds folder Validators for Rate Module
+[33me223cf3[m Merge branch 'develop' into 2021-0853
+[33m8c98ae2[m Add hotel management services for floors and categories
+[33m5777d07[m[33m ([m[1;31morigin/2024-1824[m[33m)[m Add Service Controller, Some changes in Service Repository and Service And some configuration changes
+[33m48c06bc[m[33m ([m[1;31morigin/2024-2016[m[33m)[m Add builder for Room and Report
+[33mf57a64c[m Add condition for Sucess messages
+[33m554eebb[m Refactor AppLogger for API
+[33m4bc3a8f[m Add Configuration package to Persistence
+[33mfd49742[m Minor changes to ReportService
+[33mc3e737b[m Minor changes to RoomService
+[33me2cbae7[m Add minor changes to rule messages
+[33mec70fae[m Refactor constructor in ReportRepository for use in API
+[33mb336617[m Refactor constructor in RoomRepository for use in API
+[33m9993099[m Add ReservationService Controller
+[33m0770ac9[m Add ReservationController And small change StoreProcedureEx and IAppLogger
+[33m3cde782[m Added ConnectionString to Json
+[33mfe9d7e4[m Added routes for Room and Report services
+[33m77876d7[m References to persistence and application layer
+[33m1926cfc[m Add ReportController
+[33mb79ace0[m Add RoomController
+[33m2169f87[m Merge pull request #14 from ErkyHanma/2024-1824
+[33m603080b[m Add the ReservationModule services
+[33mfb87873[m Add Service for the Service entity
+[33md4862bb[m Add ServiceModule and Reservation Module services interfaces
+[33ma236388[m Implement methods on RateService
+[33m6775cb1[m Define methods on IRateService
+[33m8a6ce19[m Merge develop and solving breaking changes
+[33m5510700[m Merge branch 'develop' into 2024-1824
+[33m61e75d5[m Merge pull request #13 from ErkyHanma/2024-2016
+[33m645afd0[m Solved merge 2024-2016 and develop
+[33m671286d[m Adds classes RateService, RoomService and ReportService
+[33m91f3766[m Adds interfaces IRateService, IRoomService and IReportService
+[33mc17be49[m Adds Configuration Package to SGRH.Application
+[33m7f83908[m Removes unnecessary reference
+[33me23ec66[m Refactor RoomRepository for use on Service Layer
+[33mf390098[m Refactor ReportRepository for use on Service Layer
+[33me64001f[m Add folder Common on Application Layer
+[33m4834879[m Removes unnecesary reference from StoreProcedureEx
+[33m29e2f8d[m Refactor IReportRepository to use Inputs DTOS for service layer
+[33m77139ed[m Add Input DTOs to improve usability on service layer
+[33mfcb490f[m Refactor placement of IAppLogger
+[33m8a96ca8[m Merge pull request #12 from ErkyHanma/2024-2016
+[33mbf61d38[m Merge branch 'develop' into 2024-2016
+[33m584428c[m add minor changes
+[33m204c93e[m Add validations for Reservation, ReservationService and Service reporitories
+[33m02957f7[m Merge branch '2024-1867Floor-RoomCategory' of https://github.com/ErkyHanma/SGRH-admin-api into 2024-1867Floor-RoomCategory
+[33m766702c[m +validators and repositoryMerge branch '2024-1867Floor-RoomCategory' of https://github.com/ErkyHanma/SGRH-admin-api into 2024-1867Floor-RoomCategory
+[33mf968ac0[m Add Fuctions and Logger abstraction to Reservation and Service Modules
+[33m8710fd6[m Add class RatesRepository.cs
+[33mbf9b9e6[m Add interface IRatesRepository
+[33m7876265[m Add minor comment to AuditEntity
+[33mbf705d4[m Add DbSet Rate to SGRHContext
+[33m08a4bc2[m[33m ([m[1;32mdevelop[m[33m)[m add 2021-0853 change
+[33m7622f1a[m Merge branch '2024-1867Floor-RoomCategory' of https://github.com/ErkyHanma/SGRH-admin-api into 2024-1867Floor-RoomCategory
+[33m272e755[m Dtos e interfaces de floor y roomCategoryMerge pull request #10 from ErkyHanma/2024-2016Merge pull request #9 from ErkyHanma/2024-1824
+[33mfa1ae32[m Merge branch 'develop' into 2024-1824
+[33m6133dc9[m Merge pull request #10 from ErkyHanma/2024-2016
+[33m1ab9c86[m Refactor RoomRepository for logger compatibility
+[33mfa969b4[m Improve FunctionReaderEx usability
+[33m52eb4d4[m Refactor StoreProcedureEx for logger compatibility
+[33mc5ad0e5[m Add Report Repository
+[33m4c92350[m Add interface IAppLogger, class AppLogger for logging
+[33mb5bdd92[m Add minor changes to IRoomRepository and IReportRepository
+[33m30f4e52[m Add comments to validator classes for clarity
+[33me35bcb2[m Merge branch 'develop' into 2024-1824
+[33mefc14ea[m Add Service Repository
+[33m2bd26fa[m Merge pull request #9 from ErkyHanma/2024-1824
+[33me752b71[m Merge pull request #8 from ErkyHanma/2024-2016
+[33m348bacd[m Add Service Repository
+[33m1130374[m Add RoomRepository GetAllAsync and GetByIdAsync method implementations
+[33md243134[m Adds static class FunctionReaderEx for handling functions on BD
+[33m6bd0106[m Add ReservationServiceRepository
+[33m884f48d[m Add logic for all Reservation Repository methods
+[33m1bf9889[m Merge pull request #7 from ErkyHanma/2024-1824
+[33m73e65f8[m Refactor StoreProcedureEx method for better readability
+[33md73e2a3[m Merge branch 'develop' into 2024-1824
+[33m561b01e[m Add Reservation Repository addAsync method implementation
+[33mc8d53aa[m Merge pull request #6 from ErkyHanma/2024-2016
+[33m4fa46d5[m Add implementation to AddAsync, UpdateAsync, and DeleteAsync methods
+[33m5af6363[m Small changes to IRoomRepository
+[33mf1b7cfd[m ReportRepository now implements its refactored methodsImplement refactored methods in ReportRepository
+[33m47c643b[m Add folder Helpers and class StoredProcedureEx for common DB operations
+[33m66b9ede[m Add Room Validators DTOs for hotel room validation
+[33m000d44a[m Merge pull request #5 from ErkyHanma/2024-1824
+[33m6feaa48[m Refactor OperationResult Method and Add initial structure for Reservation Repository
+[33mcad366e[m Add methods for reservationModule repository interfaces
+[33m19bc6a5[m Add ReservationModule Dtos
+[33mb4d7664[m refactor: update some namespaces to match new folder structure in Domain.Entities, Application.Dtos and Application.Interfaces.Repositories
+[33m1048edc[m Pulled latest changes from remote 'develop' and resolved merge conflict in IBookRepository
+[33mdc87999[m Add some minor changes
+[33m72453a7[m Merge pull request #4 from ErkyHanma/2024-2016
+[33m37bdd03[m Add Report folder with its entity class to Domain/Entities
+[33m85b0159[m Add Report folder and its interface to Repositories
+[33mf91f8b3[m Create Dtos folder and add Hotel and Report Dtos
+[33mc553759[m Updates csproj
+[33m40b7d06[m Updates methods on IRoomRepository
+[33mb84ed27[m Add IReportRepository interface and comment on IRoomRepository
+[33mc9adb3f[m test E#
+[33m8ac73bd[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #3 from ErkyHanma/develop
+[33m4d81189[m Add Role entity
+[33m8785f47[m Merge pull request #2 from ErkyHanma/develop
+[33md5daf50[m Add Entities, Base classes and folder structure refactor
+[33m2d3ef67[m Merge pull request #1 from ErkyHanma/develop
+[33m36b9734[m Initial commit
+[33mad0f2d7[m Add project files.
+[33m982268b[m Add .gitattributes and .gitignore.

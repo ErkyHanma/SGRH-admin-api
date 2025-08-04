@@ -10,7 +10,6 @@
     <Folder Include="Base\" />
     <Folder Include="Dtos\ServiceModule\" />
     <Folder Include="Interfaces\Services\" />
-    <Folder Include="Interfaces\Repositories\UserManagement\" />
   </ItemGroup>
 
   <ItemGroup>

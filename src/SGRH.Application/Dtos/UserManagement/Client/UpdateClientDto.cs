@@ -1,18 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SGRH.Application.Dtos.UserManagement.Client
 {
-    namespace SGRH.Application.Dtos.UserManagement.Client
+    public class UpdateClientDto
     {
-        public class UpdateClientDto : DtoBase
-        {
-            public string Name { get; set; } // Client's name for update.
-            public string Email { get; set; } // Client's email for update.
-                                              // Add other properties required for updating an existing client.
-        }
+        [Required(ErrorMessage = "El ID de usuario es obligatorio.")]
+        public int UserId { get; set; }
+
+        [Required(ErrorMessage = "El nombre es un campo obligatorio.")]
+        public string FirstName { get; set; } = null!;
+
+        [Required(ErrorMessage = "El apellido es un campo obligatorio.")]
+        public string LastName { get; set; } = null!;
+
+        [Required(ErrorMessage = "El correo electrónico es un campo obligatorio.")]
+        [EmailAddress(ErrorMessage = "El formato del correo electrónico no es válido.")]
+        public string Email { get; set; } = null!;
+
+        public string? Password { get; set; }
+        public string? Phone { get; set; }
+        public string? Address { get; set; }
+
+        [Required(ErrorMessage = "El rol es un campo obligatorio.")]
+        public int RoleId { get; set; }
+
+        public bool IsActive { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

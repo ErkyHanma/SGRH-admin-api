@@ -1,11 +1,11 @@
-﻿using Core.Application.Interfaces.Repositories.UserManagement;
-using SGRH.Application.Common.Logging; // Necessary for the logger (IAppLogger)
-using SGRH.Application.Interfaces.UserManagement; // Required for IClientService inheritance
+﻿using SGRH.Application.Dtos.UserManagement.Client;
+using Core.SGRH.Application.Interfaces.Repositories.UserManagement;
+using Core.SGRH.Application.Interfaces.UserManagement;
 using SGRH.Domain.Entities.UserManagement;
-using System.Collections.Generic; // For IEnumerable<T>
-using System.Threading.Tasks; // For Task
-
-
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using SGRH.Application.Common.Logging;
 
 namespace SGRH.Application.Services.UserManagement
 {
@@ -14,45 +14,71 @@ namespace SGRH.Application.Services.UserManagement
         private readonly IClientRepository _clientRepository;
         private readonly IAppLogger<ClientService> _logger;
 
-       
         public ClientService(IClientRepository clientRepository, IAppLogger<ClientService> logger)
         {
             _clientRepository = clientRepository;
             _logger = logger;
         }
 
-       
-        public async Task<string> CreateClientAsync(Client client)
+        public async Task<string> CreateClientAsync(CreateClientDto clientDto)
         {
-            _logger.Info($"Creating client: {client.FirstName} {client.LastName}.");
-            
-            var result = await _clientRepository.CreateClientAsync(client);
-            return result;
+            var newClient = new Client
+            {
+                FirstName = clientDto.FirstName,
+                LastName = clientDto.LastName,
+                Email = clientDto.Email,
+                Phone = clientDto.Phone,
+                Address = clientDto.Address,
+                RoleId = clientDto.RoleId,
+                PasswordHash = clientDto.PasswordHash,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = 1, // Placeholder
+            };
+            return await _clientRepository.CreateClientAsync(newClient);
         }
 
-        public async Task<Client> GetClientByIdAsync(int clientId)
+        public async Task<string> UpdateClientAsync(int id, UpdateClientDto clientDto)
         {
-            _logger.Info($"Getting client with Id: {clientId}.");
-            
-            var result = await _clientRepository.GetClientByIdAsync(clientId);
-            return result;
+            var existingClient = await _clientRepository.GetClientByIdAsync(id);
+            if (existingClient == null)
+            {
+                // CORRECCIÓN: Usando el método 'Info' de tu IAppLogger
+                _logger.Info("UpdateClientAsync: Cliente con ID {0} no encontrado.", id);
+                return "Error: Cliente no encontrado.";
+            }
+
+            existingClient.FirstName = clientDto.FirstName;
+            existingClient.LastName = clientDto.LastName;
+            existingClient.Email = clientDto.Email;
+            existingClient.Phone = clientDto.Phone;
+            existingClient.Address = clientDto.Address;
+            existingClient.RoleId = clientDto.RoleId;
+            existingClient.IsActive = clientDto.IsActive;
+            existingClient.IsDeleted = clientDto.IsDeleted;
+            existingClient.UpdatedAt = DateTime.UtcNow;
+            existingClient.UpdatedBy = 1; // Placeholder
+
+            if (!string.IsNullOrEmpty(clientDto.Password))
+            {
+                existingClient.PasswordHash = clientDto.Password;
+            }
+
+            return await _clientRepository.UpdateClientAsync(existingClient);
         }
 
-        public async Task<string> UpdateClientAsync(Client client)
+        public async Task<Client?> GetClientByIdAsync(int id)
         {
-            _logger.Info($"Updating client with Id: {client.UserId}.");
-            
-            var result = await _clientRepository.UpdateClientAsync(client);
-            return result;
+            return await _clientRepository.GetClientByIdAsync(id);
         }
 
-        public async Task<string> DisableClientAsync(int clientId)
+        public async Task<IEnumerable<Client>> GetAllClientsAsync()
         {
-            _logger.Info($"Disabling client with Id: {clientId}.");
-            var result = await _clientRepository.DisableClientAsync(clientId, 1); 
-            return result;
+            return await _clientRepository.GetAllClientsAsync();
         }
 
-        
+        public async Task<string> DeleteClientAsync(int id)
+        {
+            return await _clientRepository.DeleteClientAsync(id);
+        }
     }
 }
