@@ -5,20 +5,27 @@ namespace SGRH.Web.Infrastructure.Http
 {
     public class HttpClientService : IHttpClientService
     {
-        private readonly HttpClient _httpClient; 
+        private readonly HttpClient _httpClient;
         private readonly IAppLogger<HttpClientService> _logger;
-        private readonly JsonSerializerOptions _jsonSerializer;  
+        private readonly JsonSerializerOptions _jsonSerializer;
 
-        public HttpClientService(HttpClient httpClient, IConfiguration configuration, IAppLogger<HttpClientService> logger)
+        public HttpClientService(
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration,
+            IAppLogger<HttpClientService> logger)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            if (httpClientFactory == null)
+                throw new ArgumentNullException(nameof(httpClientFactory));
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             var baseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl");
-            if(string.IsNullOrEmpty(baseUrl))
+            if (string.IsNullOrEmpty(baseUrl))
                 throw new InvalidOperationException("ApiSettings:BaseUrl is not configured");
 
+            _httpClient = httpClientFactory.CreateClient();
             _httpClient.BaseAddress = new Uri(baseUrl);
+
             _jsonSerializer = new JsonSerializerOptions();
         }
 
