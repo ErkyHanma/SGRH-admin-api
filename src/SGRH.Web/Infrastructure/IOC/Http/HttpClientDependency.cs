@@ -6,7 +6,9 @@ namespace SGRH.Web.Infrastructure.IOC.Http
     {
         public static IServiceCollection AddHttpClientDependency(this IServiceCollection services)
         {
-            services.AddHttpClient<IHttpClientService, HttpClientService>();
+            services.AddHttpClient(); // para IHttpClientFactory
+            services.AddScoped<IHttpClientService, HttpClientService>();
+
             return services;
         }
     }
