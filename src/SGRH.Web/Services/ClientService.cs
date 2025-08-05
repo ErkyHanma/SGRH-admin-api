@@ -13,12 +13,10 @@ using System.Diagnostics;
 
 namespace SGRH.Web.Services
 {
-    // El servicio ahora se centra exclusivamente en la comunicación con la API.
     public class ClientService : IClientService
     {
         private readonly HttpClient _httpClient;
 
-        // El constructor ahora solo inyecta el HttpClient.
         public ClientService(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -28,14 +26,12 @@ namespace SGRH.Web.Services
         {
             try
             {
-                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
-                var response = await _httpClient.GetAsync("api/Clients");
-
+                var response = await _httpClient.GetAsync("Clients");
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
                 var clients = JsonSerializer.Deserialize<List<ClientViewModel>>(content,
-                                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 return clients ?? new List<ClientViewModel>();
             }
@@ -50,8 +46,7 @@ namespace SGRH.Web.Services
         {
             try
             {
-                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
-                var response = await _httpClient.GetAsync($"api/Clients/{id}");
+                var response = await _httpClient.GetAsync($"Clients/{id}");
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<ClientViewModel>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -67,14 +62,10 @@ namespace SGRH.Web.Services
         {
             try
             {
-                // Usamos el `using SGRH.Web.ViewModels;` para evitar el error de tipo.
                 var jsonContent = JsonSerializer.Serialize(clientViewModel);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
-                var response = await _httpClient.PostAsync("api/Clients", httpContent);
-
-                // Si la creación fue exitosa, devolvemos true.
+                var response = await _httpClient.PostAsync("Clients", httpContent);
                 response.EnsureSuccessStatusCode();
                 return true;
             }
@@ -89,20 +80,28 @@ namespace SGRH.Web.Services
         {
             try
             {
-                // Usamos el `using SGRH.Web.Models.Clients;` para evitar el error de tipo.
                 var jsonContent = JsonSerializer.Serialize(clientViewModel);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
-                var response = await _httpClient.PutAsync($"api/Clients/{id}", httpContent);
+                // CORRECCIÓN: Manejamos explícitamente el código de estado.
+                var response = await _httpClient.PutAsync($"Clients/{id}", httpContent);
 
-                // Si la actualización fue exitosa, devolvemos true.
-                response.EnsureSuccessStatusCode();
-                return true;
+                // Si el estado de la respuesta es un éxito, el método devuelve true.
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    // Si no es un éxito, lee el contenido de la respuesta para el mensaje de error.
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"Error al actualizar cliente. Código de estado: {response.StatusCode}. Contenido: {errorContent}");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error al actualizar cliente: {ex.Message}");
+                Debug.WriteLine($"Error inesperado al actualizar cliente: {ex.Message}");
                 return false;
             }
         }
@@ -111,10 +110,7 @@ namespace SGRH.Web.Services
         {
             try
             {
-                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
-                var response = await _httpClient.DeleteAsync($"api/Clients/{id}");
-
-                // Si la eliminación fue exitosa, devolvemos true.
+                var response = await _httpClient.DeleteAsync($"Clients/{id}");
                 response.EnsureSuccessStatusCode();
                 return true;
             }
