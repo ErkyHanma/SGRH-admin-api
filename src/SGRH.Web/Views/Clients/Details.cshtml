@@ -41,10 +41,12 @@
             @Html.DisplayFor(model => model.Address)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
+            <!-- ERROR CORREGIDO: Se reemplaza UserId por Id -->
+            @Html.DisplayNameFor(model => model.Id)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
+            <!-- ERROR CORREGIDO: Se reemplaza UserId por Id -->
+            @Html.DisplayFor(model => model.Id)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.IsActive)

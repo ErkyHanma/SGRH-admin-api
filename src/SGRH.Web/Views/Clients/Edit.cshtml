@@ -9,6 +9,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
+        <!-- CORRECCIÓN: Se revierte el cambio y se vuelve a usar UserId -->
         <form asp-action="Edit" asp-route-id="@Model.UserId">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -21,10 +22,11 @@
             @if (ViewBag.DebugMessage != null)
             {
                 <div class="alert alert-info">
-                    **DEBUG:** @ViewBag.DebugMessage
+                    <strong>DEBUG:</strong> @ViewBag.DebugMessage
                 </div>
             }
 
+            <!-- CORRECCIÓN: Se revierte el cambio y se vuelve a usar UserId -->
             <input type="hidden" asp-for="UserId" />
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>

@@ -9,50 +9,120 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace SGRH.Web.Services
 {
-    // Implementation of the IClientService for the web application.
-    // This service handles all API calls related to clients.
+    // El servicio ahora se centra exclusivamente en la comunicación con la API.
     public class ClientService : IClientService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiBaseUrl = "http://localhost:5171/api/clients"; // Correct API URL
 
+        // El constructor ahora solo inyecta el HttpClient.
         public ClientService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        // Retrieves all clients from the API and deserializes them.
         public async Task<List<ClientViewModel>> GetClientsAsync()
         {
             try
             {
-                var response = await _httpClient.GetAsync(_apiBaseUrl);
+                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
+                var response = await _httpClient.GetAsync("api/Clients");
+
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                var clients = JsonSerializer.Deserialize<List<ClientViewModel>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var clients = JsonSerializer.Deserialize<List<ClientViewModel>>(content,
+                                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                return clients;
+                return clients ?? new List<ClientViewModel>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // In a real app, you would log the exception here.
+                Debug.WriteLine($"Error al obtener clientes: {ex.Message}");
                 return new List<ClientViewModel>();
             }
         }
 
-        // Creates a new client by sending a POST request to the API.
-        public async Task CreateClientAsync(ClientCreateViewModel clientViewModel)
+        public async Task<ClientViewModel> GetClientByIdAsync(int id)
         {
-            // The password hashing logic will go here.
-            var jsonContent = JsonSerializer.Serialize(clientViewModel);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            try
+            {
+                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
+                var response = await _httpClient.GetAsync($"api/Clients/{id}");
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<ClientViewModel>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al obtener cliente por ID: {ex.Message}");
+                return null;
+            }
+        }
 
-            var response = await _httpClient.PostAsync(_apiBaseUrl, httpContent);
-            response.EnsureSuccessStatusCode();
+        public async Task<bool> CreateClientAsync(ClientCreateViewModel clientViewModel)
+        {
+            try
+            {
+                // Usamos el `using SGRH.Web.ViewModels;` para evitar el error de tipo.
+                var jsonContent = JsonSerializer.Serialize(clientViewModel);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
+                var response = await _httpClient.PostAsync("api/Clients", httpContent);
+
+                // Si la creación fue exitosa, devolvemos true.
+                response.EnsureSuccessStatusCode();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al crear cliente: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateClientAsync(int id, ClientEditViewModel clientViewModel)
+        {
+            try
+            {
+                // Usamos el `using SGRH.Web.Models.Clients;` para evitar el error de tipo.
+                var jsonContent = JsonSerializer.Serialize(clientViewModel);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
+                var response = await _httpClient.PutAsync($"api/Clients/{id}", httpContent);
+
+                // Si la actualización fue exitosa, devolvemos true.
+                response.EnsureSuccessStatusCode();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al actualizar cliente: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteClientAsync(int id)
+        {
+            try
+            {
+                // Agregamos el prefijo 'api/' a la URL para que coincida con la API.
+                var response = await _httpClient.DeleteAsync($"api/Clients/{id}");
+
+                // Si la eliminación fue exitosa, devolvemos true.
+                response.EnsureSuccessStatusCode();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error al eliminar cliente: {ex.Message}");
+                return false;
+            }
         }
     }
 }

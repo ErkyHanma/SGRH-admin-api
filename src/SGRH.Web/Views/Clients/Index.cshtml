@@ -28,7 +28,8 @@
                 @Html.DisplayNameFor(model => model.Address)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserId)
+                <!-- ERROR CORREGIDO: Se reemplaza UserId por Id -->
+                @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.IsActive)
@@ -56,7 +57,8 @@
                     @Html.DisplayFor(modelItem => item.Address)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.UserId)
+                    <!-- ERROR CORREGIDO: Se reemplaza UserId por Id -->
+                    @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.IsActive)

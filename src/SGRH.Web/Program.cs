@@ -1,4 +1,4 @@
-// File: C:\Users\ander\Source\Repos\SGRH-admin-api\src\SGRH.Web\Program.cs
+// File: SGRH.Web/Program.cs
 
 using SGRH.Web.Interfaces;
 using SGRH.Web.Services;
@@ -10,12 +10,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // =================================================================================================
-// SOLUTION FOR HTTPCLIENT AND DEPENDENCY INJECTION ERRORS
+// SOLUCION FINAL PARA HTTPCLIENT Y DEPENDENCY INJECTION
 // =================================================================================================
-// 1. Register a typed HttpClient to be injected.
-// 2. Associate the IClientService interface with the concrete ClientService implementation.
-//    This allows the ClientsController to receive an instance of ClientService.
-builder.Services.AddHttpClient<IClientService, ClientService>();
+// 1. Registra un HttpClient tipado para IClientService.
+// 2. Asociamos la interfaz IClientService con la implementación ClientService.
+// 3. Configuramos la BaseAddress del HttpClient de forma centralizada.
+builder.Services.AddHttpClient<IClientService, ClientService>(client =>
+{
+    // Obtenemos la URL base desde la configuración del proyecto (appsettings.json).
+    client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ApiSettings:BaseUrl") ??
+                                 throw new InvalidOperationException("ApiSettings:BaseUrl not found in configuration."));
+});
 // =================================================================================================
 
 var app = builder.Build();

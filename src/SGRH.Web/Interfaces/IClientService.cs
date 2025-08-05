@@ -1,18 +1,20 @@
-﻿using SGRH.Web.Models.Clients;
+﻿// File: SGRH.Web/Interfaces/IClientService.cs
+
+using SGRH.Web.Models.Clients;
 using SGRH.Web.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SGRH.Web.Interfaces
 {
-    // Interface for the client service in the web application.
-    // It defines the methods to interact with the API.
+    // Asegúrate de que los métodos de la interfaz coincidan exactamente con
+    // la implementación en ClientService.cs.
     public interface IClientService
     {
-        // Asynchronously retrieves a list of all clients from the API.
         Task<List<ClientViewModel>> GetClientsAsync();
-
-        // Asynchronously creates a new client via the API.
-        Task CreateClientAsync(ClientCreateViewModel clientViewModel);
+        Task<ClientViewModel> GetClientByIdAsync(int id);
+        Task<bool> CreateClientAsync(ClientCreateViewModel clientViewModel);
+        Task<bool> UpdateClientAsync(int id, ClientEditViewModel clientViewModel);
+        Task<bool> DeleteClientAsync(int id);
     }
 }
